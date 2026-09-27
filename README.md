@@ -95,6 +95,11 @@ npm run build
 
 Issues and pull requests are welcome.
 
+## Security
+
+Please report vulnerabilities privately — see [SECURITY.md](./SECURITY.md).
+Don't open a public issue for them.
+
 ## License
 
 [MIT](./LICENSE) © 2026 Rapid Apps
