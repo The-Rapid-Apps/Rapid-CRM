@@ -97,4 +97,4 @@ Issues and pull requests are welcome.
 
 ## License
 
-[MIT](./LICENSE) © 2026 Rapi Apps
+[MIT](./LICENSE) © 2026 Rapid Apps
