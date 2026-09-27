@@ -18,7 +18,6 @@ interface Sample {
   page_referrer: string | null;
   campaign: string | null;
   ts_source: string | null;
-  affiliate_sql: string | null;
   surface_type_sql: string | null;
   search_term_sql: string | null;
   campaign_sql: string | null;
@@ -53,10 +52,6 @@ test(`real production sample fixture is non-trivial (${samples.length} rows)`, (
     "fixture should cover the direct case",
   );
   assert.ok(
-    samples.some((s) => s.affiliate_sql),
-    "fixture should cover a real affiliate (mref) value",
-  );
-  assert.ok(
     samples.some((s) => s.search_term_sql),
     "fixture should cover a real search-term value",
   );
@@ -75,14 +70,6 @@ test("source: JS port matches live BigQuery output for every sample", () => {
       expected,
       `source mismatch for page_location=${sample.page_location} referrer=${sample.page_referrer} ts_source=${sample.ts_source}`,
     );
-  }
-});
-
-test("affiliate: JS port matches live BigQuery output for every sample", () => {
-  for (const sample of samples) {
-    const actual = resolveDimensionValue("affiliate", toRow(sample));
-    const expected = sample.affiliate_sql ?? "(not set)";
-    assert.equal(actual, expected, `affiliate mismatch for page_location=${sample.page_location}`);
   }
 });
 
@@ -200,7 +187,6 @@ test("every dimension defaults to (not set) when its underlying field is null", 
     "source",
     "medium",
     "search_term",
-    "affiliate",
     "referrer_site",
     "traffic_source_name",
     "campaign",
@@ -216,11 +202,11 @@ test("every dimension defaults to (not set) when its underlying field is null", 
 });
 
 test("regex extraction matches a bare substring, mirroring BigQuery's own imprecision (not a real query-string parser)", () => {
-  // "mref=" appears as a value fragment, not a real query param key — the SQL
+  // "surface_type=" appears as a value fragment, not a real query param key — the SQL
   // REGEXP_EXTRACT would match it too (no key-boundary anchor), so the JS
   // port must reproduce that, not "fix" it.
   const row: DimensionRow = {
-    pageLocation: "https://apps.shopify.com/rapi?other=mref=sneaky&x=1",
+    pageLocation: "https://apps.shopify.com/rapi?other=surface_type=sneaky&x=1",
     pageReferrer: null,
     campaign: null,
     trafficSourceName: null,
@@ -229,5 +215,5 @@ test("regex extraction matches a bare substring, mirroring BigQuery's own imprec
     language: null,
     country: null,
   };
-  assert.equal(resolveDimensionValue("affiliate", row), "sneaky");
+  assert.equal(resolveDimensionValue("surface_type", row), "sneaky");
 });

@@ -5,9 +5,9 @@ function eventParam(key: string): string {
 }
 
 /**
- * Several Shopify App Store dimensions (affiliate, surface type/detail/
- * position) aren't their own GA4 event param — they're query-string params on
- * the listing page URL (e.g. `?mref=partner30`, `?surface_type=search`),
+ * Several Shopify App Store dimensions (surface type/detail/position,
+ * campaign) aren't their own GA4 event param — they're query-string params on
+ * the listing page URL (e.g. `?surface_type=search`),
  * confirmed against live page_location values (2026-07-26).
  */
 function pageLocationParam(param: string): string {
@@ -120,7 +120,7 @@ function sourceParam(): string {
  * just as page-view-only as `page_location`, so a "(direct)"-with-real-
  * referrer install event needs the same visitor-lookback join, or its
  * Installed count would silently undercount the referrer-derived row (the
- * same class of bug already fixed for `affiliate`/`search_term`).
+ * same class of bug already fixed for `search_term`).
  */
 export const PIVOT_DIMENSIONS = [
   {
@@ -139,12 +139,6 @@ export const PIVOT_DIMENSIONS = [
     key: "search_term",
     label: "Search term",
     column: searchTermParam(),
-    installEventNative: false,
-  },
-  {
-    key: "affiliate",
-    label: "Affiliate",
-    column: pageLocationParam("mref"),
     installEventNative: false,
   },
   {

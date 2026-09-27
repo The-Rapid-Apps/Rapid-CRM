@@ -17,7 +17,7 @@
  },
  {
   "event_name": "installs",
-  "page_location": "https://apps.shopify.com/rapi?mref=unhvlfoo&locale=fr",
+  "page_location": "https://apps.shopify.com/rapi?locale=fr",
   "ts_medium": "(none)",
   "search_term_sql": "(not set)",
   "language_sql": "fr",
@@ -25,7 +25,7 @@
  },
  {
   "event_name": "installs",
-  "page_location": "https://apps.shopify.com/rapi?mref=unhvlfoo",
+  "page_location": "https://apps.shopify.com/rapi",
   "ts_medium": "(none)",
   "search_term_sql": "(not set)",
   "language_sql": "en",
@@ -33,7 +33,7 @@
  },
  {
   "event_name": "installs",
-  "page_location": "https://apps.shopify.com/rapi?mref=Partner20",
+  "page_location": "https://apps.shopify.com/rapi",
   "ts_medium": "referral",
   "search_term_sql": "(not set)",
   "language_sql": "en",
@@ -97,7 +97,7 @@
  },
  {
   "event_name": "installs",
-  "page_location": "https://apps.shopify.com/rapi?mref=Partner20",
+  "page_location": "https://apps.shopify.com/rapi",
   "ts_medium": "(none)",
   "search_term_sql": "(not set)",
   "language_sql": "en",
@@ -177,7 +177,7 @@
  },
  {
   "event_name": "view_item",
-  "page_location": "https://apps.shopify.com/rapi?mref=acmeref&locale=fr",
+  "page_location": "https://apps.shopify.com/rapi?locale=fr",
   "ts_medium": "(none)",
   "search_term_sql": "(not set)",
   "language_sql": "fr",
@@ -185,7 +185,7 @@
  },
  {
   "event_name": "view_item",
-  "page_location": "https://apps.shopify.com/rapi?mref=wmkufzuw",
+  "page_location": "https://apps.shopify.com/rapi",
   "ts_medium": "referral",
   "search_term_sql": "(not set)",
   "language_sql": "en",
@@ -209,7 +209,7 @@
  },
  {
   "event_name": "view_item",
-  "page_location": "https://apps.shopify.com/rapi?mref=mlddqeyo",
+  "page_location": "https://apps.shopify.com/rapi",
   "ts_medium": "referral",
   "search_term_sql": "(not set)",
   "language_sql": "en",
@@ -225,7 +225,7 @@
  },
  {
   "event_name": "view_item",
-  "page_location": "https://apps.shopify.com/rapi?irclickid=wbKTHvzeDxyPTV3zibX6sxejUkCQb2RkZXhp1g0&irgwc=1&partner=4979675&affpt=excluded&utm_channel=affiliates&utm_source=4979675-impact&utm_medium=cpa&iradid=1061744&locale=fr",
+  "page_location": "https://apps.shopify.com/rapi?utm_source=partner-network&utm_medium=cpa&locale=fr",
   "ts_medium": "(none)",
   "search_term_sql": "(not set)",
   "language_sql": "fr",
@@ -241,7 +241,7 @@
  },
  {
   "event_name": "view_item",
-  "page_location": "https://apps.shopify.com/rapi?mref=mlddqeyo",
+  "page_location": "https://apps.shopify.com/rapi",
   "ts_medium": "(none)",
   "search_term_sql": "(not set)",
   "language_sql": "en",
@@ -273,7 +273,7 @@
  },
  {
   "event_name": "view_item",
-  "page_location": "https://apps.shopify.com/rapi?mref=bkhkybrt",
+  "page_location": "https://apps.shopify.com/rapi",
   "ts_medium": null,
   "search_term_sql": "(not set)",
   "language_sql": "en",
@@ -305,7 +305,7 @@
  },
  {
   "event_name": "installs",
-  "page_location": "https://apps.shopify.com/rapi?mref=Partner20&locale=it",
+  "page_location": "https://apps.shopify.com/rapi?locale=it",
   "ts_medium": null,
   "search_term_sql": "(not set)",
   "language_sql": "it",
@@ -401,7 +401,7 @@
  },
  {
   "event_name": "view_item",
-  "page_location": "https://apps.shopify.com/rapi?mref=acmeref&locale=fr",
+  "page_location": "https://apps.shopify.com/rapi?locale=fr",
   "ts_medium": "cpa",
   "search_term_sql": "(not set)",
   "language_sql": "fr",
@@ -409,7 +409,7 @@
  },
  {
   "event_name": "view_item",
-  "page_location": "https://apps.shopify.com/rapi?mref=mlddqeyo&locale=zh-TW",
+  "page_location": "https://apps.shopify.com/rapi?locale=zh-TW",
   "ts_medium": "referral",
   "search_term_sql": "(not set)",
   "language_sql": "zh-TW",
@@ -441,7 +441,7 @@
  },
  {
   "event_name": "view_item",
-  "page_location": "https://apps.shopify.com/rapi?mref=mlvkdiui&locale=es",
+  "page_location": "https://apps.shopify.com/rapi?locale=es",
   "ts_medium": "referral",
   "search_term_sql": "(not set)",
   "language_sql": "es",
@@ -505,7 +505,7 @@
  },
  {
   "event_name": "view_item",
-  "page_location": "https://apps.shopify.com/rapi?mref=mouyiejc&locale=fr",
+  "page_location": "https://apps.shopify.com/rapi?locale=fr",
   "ts_medium": "organic",
   "search_term_sql": "(not set)",
   "language_sql": "fr",
@@ -697,7 +697,7 @@
  },
  {
   "event_name": "view_item",
-  "page_location": "https://apps.shopify.com/rapi?mref=kvvnofmq",
+  "page_location": "https://apps.shopify.com/rapi",
   "ts_medium": "Rapi",
   "search_term_sql": "(not set)",
   "language_sql": "en",
@@ -753,7 +753,7 @@
  },
  {
   "event_name": "view_item",
-  "page_location": "https://apps.shopify.com/rapi?mref=Partner20",
+  "page_location": "https://apps.shopify.com/rapi",
   "ts_medium": "organic",
   "search_term_sql": "(not set)",
   "language_sql": "en",
@@ -761,7 +761,7 @@
  },
  {
   "event_name": "view_item",
-  "page_location": "https://apps.shopify.com/rapi?mref=vkjvveuy",
+  "page_location": "https://apps.shopify.com/rapi",
   "ts_medium": "homepage",
   "search_term_sql": "(not set)",
   "language_sql": "en",
@@ -841,7 +841,7 @@
  },
  {
   "event_name": "view_item",
-  "page_location": "https://apps.shopify.com/rapi?mref=partner30&gclid=56406522",
+  "page_location": "https://apps.shopify.com/rapi?gclid=56406522",
   "ts_medium": "cpc",
   "search_term_sql": "(not set)",
   "language_sql": "en",
@@ -849,7 +849,7 @@
  },
  {
   "event_name": "view_item",
-  "page_location": "https://apps.shopify.com/rapi?mref=bobref",
+  "page_location": "https://apps.shopify.com/rapi",
   "ts_medium": "organic",
   "search_term_sql": "(not set)",
   "language_sql": "en",
@@ -905,7 +905,7 @@
  },
  {
   "event_name": "view_item",
-  "page_location": "https://apps.shopify.com/rapi?mref=nbcbbcd",
+  "page_location": "https://apps.shopify.com/rapi",
   "ts_medium": "Rapi",
   "search_term_sql": "(not set)",
   "language_sql": "en",
@@ -953,7 +953,7 @@
  },
  {
   "event_name": "view_item",
-  "page_location": "https://apps.shopify.com/rapi?source=backlink&medium=pagefly&source=partnership&irclickid=VyMyZuRicxyZTUfUNKUB%3A2rEUkr0yqzF020VS00&irgwc=1&partner=337322&affpt=excluded&utm_channel=affiliates&utm_source=337322-impact&utm_medium=cpa&iradid=1061744&locale=zh-CN",
+  "page_location": "https://apps.shopify.com/rapi?source=backlink&medium=pagefly&source=partnership&utm_source=partner-network&utm_medium=cpa&locale=zh-CN",
   "ts_medium": "cpa",
   "search_term_sql": "(not set)",
   "language_sql": "zh-CN",
@@ -961,7 +961,7 @@
  },
  {
   "event_name": "view_item",
-  "page_location": "https://apps.shopify.com/rapi?affpt=excluded&iradid=1061744&irclickid=VyMyZuRicxyZTUfUNKUB%3A2rEUkr0yqzF020VS00&irgwc=1&locale=zh-CN&medium=pagefly&partner=337322&preferred_listing_locale=en&source=partnership&utm_channel=affiliates&utm_medium=cpa&utm_source=337322-impact",
+  "page_location": "https://apps.shopify.com/rapi?locale=zh-CN&medium=pagefly&preferred_listing_locale=en&source=partnership&utm_medium=cpa&utm_source=partner-network",
   "ts_medium": "cpa",
   "search_term_sql": "(not set)",
   "language_sql": "zh-CN",
@@ -1041,7 +1041,7 @@
  },
  {
   "event_name": "view_item",
-  "page_location": "https://apps.shopify.com/rapi?mref=bxvnzrsm",
+  "page_location": "https://apps.shopify.com/rapi",
   "ts_medium": "cpa",
   "search_term_sql": "(not set)",
   "language_sql": "en",
@@ -1057,7 +1057,7 @@
  },
  {
   "event_name": "view_item",
-  "page_location": "https://apps.shopify.com/rapi?mref=bxvnzrsm&locale=fr",
+  "page_location": "https://apps.shopify.com/rapi?locale=fr",
   "ts_medium": "trendtrack",
   "search_term_sql": "(not set)",
   "language_sql": "fr",
@@ -1177,7 +1177,7 @@
  },
  {
   "event_name": "view_item",
-  "page_location": "https://apps.shopify.com/rapi?source=backlink&medium=pagefly&source=partnership&irclickid=3ymU%3A1zMhxyZRqSSA5XRrW4DUkuXHlWDxVLU1s0&irgwc=1&partner=337322&affpt=excluded&utm_channel=affiliates&utm_source=337322-impact&utm_medium=cpa&iradid=1061744&locale=zh-CN",
+  "page_location": "https://apps.shopify.com/rapi?source=backlink&medium=pagefly&source=partnership&utm_source=partner-network&utm_medium=cpa&locale=zh-CN",
   "ts_medium": "cpa",
   "search_term_sql": "(not set)",
   "language_sql": "zh-CN",

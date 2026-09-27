@@ -434,7 +434,7 @@ function matchLatestViewAtOrBefore(
 /**
  * Resolves page-view-only pivot dimensions (see `PIVOT_DIMENSIONS`'
  * `installEventNative` flag) for a batch of `shopify_app_install` events.
- * `page_location` — and everything derived from it (affiliate, search term,
+ * `page_location` — and everything derived from it (search term,
  * surface type/detail/position, campaign, referrer) — is null on 100% of
  * install events (confirmed against live Rapi Bundle data, 2026-08-07), so
  * reading those dimensions straight off the install event always produces

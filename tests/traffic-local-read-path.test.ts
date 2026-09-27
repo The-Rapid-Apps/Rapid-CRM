@@ -113,15 +113,15 @@ test("local read path: direct funnel counts, dimension grouping, and the visitor
 
   const { appId } = await fixtureApp(t);
 
-  // Visitor A: views the listing page via an affiliate link, then installs —
+  // Visitor A: views the listing page via a campaign link, then installs —
   // the install itself carries no page_location (matches real GA4 behavior),
-  // so "affiliate" must come from the visitor-lookback join to their own
+  // so "campaign" must come from the visitor-lookback join to their own
   // earlier view_item, not straight off the install event.
   await seedFact(appId, {
     eventName: "view_item",
     eventTimestamp: day(1),
     userPseudoId: "visitor-a",
-    pageLocation: "https://apps.shopify.com/rapi?mref=Partner20",
+    pageLocation: "https://apps.shopify.com/rapi?utm_campaign=spring-launch",
     trafficSourceSource: "(direct)",
   });
   await seedFact(appId, {
@@ -132,7 +132,7 @@ test("local read path: direct funnel counts, dimension grouping, and the visitor
     trafficSourceSource: "(direct)",
   });
 
-  // Visitor B: views the listing page with no affiliate, never installs —
+  // Visitor B: views the listing page with no campaign, never installs —
   // only counts toward "App Listing Page View", not "Installed".
   await seedFact(appId, {
     eventName: "view_item",
@@ -142,7 +142,7 @@ test("local read path: direct funnel counts, dimension grouping, and the visitor
     trafficSourceSource: "google",
   });
 
-  // Visitor C: installs directly with no prior view_item — affiliate should
+  // Visitor C: installs directly with no prior view_item — campaign should
   // resolve to "(not set)" (no view to join against), not crash or leak
   // visitor A's dimensions.
   await seedFact(appId, {
@@ -155,7 +155,7 @@ test("local read path: direct funnel counts, dimension grouping, and the visitor
 
   const report = await getTrafficSourcesReport(
     { start: day(0), end: day(10), interval: "day" },
-    ["affiliate"],
+    ["campaign"],
     ["listing_view", "installed"],
     1,
     50,
@@ -172,14 +172,14 @@ test("local read path: direct funnel counts, dimension grouping, and the visitor
   assert.equal(report.totals.listing_view, 2, "2 view_item events");
   assert.equal(report.totals.installed, 2, "2 shopify_app_install events");
 
-  const byAffiliate = new Map(report.rows.map((row) => [row.dimensions.affiliate, row]));
-  const partnerRow = byAffiliate.get("Partner20");
-  assert.ok(partnerRow, "expected a row for the Partner20 affiliate");
-  assert.equal(partnerRow!.funnel.installed, 1, "visitor-a's install attributes to Partner20 via the lookback join");
+  const byCampaign = new Map(report.rows.map((row) => [row.dimensions.campaign, row]));
+  const campaignRow = byCampaign.get("spring-launch");
+  assert.ok(campaignRow, "expected a row for the spring-launch campaign");
+  assert.equal(campaignRow!.funnel.installed, 1, "visitor-a's install attributes to spring-launch via the lookback join");
 
-  const notSetRow = byAffiliate.get("(not set)");
+  const notSetRow = byCampaign.get("(not set)");
   assert.ok(notSetRow, "expected a row for (not set)");
-  // visitor-b's view (no affiliate) + visitor-c's install (no prior view to join).
+  // visitor-b's view (no campaign) + visitor-c's install (no prior view to join).
   assert.equal(notSetRow!.funnel.listing_view, 1);
   assert.equal(notSetRow!.funnel.installed, 1);
 });

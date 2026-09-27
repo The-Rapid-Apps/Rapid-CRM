@@ -708,7 +708,7 @@ model TrafficEventFact {
   /// Only present on shopify_app_install/installs.
   shopUrl             String?  @db.VarChar(255)
   /// Raw, only present on view_item — every page-view-only dimension
-  /// (referral code, search term, surface type/detail/position) is derived from
+  /// (search term, surface type/detail/position, campaign) is derived from
   /// this at read time, mirroring pageLocationParam() in
   /// traffic-sources.shared.ts today.
   pageLocation        String?  @db.Text

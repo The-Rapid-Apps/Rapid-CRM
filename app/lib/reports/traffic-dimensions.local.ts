@@ -147,8 +147,6 @@ function rawDimensionValue(key: PivotDimensionKey, row: DimensionRow): string | 
       return resolveMedium(row.pageLocation, row.trafficSourceMedium);
     case "search_term":
       return resolveSearchTerm(row.pageLocation);
-    case "affiliate":
-      return extractQueryParam(row.pageLocation, "mref");
     case "referrer_site":
       // Host, not the raw URL — mirrors NET.HOST() in the SQL expression.
       return netHost(row.pageReferrer);
