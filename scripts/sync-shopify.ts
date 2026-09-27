@@ -1,7 +1,7 @@
 /**
  * The Shopify synchronization trigger.
  *
- * Runs on the server under pm2 (`rapi-management-sync`, `cron_restart` every
+ * Runs on the server under pm2 (`rapid-sync`, `cron_restart` every
  * 5 minutes — see ecosystem.config.cjs), and since 2026-08-21 it is the only
  * trigger: the `Synchronize Shopify analytics facts` GitHub Actions workflow
  * that used to SSH in and curl the same endpoints is gone. That schedule was

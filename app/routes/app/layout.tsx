@@ -586,12 +586,12 @@ export default function AppLayout({ loaderData }: Route.ComponentProps) {
   });
 
   const brandMarkup = (
-    <Link className="app-brand" to="/app" aria-label="Rapid Apps home">
+    <Link className="app-brand" to="/app" aria-label="Rapid home">
       <span className="app-brand-mark" aria-hidden="true">
-        <img src="/RapiLogo.jpg" alt="" />
+        <img src="/rapid-logo.svg" alt="" />
       </span>
       <span className="app-brand-copy">
-        <strong>Rapid Apps</strong>
+        <strong>Rapid</strong>
       </span>
     </Link>
   );

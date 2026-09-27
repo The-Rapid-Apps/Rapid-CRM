@@ -4,8 +4,8 @@
  * A plan billed through Shopify has no row of our own to point at, and no id —
  * its identity IS (name, list price, cadence), which is how Mantle keys plans
  * and how `buildObservedPlans` groups them. All three go in the query string
- * because all three are needed to pick the right plan back out: Rapi Bundle
- * has two plans called "Starter" and Rapi Tracking has four called
+ * because all three are needed to pick the right plan back out: one app
+ * has two plans called "Starter" and another has four called
  * "Monthly Plan".
  */
 export function planDetailUrl(

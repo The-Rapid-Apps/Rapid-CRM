@@ -194,7 +194,7 @@ test("classifyLaneResponse only treats 200 as complete and 503 as unusable", () 
 });
 
 test("every lane the schedule owns is in LANE_NAMES", () => {
-  // The pm2 `rapi-management-sync` cron drives exactly this list. traffic-events
+  // The pm2 `rapid-sync` cron drives exactly this list. traffic-events
   // is here because the GitHub Actions workflow that used to be its only trigger
   // was deleted (2026-08-21) — dropping it would silently strand the GA4
   // backfill again, with nothing failing to say so. `app-reviews` (App Store

@@ -736,7 +736,7 @@ async function loadOpeningBalanceEvents(
     // That silently reintroduced the stray-unfreeze bug in the trailing lane
     // only (the backfill loads full history, so it stayed correct), which is
     // why trailing days read higher than backfilled ones at the seam —
-    // caught 2026-09-03 against 537 matching charges on Rapi Tracking.
+    // caught 2026-09-03 against 537 matching charges on a production app.
     prisma.$queryRaw<RawEventRow[]>`
       SELECT t.id, t.appId, t.type, t.occurredAt, t.shopDomain,
              t.chargePlatformId, t.chargeName, t.amount, t.currencyCode,

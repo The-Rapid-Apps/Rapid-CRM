@@ -117,7 +117,7 @@ export function loader({ request }: LoaderFunctionArgs) {
  * POST /api/flex/installs   — register or refresh a merchant install
  * DELETE /api/flex/installs — mark an install uninstalled
  *
- * rapi keeps its own Shopify OAuth. After a merchant authorizes rapi, rapi calls
+ * Your app keeps its own Shopify OAuth. After a merchant authorizes it, the app calls
  * this endpoint to hand the platform the shop domain + offline access token, so
  * the platform can post usage records on that shop's behalf. Authenticated with
  * the app's platform API key.

@@ -63,7 +63,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   });
 
   /* The sidebar's per-app navigation links here with `?appId=`, so the page has
-     to honour it or "Rapid Bundle > Plans" would list every app's catalogue
+     to honour it or "My App > Plans" would list every app's catalogue
      under that heading.
 
      Validated against this organization's own apps rather than trusted: the
@@ -540,8 +540,8 @@ export default function Plans({ loaderData, actionData }: Route.ComponentProps) 
                out you would be stuck in an empty app. */
             appId && observedPlans ? (
               /* Shopify-billed: no catalogue here, but the charges know what
-                 the plans are. Anything but an empty state, which for Rapi
-                 Bundle would claim it has no plans while it bills fifteen. */
+                 the plans are. Anything but an empty state, which for a large
+                 app would claim it has no plans while it bills fifteen. */
               <Suspense fallback={<ObservedPlansSkeleton />}>
                 <Await resolve={observedPlans}>
                   {(rows) =>

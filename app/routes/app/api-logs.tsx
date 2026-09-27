@@ -312,7 +312,7 @@ export default function ApiLogsPage({ loaderData }: Route.ComponentProps) {
   return (
     <Page
       title="API logs"
-      subtitle="Inspect requests made by your apps to the Rapid Apps platform API."
+      subtitle="Inspect requests made by your apps to the Rapid platform API."
       fullWidth
       primaryAction={{
         content: live ? "Live stream on" : "Start live stream",

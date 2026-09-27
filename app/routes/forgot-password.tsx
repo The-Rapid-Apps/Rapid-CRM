@@ -34,7 +34,7 @@ export async function action({ request }: Route.ActionArgs) {
 }
 
 export function meta() {
-  return [{ title: "Reset password · Rapid Apps" }];
+  return [{ title: "Reset password · Rapid" }];
 }
 
 export default function ForgotPassword({ actionData }: Route.ComponentProps) {

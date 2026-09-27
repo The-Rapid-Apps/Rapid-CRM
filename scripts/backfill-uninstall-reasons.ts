@@ -12,7 +12,7 @@
  *
  *   npm run backfill:uninstall-reasons              # dry run, writes nothing
  *   APPLY=1 npm run backfill:uninstall-reasons      # write the changes
- *   APP="Rapi Bundle" APPLY=1 npm run backfill:uninstall-reasons
+ *   APP="My App" APPLY=1 npm run backfill:uninstall-reasons
  */
 import { prisma } from "../app/lib/db.server";
 import { normalizeUninstallReason } from "../app/lib/customer-events/uninstall-reason";

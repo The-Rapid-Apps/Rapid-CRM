@@ -7,7 +7,7 @@ import { resolveDimensionValue, type DimensionRow } from "../app/lib/reports/tra
  * Mandatory equivalence test (per the plan): the JS port of the SQL
  * dimension expressions must produce byte-identical output to the live
  * BigQuery expressions, verified against REAL production `page_location`/
- * `page_referrer`/`traffic_source` values pulled directly from Rapi Bundle's
+ * `page_referrer`/`traffic_source` values pulled directly from a production app's
  * GA4 export (2026-08-16) — not synthetic guesses. A mismatch here is a
  * silently wrong dimension value shown to the user, not a crash.
  */
@@ -127,8 +127,7 @@ test("referrer_site: JS port matches live BigQuery output for every sample", () 
 
 /**
  * The regression: reading page_referrer whole split one site across every
- * path and query string it was linked from (2,338 rows for 130 real sites on
- * Rapi Bundle). Every listing-page URL below is one site.
+ * path and query string it was linked from (thousands of rows for a hundred-odd real sites). Every listing-page URL below is one site.
  */
 test("referrer_site collapses a site's URLs to one host", () => {
   const base: DimensionRow = {
@@ -142,8 +141,8 @@ test("referrer_site collapses a site's URLs to one host", () => {
     country: null,
   };
   for (const url of [
-    "https://apps.shopify.com/rapi",
-    "https://apps.shopify.com/rapi?locale=es",
+    "https://apps.shopify.com/acme",
+    "https://apps.shopify.com/acme?locale=es",
     "https://apps.shopify.com/search?q=bundle",
   ]) {
     assert.equal(
@@ -206,7 +205,7 @@ test("regex extraction matches a bare substring, mirroring BigQuery's own imprec
   // REGEXP_EXTRACT would match it too (no key-boundary anchor), so the JS
   // port must reproduce that, not "fix" it.
   const row: DimensionRow = {
-    pageLocation: "https://apps.shopify.com/rapi?other=surface_type=sneaky&x=1",
+    pageLocation: "https://apps.shopify.com/acme?other=surface_type=sneaky&x=1",
     pageReferrer: null,
     campaign: null,
     trafficSourceName: null,

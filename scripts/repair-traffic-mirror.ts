@@ -3,7 +3,7 @@
  * days the sync's old 2-hour re-read window skipped past while they were still
  * incomplete.
  *
- * `npm run repair:traffic-mirror` (DAYS=45 to change the span, APP="Rapi Bundle"
+ * `npm run repair:traffic-mirror` (DAYS=45 to change the span, APP="My App"
  * to limit it to one app).
  *
  * WHY THIS EXISTS. GA4's daily `events_YYYYMMDD` table does not exist while the

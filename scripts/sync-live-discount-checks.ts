@@ -5,7 +5,7 @@ import { logJson, logJsonError } from "./lib/script-log";
 /**
  * The live-discount check's scheduler.
  *
- * Runs on the server under pm2 (`rapi-management-live-discounts` — see
+ * Runs on the server under pm2 (`rapid-live-discounts` — see
  * ecosystem.config.cjs) as a `cron_restart` job: run to completion, exit.
  *
  * It exists because `POST /api/flex/cron/live-discount-check` once shipped with

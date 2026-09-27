@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { matchObservedPlans, planNameKey } from "../app/lib/shopify/observed-plan-match";
 
-/* Rapid Bundle's catalogue and the Partner charge groups, as read off
+/* One app's catalogue and the Partner charge groups, as read off
    production on 2026-09-23 (counts illustrative). */
 const plan = (id: string, name: string, amount: number, interval: string) => ({
   id, name, amount, interval, currency: "USD",
@@ -28,7 +28,7 @@ test("names match across spellings, cadence carried by interval and price", () =
   assert.equal(planNameKey("Monthly"), "monthly", "never stripped to nothing");
 });
 
-test("every Rapid Bundle charge group lands on its own plan", () => {
+test("every charge group lands on its own plan", () => {
   const { byPlanId, unmatched } = matchObservedPlans(CATALOGUE, [
     group("Starter", 15, "EVERY_30_DAYS", 2310, 40),
     group("Starter", 119.88, "ANNUAL", 34),

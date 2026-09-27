@@ -34,11 +34,11 @@ export const AD_SURFACE_TYPES = ["search_ad", "category_ad"] as const;
 
 /**
  * GA4 never sends a "term"/"search_term" event param on Shopify App Store
- * traffic — confirmed against live Rapi Cart data (2026-08-07), all null.
+ * traffic — confirmed against live data (2026-08-07), all null.
  * The text a merchant searched lives in `surface_detail` on a search results
  * page; elsewhere it means something else (a category slug), hence the gate.
  *
- * Matches Mantle (compared 2026-09-24, Rapi Tracking):
+ * Matches Mantle (compared 2026-09-24 on a production app):
  * - `search_ad` counts too: a click on an ad in search results still carries
  *   the term searched. Left out, "facebook pixel" showed 9 of its 49 views.
  * - Normalized, so one term is one row: `+` → space, percent-decoded
@@ -67,12 +67,12 @@ function languageParam(): string {
  * Mantle's medium, read from the listing URL rather than GA4's
  * `traffic_source.medium` — that is the USER's first-ever acquisition medium,
  * and is empty or "(none)" on ~85% of listing views. In order:
- * 1. the link's own `utm_medium` (our in-app links say "Rapi"/"Rapid");
+ * 1. the link's own `utm_medium` (e.g. links from inside your own app);
  * 2. "cpc" for an App Store ad;
  * 3. "organic" for any other App Store surface (search, category, partners);
  * 4. GA4's medium when it names one ("referral", "organic");
  * 5. otherwise "organic" — an unmarked visit to a free listing.
- * Verified against Mantle's own split for Rapi Tracking: organic 56% / cpc
+ * Verified against Mantle's own split for one app: organic 56% / cpc
  * 30% / utm 13% / referral 0.9% here, 57 / 26 / 15 / 1.4 in Mantle.
  */
 function mediumParam(): string {
@@ -106,8 +106,7 @@ function sourceParam(): string {
  * `installEventNative: false` marks dimensions that are only ever populated
  * on the listing-page view event (`view_item`) — they're derived from
  * `page_location`/query-string params that simply don't exist on the
- * `shopify_app_install` event itself (confirmed against live Rapi Bundle
- * data 2026-08-07: `page_location` is null on 100% of install events).
+ * `shopify_app_install` event itself (confirmed against live data 2026-08-07: `page_location` is null on 100% of install events).
  * `traffic_source_name`/`country` are GA4's own session-level fields and DO
  * carry through onto the install event, so they stay native. `medium` and
  * `language` were native too until 2026-09-24, when they moved to the
@@ -164,7 +163,7 @@ export const PIVOT_DIMENSIONS = [
     key: "campaign",
     /**
      * `utm_campaign` off the listing URL, NOT the `campaign` event param —
-     * that param is null on ~99% of events (July 2026, Rapi Tracking: 3 of 107
+     * that param is null on ~99% of events (July 2026, one app: 3 of 107
      * bundle-campaign page views carried it), so reading it reported 3 where
      * Mantle reported 99. Deliberately not `traffic_source.name` either, even
      * though GA4 calls that the campaign: it's already exposed as its own
@@ -228,7 +227,7 @@ export const DEFAULT_PIVOT_DIMENSIONS: PivotDimensionKey[] = ["source"];
  * Every stage here has a real data source and is selectable — there is no
  * availability flag any more, because there are no unimplemented stages left
  * to disable. (Mantle also lists "One-time charge"; it is deliberately absent
- * here. No Rapi app sells a one-time purchase — `AppPurchaseOneTime` is never
+ * here. None of the apps this was built for sells a one-time purchase — `AppPurchaseOneTime` is never
  * used — so the stage could only ever report zero. Add it back alongside the
  * data if that changes.)
  *
@@ -397,7 +396,7 @@ export const UNKNOWN_SHOP_DIMENSION_VALUE = "(unattributed shop)";
 /**
  * Values that mean "nothing recorded", left out of every insights pie.
  *
- * Mantle's pies leave them out too, and for good reason: on Rapi Tracking's
+ * Mantle's pies leave them out too, and for good reason: on one app's
  * last 30 days, "(not set)" is 200 of 301 page views for Search term. Drawn
  * in, two-thirds of that pie would say "no search term" — true, and useless.
  * Each pie's percentages are therefore over the events that HAVE a value.

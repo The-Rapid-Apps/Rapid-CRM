@@ -76,7 +76,7 @@ export async function action({ request, params }: Route.ActionArgs) {
 }
 
 export function meta() {
-  return [{ title: "Accept invite · Rapid Apps" }];
+  return [{ title: "Accept invite · Rapid" }];
 }
 
 export default function InviteAcceptPage({
@@ -148,7 +148,7 @@ export default function InviteAcceptPage({
         <Form method="post">
           <BlockStack gap="400">
             <Text as="p" tone="subdued">
-              You&rsquo;ve been invited to the Rapid Apps dashboard as{" "}
+              You&rsquo;ve been invited to the Rapid dashboard as{" "}
               <Text as="span" fontWeight="semibold">
                 {holder.email}
               </Text>

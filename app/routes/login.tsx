@@ -73,7 +73,7 @@ export async function action({ request }: Route.ActionArgs) {
 }
 
 export function meta() {
-  return [{ title: "Sign in · Rapid Apps" }];
+  return [{ title: "Sign in · Rapid" }];
 }
 
 export default function Login({
@@ -92,7 +92,7 @@ export default function Login({
         <BlockStack gap="500">
           <BlockStack gap="200" align="center" inlineAlign="center">
             <Text as="h1" variant="heading2xl">
-              Rapid Apps
+              Rapid
             </Text>
             <Text as="p" tone="subdued">
               Internal Shopify billing & analytics platform

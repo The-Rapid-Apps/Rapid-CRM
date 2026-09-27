@@ -1,7 +1,7 @@
 [
   {
     "event_name": "view_item",
-    "page_location": "https://apps.shopify.com/rapi?locale=es&st_campaign=admin-search&st_source=admin-web&utm_campaign=admin-search&utm_source=shopify",
+    "page_location": "https://apps.shopify.com/acme?locale=es&st_campaign=admin-search&st_source=admin-web&utm_campaign=admin-search&utm_source=shopify",
     "page_referrer": null,
     "campaign": null,
     "ts_source": "(direct)",
@@ -13,7 +13,7 @@
   },
   {
     "event_name": "view_item",
-    "page_location": "https://apps.shopify.com/rapi?search_id=2096e20b-0773-4a1d-9f75-705e69b97ae5&surface_detail=bundles&surface_inter_position=1&surface_intra_position=20&surface_type=search",
+    "page_location": "https://apps.shopify.com/acme?search_id=2096e20b-0773-4a1d-9f75-705e69b97ae5&surface_detail=bundles&surface_inter_position=1&surface_intra_position=20&surface_type=search",
     "page_referrer": "https://apps.shopify.com/search?q=bundles&st_campaign=search-app-launcher-no-results&st_source=admin-web&utm_campaign=search-app-launcher-no-results&utm_content=contextual&utm_medium=shopify&utm_source=shopify",
     "campaign": null,
     "ts_source": "(direct)",
@@ -25,7 +25,7 @@
   },
   {
     "event_name": "view_item",
-    "page_location": "https://apps.shopify.com/rapi?st_campaign=admin-search&st_source=admin-web&utm_campaign=admin-search&utm_source=shopify",
+    "page_location": "https://apps.shopify.com/acme?st_campaign=admin-search&st_source=admin-web&utm_campaign=admin-search&utm_source=shopify",
     "page_referrer": null,
     "campaign": null,
     "ts_source": "shopify",
@@ -37,7 +37,7 @@
   },
   {
     "event_name": "view_item",
-    "page_location": "https://apps.shopify.com/rapi?locale=fr&st_campaign=admin-search&st_source=admin-web&utm_campaign=admin-search&utm_source=shopify",
+    "page_location": "https://apps.shopify.com/acme?locale=fr&st_campaign=admin-search&st_source=admin-web&utm_campaign=admin-search&utm_source=shopify",
     "page_referrer": null,
     "campaign": null,
     "ts_source": "shopify",
@@ -49,7 +49,7 @@
   },
   {
     "event_name": "view_item",
-    "page_location": "https://apps.shopify.com/rapi?locale=fr&st_campaign=admin-search&st_source=admin-web&utm_campaign=admin-search&utm_source=shopify",
+    "page_location": "https://apps.shopify.com/acme?locale=fr&st_campaign=admin-search&st_source=admin-web&utm_campaign=admin-search&utm_source=shopify",
     "page_referrer": null,
     "campaign": null,
     "ts_source": "shopify",
@@ -61,7 +61,7 @@
   },
   {
     "event_name": "view_item",
-    "page_location": "https://apps.shopify.com/rapi?surface_detail=marketing-and-conversion-upsell-and-bundles-upsell-and-cross-sell&surface_inter_position=1&surface_intra_position=1&surface_type=category&surface_version=redesign",
+    "page_location": "https://apps.shopify.com/acme?surface_detail=marketing-and-conversion-upsell-and-bundles-upsell-and-cross-sell&surface_inter_position=1&surface_intra_position=1&surface_type=category&surface_version=redesign",
     "page_referrer": "https://apps.shopify.com/categories/marketing-and-conversion-upsell-and-bundles-upsell-and-cross-sell/all?surface_detail=marketing-and-conversion-upsell-and-bundles&surface_type=category&page=2",
     "campaign": null,
     "ts_source": "(direct)",
@@ -73,7 +73,7 @@
   },
   {
     "event_name": "view_item",
-    "page_location": "https://apps.shopify.com/rapi?locale=es&st_campaign=admin-search&st_source=admin-web&utm_campaign=admin-search&utm_source=shopify",
+    "page_location": "https://apps.shopify.com/acme?locale=es&st_campaign=admin-search&st_source=admin-web&utm_campaign=admin-search&utm_source=shopify",
     "page_referrer": null,
     "campaign": null,
     "ts_source": "shopify",
@@ -85,7 +85,7 @@
   },
   {
     "event_name": "view_item",
-    "page_location": "https://apps.shopify.com/rapi?locale=fr",
+    "page_location": "https://apps.shopify.com/acme?locale=fr",
     "page_referrer": null,
     "campaign": null,
     "ts_source": "(direct)",
@@ -97,7 +97,7 @@
   },
   {
     "event_name": "view_item",
-    "page_location": "https://apps.shopify.com/rapi?locale=fr",
+    "page_location": "https://apps.shopify.com/acme?locale=fr",
     "page_referrer": null,
     "campaign": null,
     "ts_source": "(direct)",
@@ -109,7 +109,7 @@
   },
   {
     "event_name": "view_item",
-    "page_location": "https://apps.shopify.com/rapi?locale=fr",
+    "page_location": "https://apps.shopify.com/acme?locale=fr",
     "page_referrer": null,
     "campaign": null,
     "ts_source": "(direct)",
@@ -121,7 +121,7 @@
   },
   {
     "event_name": "view_item",
-    "page_location": "https://apps.shopify.com/rapi?locale=fr",
+    "page_location": "https://apps.shopify.com/acme?locale=fr",
     "page_referrer": null,
     "campaign": null,
     "ts_source": "(direct)",
@@ -133,7 +133,7 @@
   },
   {
     "event_name": "view_item",
-    "page_location": "https://apps.shopify.com/rapi?st_campaign=admin-search&st_source=admin-web&utm_campaign=admin-search&utm_source=shopify",
+    "page_location": "https://apps.shopify.com/acme?st_campaign=admin-search&st_source=admin-web&utm_campaign=admin-search&utm_source=shopify",
     "page_referrer": null,
     "campaign": null,
     "ts_source": "shopify",
@@ -145,7 +145,7 @@
   },
   {
     "event_name": "view_item",
-    "page_location": "https://apps.shopify.com/rapi?ot=143c6ae7-ac0d-4852-b3e9-96bb9d1eb948&search_id=53738473-8d84-4121-a54f-f85ac89b8c06&surface_detail=bundle&surface_inter_position=1&surface_intra_position=3&surface_type=search_ad",
+    "page_location": "https://apps.shopify.com/acme?ot=143c6ae7-ac0d-4852-b3e9-96bb9d1eb948&search_id=53738473-8d84-4121-a54f-f85ac89b8c06&surface_detail=bundle&surface_inter_position=1&surface_intra_position=3&surface_type=search_ad",
     "page_referrer": "https://apps.shopify.com/search?q=bundle",
     "campaign": null,
     "ts_source": "(direct)",
@@ -157,8 +157,8 @@
   },
   {
     "event_name": "view_item",
-    "page_location": "https://apps.shopify.com/rapi",
-    "page_referrer": "https://apps.shopify.com/rapi",
+    "page_location": "https://apps.shopify.com/acme",
+    "page_referrer": "https://apps.shopify.com/acme",
     "campaign": null,
     "ts_source": "(direct)",
     "surface_type_sql": null,
@@ -169,8 +169,8 @@
   },
   {
     "event_name": "view_item",
-    "page_location": "https://apps.shopify.com/rapi",
-    "page_referrer": "https://apps.shopify.com/rapi",
+    "page_location": "https://apps.shopify.com/acme",
+    "page_referrer": "https://apps.shopify.com/acme",
     "campaign": null,
     "ts_source": "(direct)",
     "surface_type_sql": null,
@@ -181,7 +181,7 @@
   },
   {
     "event_name": "view_item",
-    "page_location": "https://apps.shopify.com/rapi?locale=es",
+    "page_location": "https://apps.shopify.com/acme?locale=es",
     "page_referrer": null,
     "campaign": null,
     "ts_source": "(direct)",
@@ -193,7 +193,7 @@
   },
   {
     "event_name": "view_item",
-    "page_location": "https://apps.shopify.com/rapi?locale=es&st_source=autocomplete&surface_detail=autocomplete_apps",
+    "page_location": "https://apps.shopify.com/acme?locale=es&st_source=autocomplete&surface_detail=autocomplete_apps",
     "page_referrer": "https://apps.shopify.com/?locale=es&st_campaign=app-modal-browse-all-apps&st_source=admin-web&utm_campaign=app-modal-browse-all-apps&utm_source=shopify",
     "campaign": null,
     "ts_source": "(direct)",
@@ -205,7 +205,7 @@
   },
   {
     "event_name": "view_item",
-    "page_location": "https://apps.shopify.com/rapi?locale=es",
+    "page_location": "https://apps.shopify.com/acme?locale=es",
     "page_referrer": null,
     "campaign": null,
     "ts_source": "(direct)",
@@ -217,7 +217,7 @@
   },
   {
     "event_name": "view_item",
-    "page_location": "https://apps.shopify.com/rapi?locale=es",
+    "page_location": "https://apps.shopify.com/acme?locale=es",
     "page_referrer": null,
     "campaign": null,
     "ts_source": "(direct)",
@@ -229,7 +229,7 @@
   },
   {
     "event_name": "view_item",
-    "page_location": "https://apps.shopify.com/rapi?locale=es&st_campaign=admin-search&st_source=admin-web&utm_campaign=admin-search&utm_source=shopify",
+    "page_location": "https://apps.shopify.com/acme?locale=es&st_campaign=admin-search&st_source=admin-web&utm_campaign=admin-search&utm_source=shopify",
     "page_referrer": null,
     "campaign": null,
     "ts_source": "google",
@@ -241,7 +241,7 @@
   },
   {
     "event_name": "view_item",
-    "page_location": "https://apps.shopify.com/rapi?locale=es&st_campaign=admin-search&st_source=admin-web&utm_campaign=admin-search&utm_source=shopify",
+    "page_location": "https://apps.shopify.com/acme?locale=es&st_campaign=admin-search&st_source=admin-web&utm_campaign=admin-search&utm_source=shopify",
     "page_referrer": null,
     "campaign": null,
     "ts_source": "shopify",
@@ -253,7 +253,7 @@
   },
   {
     "event_name": "view_item",
-    "page_location": "https://apps.shopify.com/rapi?locale=es",
+    "page_location": "https://apps.shopify.com/acme?locale=es",
     "page_referrer": null,
     "campaign": null,
     "ts_source": "shopify",
@@ -265,7 +265,7 @@
   },
   {
     "event_name": "view_item",
-    "page_location": "https://apps.shopify.com/rapi?surface_detail=marketing-and-conversion-upsell-and-bundles-product-bundles&surface_inter_position=1&surface_intra_position=20&surface_type=category&surface_version=redesign",
+    "page_location": "https://apps.shopify.com/acme?surface_detail=marketing-and-conversion-upsell-and-bundles-product-bundles&surface_inter_position=1&surface_intra_position=20&surface_type=category&surface_version=redesign",
     "page_referrer": "https://apps.shopify.com/categories/marketing-and-conversion-upsell-and-bundles-product-bundles/all?st_source=autocomplete&surface_detail=autocomplete_taxonomy",
     "campaign": null,
     "ts_source": "(direct)",
@@ -277,7 +277,7 @@
   },
   {
     "event_name": "view_item",
-    "page_location": "https://apps.shopify.com/rapi?locale=de&search_id=26ac84d2-3244-4ab0-a706-61cf6b5c6b67&surface_detail=quantity+discount&surface_inter_position=1&surface_intra_position=15&surface_type=search",
+    "page_location": "https://apps.shopify.com/acme?locale=de&search_id=26ac84d2-3244-4ab0-a706-61cf6b5c6b67&surface_detail=quantity+discount&surface_inter_position=1&surface_intra_position=15&surface_type=search",
     "page_referrer": "https://apps.shopify.com/search?q=quantity+discount&locale=de",
     "campaign": null,
     "ts_source": "(direct)",
@@ -289,19 +289,19 @@
   },
   {
     "event_name": "view_item",
-    "page_location": "https://apps.shopify.com/rapi?search_id=9249e141-6162-4590-a886-de3796ffbe59&surface_detail=Rapi+Bundles+Volume+Discounts&surface_inter_position=1&surface_intra_position=5&surface_type=search",
-    "page_referrer": "https://apps.shopify.com/search?q=Rapi%20Bundles%20Volume%20Discounts",
+    "page_location": "https://apps.shopify.com/acme?search_id=9249e141-6162-4590-a886-de3796ffbe59&surface_detail=Acme+Bundles+Volume+Discounts&surface_inter_position=1&surface_intra_position=5&surface_type=search",
+    "page_referrer": "https://apps.shopify.com/search?q=Acme%20Bundles%20Volume%20Discounts",
     "campaign": null,
     "ts_source": "(direct)",
     "surface_type_sql": "search",
-    "search_term_sql": "Rapi Bundles Volume Discounts",
+    "search_term_sql": "Acme Bundles Volume Discounts",
     "source_sql": "apps.shopify.com",
     "campaign_sql": null,
     "referrer_site_sql": "apps.shopify.com"
   },
   {
     "event_name": "view_item",
-    "page_location": "https://apps.shopify.com/rapi?st_campaign=admin-search&st_source=admin-web&utm_campaign=admin-search&utm_source=shopify",
+    "page_location": "https://apps.shopify.com/acme?st_campaign=admin-search&st_source=admin-web&utm_campaign=admin-search&utm_source=shopify",
     "page_referrer": null,
     "campaign": null,
     "ts_source": "shopify",
@@ -313,7 +313,7 @@
   },
   {
     "event_name": "view_item",
-    "page_location": "https://apps.shopify.com/rapi?st_campaign=admin-search&st_source=admin-web&utm_campaign=admin-search&utm_source=shopify",
+    "page_location": "https://apps.shopify.com/acme?st_campaign=admin-search&st_source=admin-web&utm_campaign=admin-search&utm_source=shopify",
     "page_referrer": null,
     "campaign": null,
     "ts_source": "shopify",
@@ -325,7 +325,7 @@
   },
   {
     "event_name": "view_item",
-    "page_location": "https://apps.shopify.com/rapi?st_campaign=admin-search&st_source=admin-web&utm_campaign=admin-search&utm_source=shopify",
+    "page_location": "https://apps.shopify.com/acme?st_campaign=admin-search&st_source=admin-web&utm_campaign=admin-search&utm_source=shopify",
     "page_referrer": null,
     "campaign": null,
     "ts_source": "shopify",
@@ -337,7 +337,7 @@
   },
   {
     "event_name": "view_item",
-    "page_location": "https://apps.shopify.com/rapi?search_id=d5feb7ea-599a-4d78-8a55-fea1e660a788&surface_detail=bundles&surface_inter_position=1&surface_intra_position=20&surface_type=search",
+    "page_location": "https://apps.shopify.com/acme?search_id=d5feb7ea-599a-4d78-8a55-fea1e660a788&surface_detail=bundles&surface_inter_position=1&surface_intra_position=20&surface_type=search",
     "page_referrer": "https://apps.shopify.com/search?q=bundles",
     "campaign": null,
     "ts_source": "(direct)",
@@ -349,7 +349,7 @@
   },
   {
     "event_name": "view_item",
-    "page_location": "https://apps.shopify.com/rapi?locale=es",
+    "page_location": "https://apps.shopify.com/acme?locale=es",
     "page_referrer": null,
     "campaign": null,
     "ts_source": "(direct)",
@@ -361,7 +361,7 @@
   },
   {
     "event_name": "view_item",
-    "page_location": "https://apps.shopify.com/rapi?st_campaign=admin-search&st_source=admin-web&utm_campaign=admin-search&utm_source=shopify",
+    "page_location": "https://apps.shopify.com/acme?st_campaign=admin-search&st_source=admin-web&utm_campaign=admin-search&utm_source=shopify",
     "page_referrer": null,
     "campaign": null,
     "ts_source": "shopify",
@@ -373,7 +373,7 @@
   },
   {
     "event_name": "view_item",
-    "page_location": "https://apps.shopify.com/rapi",
+    "page_location": "https://apps.shopify.com/acme",
     "page_referrer": null,
     "campaign": null,
     "ts_source": "(direct)",
@@ -385,7 +385,7 @@
   },
   {
     "event_name": "view_item",
-    "page_location": "https://apps.shopify.com/rapi",
+    "page_location": "https://apps.shopify.com/acme",
     "page_referrer": null,
     "campaign": null,
     "ts_source": "(direct)",
@@ -397,7 +397,7 @@
   },
   {
     "event_name": "view_item",
-    "page_location": "https://apps.shopify.com/rapi?utm_source=retargeting-facebook&utm_medium=image&utm_content=rt.3&fbclid=IwY2xjawS5evxleHRuA2FlbQIxMABicmlkETFZUkFmODBvUnhXQ0lZQUVWc3J0YwZhcHBfaWQPNTQxNjM5NDkzODg5MDI1AAEexFFwwFwaAE1rM2no5U67zv9jXIUw3DDDEpAehhjxEX72Xwd8UyEAZ6g1z3U_aem_OFSQEt-pzDpZKVgqg1_diA",
+    "page_location": "https://apps.shopify.com/acme?utm_source=retargeting-facebook&utm_medium=image&utm_content=rt.3&fbclid=IwY2xjawS5evxleHRuA2FlbQIxMABicmlkETFZUkFmODBvUnhXQ0lZQUVWc3J0YwZhcHBfaWQPNTQxNjM5NDkzODg5MDI1AAEexFFwwFwaAE1rM2no5U67zv9jXIUw3DDDEpAehhjxEX72Xwd8UyEAZ6g1z3U_aem_OFSQEt-pzDpZKVgqg1_diA",
     "page_referrer": "https://l.facebook.com/",
     "campaign": "(referral)",
     "ts_source": "(direct)",
@@ -409,7 +409,7 @@
   },
   {
     "event_name": "view_item",
-    "page_location": "https://apps.shopify.com/rapi?utm_source=retargeting-facebook&utm_medium=image&utm_content=rt.1&fbclid=IwY2xjawS5hpdleHRuA2FlbQIxMABicmlkETFiV2x3aFNKNWpxem9VbEltc3J0YwZhcHBfaWQPNTQxNjM5NDkzODg5MDI1AAEeiPScjGEoHqg7Hbk2ObDgbMS48DoVXlKPFt2HB7dvq4-KvixNG-00k8EqStk_aem_CAQoqz5s3SUDnLIt3ut3iw",
+    "page_location": "https://apps.shopify.com/acme?utm_source=retargeting-facebook&utm_medium=image&utm_content=rt.1&fbclid=IwY2xjawS5hpdleHRuA2FlbQIxMABicmlkETFiV2x3aFNKNWpxem9VbEltc3J0YwZhcHBfaWQPNTQxNjM5NDkzODg5MDI1AAEeiPScjGEoHqg7Hbk2ObDgbMS48DoVXlKPFt2HB7dvq4-KvixNG-00k8EqStk_aem_CAQoqz5s3SUDnLIt3ut3iw",
     "page_referrer": "https://l.facebook.com/",
     "campaign": null,
     "ts_source": "(direct)",
@@ -421,7 +421,7 @@
   },
   {
     "event_name": "view_item",
-    "page_location": "https://apps.shopify.com/rapi?st_campaign=admin-search&st_source=admin-web&utm_campaign=admin-search&utm_source=shopify",
+    "page_location": "https://apps.shopify.com/acme?st_campaign=admin-search&st_source=admin-web&utm_campaign=admin-search&utm_source=shopify",
     "page_referrer": null,
     "campaign": null,
     "ts_source": "shopify",
@@ -433,19 +433,19 @@
   },
   {
     "event_name": "view_item",
-    "page_location": "https://apps.shopify.com/rapi?search_id=7d62957f-e304-4010-ab42-460afd87e579&shallow_install_type=search&surface_detail=rapi&surface_inter_position=1&surface_intra_position=1&surface_type=search",
-    "page_referrer": "https://apps.shopify.com/search?q=rapi&st_source=autocomplete&surface_detail=autocomplete_searches",
+    "page_location": "https://apps.shopify.com/acme?search_id=7d62957f-e304-4010-ab42-460afd87e579&shallow_install_type=search&surface_detail=acme&surface_inter_position=1&surface_intra_position=1&surface_type=search",
+    "page_referrer": "https://apps.shopify.com/search?q=acme&st_source=autocomplete&surface_detail=autocomplete_searches",
     "campaign": null,
     "ts_source": "(direct)",
     "surface_type_sql": "search",
-    "search_term_sql": "rapi",
+    "search_term_sql": "acme",
     "source_sql": "apps.shopify.com",
     "campaign_sql": null,
     "referrer_site_sql": "apps.shopify.com"
   },
   {
     "event_name": "view_item",
-    "page_location": "https://apps.shopify.com/rapi",
+    "page_location": "https://apps.shopify.com/acme",
     "page_referrer": "https://www.google.com/",
     "campaign": null,
     "ts_source": "google",
@@ -457,7 +457,7 @@
   },
   {
     "event_name": "view_item",
-    "page_location": "https://apps.shopify.com/rapi?locale=es&surface_intra_position=1&surface_type=partners&surface_version=simplified",
+    "page_location": "https://apps.shopify.com/acme?locale=es&surface_intra_position=1&surface_type=partners&surface_version=simplified",
     "page_referrer": "https://apps.shopify.com/partners/royal-apps?locale=es",
     "campaign": null,
     "ts_source": "(direct)",
@@ -469,12 +469,12 @@
   },
   {
     "event_name": "view_item",
-    "page_location": "https://apps.shopify.com/rapi?search_id=76ece773-459b-4c88-82be-74b13e878a18&shallow_install_type=search&surface_detail=rapi+bundles&surface_inter_position=1&surface_intra_position=1&surface_type=search",
-    "page_referrer": "https://apps.shopify.com/search?q=rapi+bundles&st_source=autocomplete&surface_detail=autocomplete_searches",
+    "page_location": "https://apps.shopify.com/acme?search_id=76ece773-459b-4c88-82be-74b13e878a18&shallow_install_type=search&surface_detail=acme+bundles&surface_inter_position=1&surface_intra_position=1&surface_type=search",
+    "page_referrer": "https://apps.shopify.com/search?q=acme+bundles&st_source=autocomplete&surface_detail=autocomplete_searches",
     "campaign": null,
     "ts_source": "(direct)",
     "surface_type_sql": "search",
-    "search_term_sql": "rapi bundles",
+    "search_term_sql": "acme bundles",
     "source_sql": "apps.shopify.com",
     "campaign_sql": null,
     "referrer_site_sql": "apps.shopify.com"

@@ -227,7 +227,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 export function meta() {
-  return [{ title: "Plan · Rapid Apps" }];
+  return [{ title: "Plan · Rapid" }];
 }
 
 export default function PlanObserved({ loaderData }: Route.ComponentProps) {

@@ -47,6 +47,7 @@ import "./app.css";
 export const middleware: Route.MiddlewareFunction[] = [apiRequestLogMiddleware];
 
 export const links: Route.LinksFunction = () => [
+  { rel: "icon", href: "/rapid-logo.svg", type: "image/svg+xml" },
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {
     rel: "preconnect",

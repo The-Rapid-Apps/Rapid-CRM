@@ -10,7 +10,7 @@ import { toCents } from "~/lib/money.server";
 /**
  * GET /api/flex/discount/resolve?code=SAVE20&planId=...
  *
- * This is the endpoint the Slack thread was asking for: rapi passes a discount
+ * This is the endpoint an app calls to check a code: it passes a discount
  * code (and optionally a plan) and we return whether it's valid and the
  * resulting discounted price — no Shopify discount codes involved. The price is
  * what the flex charge cron will actually post as a usage record (spec §4.2).

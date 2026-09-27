@@ -58,10 +58,10 @@ function sha256(value: string): string {
 function brand() {
   const year = String(new Date().getUTCFullYear());
   return {
-    product_name: "Rapid Apps",
-    productName: "Rapid Apps",
-    company_name: "Rapid Apps",
-    companyName: "Rapid Apps",
+    product_name: "Rapid",
+    productName: "Rapid",
+    company_name: "Rapid",
+    companyName: "Rapid",
     current_year: year,
     currentYear: year,
   };

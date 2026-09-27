@@ -1,4 +1,4 @@
-// rapi-management — standalone, multi-tenant Shopify app billing and analytics
+// rapid — standalone, multi-tenant Shopify app billing and analytics
 // platform. It holds many apps' credentials and bills merchants on their behalf.
 //
 // Tenancy chain: Organization -> App -> AppInstall (a merchant's install) -> Subscription.
@@ -137,7 +137,7 @@ enum AccountLifecycleEventType {
 // Tenancy: Organization -> App -> AppInstall
 // ---------------------------------------------------------------------------
 
-/// A platform account (e.g. rapi's company). Owns apps and dashboard users.
+/// A platform account (e.g. your company). Owns apps and dashboard users.
 model Organization {
   id        String   @id @default(cuid())
   name      String
@@ -249,7 +249,7 @@ model UserInvite {
   @@map("user_invites")
 }
 
-/// A Shopify app managed by the platform (e.g. "rapi"). Holds the Shopify app
+/// A Shopify app managed by the platform (e.g. "my-app"). Holds the Shopify app
 /// credentials the platform uses to act on behalf of the app, plus the API key
 /// the app uses to authenticate to *our* public API.
 model App {
@@ -267,9 +267,9 @@ model App {
   /// so this is decoration that improves scanning, never something a screen
   /// depends on.
   logoUrl        String? @db.VarChar(512)
-  /// The App Store listing's handle — `rapid-tracking` in
-  /// apps.shopify.com/rapid-tracking. Not `handle`: a listing can be renamed
-  /// (rapi-tracking → rapid-tracking, and the old address 404s) while the
+  /// The App Store listing's handle — `my-app` in
+  /// apps.shopify.com/my-app. Not `handle`: a listing can be renamed
+  /// (old-name → new-name, and the old address 404s) while the
   /// Partner app keeps its handle. Null = reviews are not collected.
   appStoreHandle String? @db.VarChar(191)
   /// Review collection state (app-reviews-sync.server.ts). The listing page is
@@ -287,7 +287,7 @@ model App {
   /// Whether this row is the real, published app rather than a development or
   /// staging instance of it.
   ///
-  /// Nothing else in the model tells them apart — `rapi-dev` and `rapi-staging`
+  /// Nothing else in the model tells them apart — `my-app-dev` and `my-app-staging`
   /// carry a Shopify app id, a verified partner connection and real installs,
   /// exactly like the live ones. So it has to be stated rather than inferred.
   ///
@@ -1067,7 +1067,7 @@ model PartnerDailyPlanMrrSnapshot {
   ///
   /// COLLATION MATTERS and is not expressible here: the column is
   /// `utf8mb4_bin`, set by migration 20260909130000, because two different
-  /// plans can differ only in case — Rapi Tracking carries both
+  /// plans can differ only in case — one app carries both
   /// `Monthly Plan (early user)` ($8.99) and `Monthly Plan (Early user)`
   /// ($7.99). Under this schema's default `utf8mb4_unicode_ci` they collide on
   /// the unique key below and one tier's revenue disappears.
@@ -1506,8 +1506,8 @@ model Plan {
   /// A value the app reads from the catalogue and enforces itself; the platform
   /// stores and serves it but NEVER computes against it — no currency
   /// conversion, no period arithmetic here. Merchants bill in many currencies,
-  /// so the app converts their revenue to USD and compares (see Rapi-Bundle's
-  /// CheckExtraRevenueCapLimitJob). Keeping all math in the app is what avoids
+  /// so the app converts their revenue to USD and compares (the consuming
+  /// app runs its own revenue-cap job). Keeping all math in the app is what avoids
   /// a conversion bug gating or upgrading a merchant on the wrong number.
   ///
   /// Distinct from `usageChargeCappedAmount` (a Shopify spend ceiling) and,

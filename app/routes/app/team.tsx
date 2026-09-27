@@ -148,7 +148,7 @@ export async function action({ request }: Route.ActionArgs) {
 }
 
 export function meta() {
-  return [{ title: "Team · Rapid Apps" }];
+  return [{ title: "Team · Rapid" }];
 }
 
 export default function TeamPage({ loaderData, actionData }: Route.ComponentProps) {

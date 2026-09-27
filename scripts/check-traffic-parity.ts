@@ -2,7 +2,7 @@
  * Compares the local `TrafficEventFact` mirror against live BigQuery, day by
  * day, for every tracked event and every configured app.
  *
- * `npm run check:traffic-parity` (DAYS=90 to change the span, APP="Rapi Bundle"
+ * `npm run check:traffic-parity` (DAYS=90 to change the span, APP="My App"
  * to limit it to one app).
  *
  * READ-ONLY and safe to run against production: it issues one BigQuery count

@@ -5,14 +5,10 @@
  * drift from the real listing — during a rebrand that drift is the whole
  * question.
  *
- * WHY THIS AND NOT A FIND-REPLACE. The first version of this rename rewrote
- * "Rapi" to "Rapid" with a regex, which is what the rebrand looked like from
- * the outside. Against the live listings it would have been wrong for three of
- * seven apps: `Rapi bundle dev` is actually `Rappi Dev` (two Ps, not "Rapid"),
- * and `Rapi Staging` and `Rapi Tracking` have not been renamed at all — the
- * regex would have invented "Rapid Staging" and "Rapid Tracking" and put our
- * dashboard at odds with Shopify. A rebrand is not a string transformation;
- * the listing is the source of truth, so this copies it rather than guessing.
+ * WHY THIS AND NOT A FIND-REPLACE. During a rebrand it is tempting to rewrite
+ * the names with a regex, but the listings rarely follow one rule — some apps
+ * keep their old name, others get a spelling you would not guess. The listing
+ * is the source of truth, so this copies it rather than guessing.
  *
  * Re-runnable, and useful outside a rebrand: it catches any drift between our
  * label and the real app name.

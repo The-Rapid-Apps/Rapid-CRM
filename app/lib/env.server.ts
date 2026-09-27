@@ -215,7 +215,7 @@ export const env = {
    */
   MAIL_FROM_ADDRESS: process.env.MAIL_FROM_ADDRESS ?? "no-reply@example.com",
   /** The display name beside MAIL_FROM_ADDRESS — what the inbox shows as sender. */
-  MAIL_FROM_NAME: process.env.MAIL_FROM_NAME ?? "Rapi Management",
+  MAIL_FROM_NAME: process.env.MAIL_FROM_NAME ?? "Rapid",
 
   NODE_ENV: nodeEnv,
 } as const;

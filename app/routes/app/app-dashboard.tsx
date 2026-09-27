@@ -264,8 +264,8 @@ export async function loader({ request }: Route.LoaderArgs) {
   /* STREAMED, NOT AWAITED — this is what makes the page paint immediately.
 
      These two are the whole cost of the page: the Partner reconstruction and
-     the portfolio report together run about 6s warm and 12s cold for Rapi
-     Bundle, against ~300ms for everything else on this loader combined.
+     the portfolio report together run about 6s warm and 12s cold for a large
+     app, against ~300ms for everything else on this loader combined.
      Awaiting them here meant the browser got nothing at all until they
      finished, so a page whose revenue tiles, transactions chart, top
      customers and event feed were ready in a fraction of a second sat blank
@@ -393,7 +393,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 export function meta() {
-  return [{ title: "App dashboard · Rapid Apps" }];
+  return [{ title: "App dashboard · Rapid" }];
 }
 
 /* One colour per plan, reused for that plan's gains AND losses so a reader can
@@ -1290,7 +1290,7 @@ export default function AppDashboard({ loaderData }: Route.ComponentProps) {
                 <Text as="p" variant="heading2xl" fontWeight="bold">
                   {formatMoney(0, currency)}
                 </Text>
-                {/* Not a chart with no data — a statement. No Rapi app bills
+                {/* Not a chart with no data — a statement. None of the apps this was built for bills
                     usage or sells one-time purchases, so this is structurally
                     zero rather than awaiting a sync. Drawing a flat line would
                     imply otherwise. */}

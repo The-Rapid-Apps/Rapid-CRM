@@ -5,7 +5,7 @@
  * app/lib/api-request-logs.server.ts). The /v1 identify surface
  * is chatty — an installed app calls it repeatedly — so the table grows fast
  * and needs periodic trimming. Scheduled weekly from ecosystem.config.cjs
- * (rapi-management-cleanup-api-logs); safe to run by hand any time.
+ * (rapid-cleanup-api-logs); safe to run by hand any time.
  *
  * Retention defaults to 30 days so the API-logs page's "Last 30 days" filter
  * stays meaningful. Override with API_LOG_RETENTION_DAYS, or `-- --days N`.

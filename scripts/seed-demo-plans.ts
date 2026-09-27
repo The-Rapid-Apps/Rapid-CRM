@@ -4,7 +4,7 @@
  *
  * `npm run seed:demo-plans`            — create
  * `REMOVE=1 npm run seed:demo-plans`   — delete them again
- * `APP="Rapi Cart" npm run seed:demo-plans` — just that app
+ * `APP="My App" npm run seed:demo-plans` — just that app
  *
  * DEVELOPMENT DATA. Every row it writes is named with the marker below, and
  * removal matches on exactly that, so it can only ever delete plans it created.
@@ -14,7 +14,7 @@
  * The three tiers are deliberately IDENTICAL across apps. Distinct names per
  * app would let a filtered page look right while actually being wrong (you
  * would be reading the names, not testing the filter); with the same three
- * everywhere, "Rapi Cart > Plans" is correct only if it shows exactly three.
+ * everywhere, "My App > Plans" is correct only if it shows exactly three.
  *
  * Removal refuses any plan a subscription points at. Nothing here should ever
  * acquire one, but a plan with customers on it is not demo data any more, and

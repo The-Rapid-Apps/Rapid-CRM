@@ -1,6 +1,6 @@
 # Shopify analytics data flow
 
-Shopify is the source of truth for subscription billing analytics. Rapi
+Shopify is the source of truth for subscription billing analytics. Rapid
 Management stores only immutable Partner API facts and synchronization cursors:
 
 - subscription charge lifecycle events;
@@ -25,7 +25,7 @@ behind the `SNAPSHOT_READ_PATH_ENABLED` env var.
 
 ## Scheduled synchronization
 
-Synchronization is a **pm2 cron process**: `rapi-management-sync` in
+Synchronization is a **pm2 cron process**: `rapid-sync` in
 `ecosystem.config.cjs`, `cron_restart` every 5 minutes, running
 `npm run sync:shopify`. It starts with `pm2 startOrReload`, so there is
 nothing to configure by hand.
@@ -122,9 +122,9 @@ completed and both recent billing streams are within the five-minute freshness
 window. An app stays `Syncing` until the background or scheduled sync has
 converged. If the dashboard is stale, verify:
 
-1. `pm2 status` shows `rapi-management-sync` — a cron job, so `stopped` between
+1. `pm2 status` shows `rapid-sync` — a cron job, so `stopped` between
    ticks is healthy; what matters is a recent restart time.
-2. `pm2 logs rapi-management-sync` (or `logs/sync-out.log`) shows a
+2. `pm2 logs rapid-sync` (or `logs/sync-out.log`) shows a
    `sync run finished` line per tick, with per-lane states. `logs/sync-err.log`
    collects lane failures.
 3. `CRON_SECRET` exists in the server's `.env`, and `PORT` in the sync

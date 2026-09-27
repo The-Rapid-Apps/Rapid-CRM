@@ -1,7 +1,7 @@
-# rapi-management — App Integration Guide
+# Rapid — App Integration Guide
 
-This guide is for engineers building a Shopify app (e.g. **rapi**) that uses
-**rapi-management** as its billing backend. rapi-management is a standalone
+This guide is for engineers building a Shopify app that uses
+**Rapid** as its billing backend. Rapid is a standalone
 billing platform: your app keeps its own Shopify OAuth and UI,
 and delegates *subscriptions, proration, trials, discounts, and usage-based
 tiering* to the platform over a small HTTP API.
@@ -72,8 +72,8 @@ Auth failures return `401` (missing/invalid key) or `403` (app disabled).
 ```mermaid
 sequenceDiagram
     participant M as Merchant
-    participant App as Your app (rapi)
-    participant P as rapi-management
+    participant App as Your app
+    participant P as Rapid
     participant S as Shopify
 
     M->>App: Install (Shopify OAuth)

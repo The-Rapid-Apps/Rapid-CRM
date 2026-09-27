@@ -407,8 +407,8 @@ function overlapStart(value: Date | null, overlapMs: number): string | null {
  * computing `data`. Without it, a worker whose chunk started before an
  * out-of-band cursor reset (e.g. a manual cleanup) can still hold a valid
  * lease and overwrite the reset with its stale next-cursor value, silently
- * reintroducing a skipped range. Caused a real gap in production: Rapi
- * Tracking's state backfill marked itself complete while missing ~2/3 of
+ * reintroducing a skipped range. Caused a real gap in production: one
+ * app's state backfill marked itself complete while missing ~2/3 of
  * its charges, traced to exactly this race.
  */
 export async function updateAppWithinBillingLease(

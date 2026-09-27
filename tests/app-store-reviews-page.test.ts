@@ -7,7 +7,7 @@ import {
   ReviewsPageLayoutError,
 } from "../app/lib/reviews/app-store-reviews-page";
 
-/** A real listing page (Rapid Tracking, 2026-09-24), trimmed to what the parser reads. */
+/** A real listing page (2026-09-24), anonymised and trimmed to what the parser reads. */
 const page = readFileSync(new URL("fixtures/app-store-reviews-page.html", import.meta.url), "utf8");
 
 /** One review block in the listing's markup, for the edge cases below. */
@@ -85,9 +85,9 @@ test("a missing country or duration is null, whichever it is", () => {
 
 test("a developer reply is captured, and never mistaken for the review", () => {
   const [review] = parseReviewsPage(
-    block({ reply: "<p>Rapid Apps replied April 1, 2026</p><p>Thanks!</p>" }),
+    block({ reply: "<p>Acme Apps replied April 1, 2026</p><p>Thanks!</p>" }),
   ).reviews;
-  assert.equal(review.replyBody, "Rapid Apps replied April 1, 2026\n\nThanks!");
+  assert.equal(review.replyBody, "Acme Apps replied April 1, 2026\n\nThanks!");
   assert.deepEqual(review.reviewedAt, new Date("2026-03-03T00:00:00.000Z"), "date from the review, not the reply");
 });
 

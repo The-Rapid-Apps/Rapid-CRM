@@ -193,7 +193,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 export function meta() {
-  return [{ title: "Uninstall reasons · Rapid Apps" }];
+  return [{ title: "Uninstall reasons · Rapid" }];
 }
 
 /** "2 hours ago", "6 days ago" — Mantle's relative uninstall date. */

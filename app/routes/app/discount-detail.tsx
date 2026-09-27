@@ -172,7 +172,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 }
 
 export function meta({ loaderData }: Route.MetaArgs) {
-  return [{ title: `${loaderData?.discount.code ?? "Discount"} · Discounts · Rapid Apps` }];
+  return [{ title: `${loaderData?.discount.code ?? "Discount"} · Discounts · Rapid` }];
 }
 
 type MerchantRow = Route.ComponentProps["loaderData"]["active"][number];

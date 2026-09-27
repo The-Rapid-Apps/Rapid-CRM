@@ -16,7 +16,7 @@
  * deliberate catch-up.
  *
  *   npm run snapshot:install          # every live app
- *   APP="Rapi Bundle" npm run snapshot:install
+ *   APP="My App" npm run snapshot:install
  */
 import { prisma } from "../app/lib/db.server";
 import { runInstallSnapshotSync } from "../app/lib/reports/install-snapshot.server";

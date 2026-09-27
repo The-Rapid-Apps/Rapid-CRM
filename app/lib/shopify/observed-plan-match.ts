@@ -3,7 +3,7 @@
  *
  * A standard (non-flex) plan is billed by Shopify, not by this platform, so no
  * local `Subscription` row ever exists for it and the Plans page counted zero
- * customers on every one of them — Rapid Bundle showed 0 against ~4,200 live
+ * customers on every one of them — a large app showed 0 against thousands of live
  * Partner subscriptions. The merchants are all in the Partner data, grouped by
  * `buildObservedPlans` into (charge name, amount, interval, currency); this
  * maps each of those groups onto the catalogue plan it is.

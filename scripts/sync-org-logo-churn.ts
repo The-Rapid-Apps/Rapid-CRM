@@ -11,7 +11,7 @@
  * (`Organization` has none) nor in-process cache locality, so it doesn't need
  * to run inside the web process — it talks to the database directly as its
  * own pm2 cron process (see `ecosystem.config.cjs`'s
- * `rapi-management-org-logo-churn` entry).
+ * `rapid-org-logo-churn` entry).
  *
  * Run: npm run sync:org-logo-churn
  */

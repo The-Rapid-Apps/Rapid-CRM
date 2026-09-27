@@ -63,7 +63,7 @@ async function fetchReviewsPage(
       const response = await fetch(reviewsPageUrl(handle, page), {
         signal: controller.signal,
         headers: {
-          "User-Agent": "Mozilla/5.0 (compatible; RapiManagementReviews/1.0)",
+          "User-Agent": "Mozilla/5.0 (compatible; RapidReviews/1.0)",
           "Accept-Language": "en",
         },
       });

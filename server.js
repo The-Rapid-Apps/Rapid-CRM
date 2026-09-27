@@ -1,4 +1,4 @@
-// Production HTTP server for rapi-management.
+// Production HTTP server for rapid.
 //
 // Replaces `react-router-serve` (`npm run start`) for one reason: pm2 cluster
 // mode forks via Node's `cluster` module and therefore needs a real JS entry

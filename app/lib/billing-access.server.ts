@@ -5,7 +5,7 @@ export const BILLING_ACCESS_QUERY_PARAM = "token";
 export const DEFAULT_BILLING_ACCESS_TTL_SECONDS = 15 * 60;
 
 const TOKEN_VERSION = 1;
-const SIGNING_CONTEXT = "rapi:merchant-billing:v1";
+const SIGNING_CONTEXT = "rapid:merchant-billing:v1";
 
 interface BillingAccessPayload {
   v: typeof TOKEN_VERSION;

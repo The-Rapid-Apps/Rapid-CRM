@@ -11,7 +11,7 @@ import {
 export type ThemePreference = "light" | "dark" | "system";
 export type ResolvedTheme = Exclude<ThemePreference, "system">;
 
-const STORAGE_KEY = "rapi-management-theme";
+const STORAGE_KEY = "rapid-theme";
 
 type ThemeContextValue = {
   preference: ThemePreference;

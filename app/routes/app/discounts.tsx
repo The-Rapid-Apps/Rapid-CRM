@@ -361,7 +361,7 @@ export default function Discounts({
   const [editingId, setEditingId] = useState<string | null>(null);
   /* The NEW-discount form's own app, distinct from the page filter above.
      Defaults to whichever app is being viewed, so creating a code from inside
-     Rapi Cart does not quietly attach it to whichever app sorts first. */
+     one app does not quietly attach it to whichever app sorts first. */
   const [appId, setAppId] = useState(scopedAppId || apps[0]?.id || "");
   /* The other apps the discount is also valid in. One code, one discount,
      usable in any of them — codes are unique across the organization. */
@@ -416,7 +416,7 @@ export default function Discounts({
 
   /* Plan dropdown: handles from the apps this discount is available in,
      one option per handle, priced per app when the apps differ
-     ("starter-monthly — $15.00/mo in Rapid Bundle · $29.00/mo in Rappi Dev"). */
+     ("starter-monthly — $15.00/mo in App A · $29.00/mo in App B"). */
   const OTHER_PLAN = "__other__";
   const [otherPlan, setOtherPlan] = useState(false);
   const discountAppIds = [appId, ...extraAppIds];

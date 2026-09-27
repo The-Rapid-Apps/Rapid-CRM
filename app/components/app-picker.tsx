@@ -54,7 +54,7 @@ export function AppPicker({
         onClose={() => setOpen(false)}
         /* NOT `fullWidth`: that sizes the menu to the ACTIVATOR, which is right
            in a filter bar and wrong wherever the activator is a small inline
-           button — the Discounts header one squeezed "Rapi bundle dev" onto
+           button — the Discounts header one squeezed a long app name onto
            three lines and grew a horizontal scrollbar. The menu sizes to its
            content instead, with a floor below. */
         activator={

@@ -28,7 +28,7 @@ import { verifyPassword } from "../app/lib/auth/password.server";
 
 /** `.invalid` is reserved by RFC 2606 and can never be a real address, so this
  * cannot collide with a colleague even by accident. */
-const EMAIL = "verify-team-invites@rapi.invalid";
+const EMAIL = "verify-team-invites@rapid.invalid";
 const PASSWORD = "correct-horse-battery-staple";
 
 let failures = 0;

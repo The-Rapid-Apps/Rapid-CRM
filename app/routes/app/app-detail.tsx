@@ -199,7 +199,7 @@ export async function action({ request, params }: Route.ActionArgs) {
     // Writes all three representations together so they can never drift.
     await prisma.app.update({
       where: { id: app.id },
-      data: appApiKeyFields(`rapi_${randomUUID().replace(/-/g, "")}`),
+      data: appApiKeyFields(`rapid_${randomUUID().replace(/-/g, "")}`),
     });
     return redirect(`/app/apps/${app.id}`);
   }
@@ -419,8 +419,8 @@ export async function action({ request, params }: Route.ActionArgs) {
     }
 
     if (form.has("appStoreHandle")) {
-      /* A pasted listing URL is accepted too — apps.shopify.com/rapi/reviews
-         and "rapi" both mean the listing handle "rapi". */
+      /* A pasted listing URL is accepted too — apps.shopify.com/my-app/reviews
+         and "my-app" both mean the listing handle "my-app". */
       const raw = String(form.get("appStoreHandle") ?? "").trim();
       const handle = (
         /apps\.shopify\.com\/([^/?#]+)/i.exec(raw)?.[1] ?? raw
@@ -763,10 +763,10 @@ export default function AppDetail({
             <Card>
               <BlockStack gap="400">
                 <Text as="h2" variant="headingMd">
-                  Connect rapi to this platform
+                  Connect your app to this platform
                 </Text>
                 <Text as="p" tone="subdued" variant="bodySm">
-                  rapi keeps its own Shopify OAuth. Use these values to
+                  Your app keeps its own Shopify OAuth. Use these values to
                   authenticate to the platform API and to sync installs.
                 </Text>
                 <CodeRow

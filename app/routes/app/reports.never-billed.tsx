@@ -57,7 +57,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 export function meta() {
-  return [{ title: "Never billed · Rapid Apps" }];
+  return [{ title: "Never billed · Rapid" }];
 }
 
 export default function NeverBilledReport({ loaderData }: Route.ComponentProps) {

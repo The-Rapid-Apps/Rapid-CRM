@@ -66,7 +66,7 @@ export async function upsertPartnerStateForCharges(
         // check (2026-08-17): without this, test charges (common on dev/
         // staging apps) got their own PartnerSubscriptionState rows the live
         // reconstruction has never shown, inflating counts on exactly the
-        // apps where it'd be most visible (Rapi bundle dev, Rapi Staging).
+        // apps where it'd be most visible (its dev and staging copies).
         where: { appId, chargePlatformId: { in: uniqueIds }, test: false },
         select: {
           chargePlatformId: true,

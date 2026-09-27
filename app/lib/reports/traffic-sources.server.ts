@@ -42,7 +42,7 @@ import {
   type CustomerRevenue,
 } from "./insight-metrics";
 
-/** Revenue currently only comes from Rapi Bundle's Partner subscription data,
+/** Revenue here comes from Partner subscription data,
  * which bills exclusively in USD (verified against live data 2026-08-04) — no
  * multi-currency normalization needed yet. Revisit if a second app/currency
  * is ever added. */
@@ -53,7 +53,7 @@ function round2(value: number): number {
 }
 
 /**
- * GA4 event mapping confirmed against live Rapi Bundle data (2026-07-25):
+ * GA4 event mapping confirmed against live data (2026-07-25):
  * `view_item` fires on the apps.shopify.com listing page (page_location);
  * `shopify_app_install` carries a real shop_id/shop_url/shop_name and is the
  * genuine install signal. `installs` is a client-side listing-page event with
@@ -304,7 +304,7 @@ function cacheBucketKey(date: Date): number {
  * assumed GA4 keeps exactly one, i.e. that yesterday is always finalized.
  * It is not: GA4's daily export lands roughly two days late, so there are
  * routinely TWO intraday tables, and the day before today was matched by
- * neither half. Measured on Rapi Bundle 2026-09-11, when `events_20260909`
+ * neither half. Measured on a production app 2026-09-11, when `events_20260909`
  * was the newest finalized table and 09-10/09-11 were both intraday: the old
  * predicate returned 16 listing views for 09-10 against a true 175, a 91%
  * undercount of an entire day, in every report that read it.
@@ -436,7 +436,7 @@ function matchLatestViewAtOrBefore(
  * `installEventNative` flag) for a batch of `shopify_app_install` events.
  * `page_location` — and everything derived from it (search term,
  * surface type/detail/position, campaign, referrer) — is null on 100% of
- * install events (confirmed against live Rapi Bundle data, 2026-08-07), so
+ * install events (confirmed against live data, 2026-08-07), so
  * reading those dimensions straight off the install event always produces
  * "(not set)" even when the visitor's own listing-page view carried a real
  * value. This looks up each visitor's (`user_pseudo_id`) most recent
@@ -1215,7 +1215,7 @@ async function attachMrrAndClv(
  * classification changes rather than merely narrowing. (Charge-scoped loading
  * is exactly the bug that made `buildTodayRecurringTopUp` misclassify.)
  *
- * **But the whole app cannot be folded on every request** — Rapi Bundle alone
+ * **But the whole app cannot be folded on every request** — one large app alone
  * is ~41k events. So the shops are narrowed first, then loaded completely:
  * only a shop with activity in the window can have a derived event in it. That
  * includes clock activity, not just feed activity — a trial converting emits
@@ -1578,7 +1578,7 @@ async function computeTrafficSourcesReport(
    * service account to have been separately granted cross-project access. */
   projectId: string | null = env.GCP_PROJECT_ID ?? null,
   /** Scopes lifecycle events, Partner subscription events, and MRR/CLV
-   * lookups to this app — a shop can have multiple Rapi apps installed, and
+   * lookups to this app — a shop can have multiple of your apps installed, and
    * those tables aren't otherwise scoped by shop domain alone. */
   appId: string = "",
   /** True when the local `TrafficEventFact` mirror fully covers `range` (and

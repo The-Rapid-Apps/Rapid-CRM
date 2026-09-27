@@ -1,12 +1,12 @@
 # Native Shopify billing discounts
 
 This guide is for engineers integrating a Shopify app with the centrally
-managed discounts in Rapi Management.
+managed discounts in Rapid.
 
-Rapi Management owns discount definitions, eligibility, redemption limits, and
+Rapid owns discount definitions, eligibility, redemption limits, and
 the redemption audit trail. Each consuming Shopify app continues to own its
 plan catalog, merchant OAuth installation, and Shopify
-`appSubscriptionCreate` mutation. Rapi Management never creates, approves,
+`appSubscriptionCreate` mutation. Rapid never creates, approves,
 activates, or charges a native Shopify subscription.
 
 This API is for apps using normal Shopify-managed app billing. Apps using the
@@ -20,7 +20,7 @@ Shopify references:
 
 ## Architecture and ownership
 
-| Responsibility | Rapi Management | Consuming Shopify app |
+| Responsibility | Rapid | Consuming Shopify app |
 | --- | --- | --- |
 | Define, activate, and expire discount campaigns | Yes | No |
 | Enforce app, plan, currency, date, and redemption rules | Yes | No |
@@ -46,7 +46,7 @@ Consuming app backend
         |
         |  POST /api/discounts/resolve
         v
-Rapi Management validates and reserves capacity for 15 minutes
+Rapid validates and reserves capacity for 15 minutes
         |
         |  returns shopifyDiscount + redemption ID
         v
@@ -64,7 +64,7 @@ App return route queries Shopify and matches the active subscription GID
 POST redemption confirmation
         |
         v
-Rapi Management records an immutable APPLIED redemption
+Rapid records an immutable APPLIED redemption
 ```
 
 Do not confirm a redemption merely because Shopify redirected the browser to
@@ -73,7 +73,7 @@ and verify that the exact returned `AppSubscription` is active.
 
 ## App setup
 
-1. Register the consuming app in **Rapi Management → Apps**.
+1. Register the consuming app in **Rapid → Apps**.
 2. Open the app detail page and copy its platform API key and native-discount
    endpoint URLs.
 3. Store the platform API key as a server-side secret in the consuming app.
@@ -83,7 +83,7 @@ and verify that the exact returned `AppSubscription` is active.
    `starter-monthly` or `pro-annual`. The same key must be used when the
    discount is configured and when the app resolves it.
 
-The base URL is the deployed Rapi Management origin. For example:
+The base URL is the deployed Rapid origin. For example:
 
 ```text
 https://management.example.com/api/discounts/resolve
@@ -170,7 +170,7 @@ returns `IDEMPOTENCY_CONFLICT`.
 
 ### Discount type mapping
 
-| Rapi Management type | Stored value example | Shopify value returned |
+| Rapid type | Stored value example | Shopify value returned |
 | --- | --- | --- |
 | Percentage | `20` | `{ "percentage": 0.2 }` |
 | Amount off | `5.00 USD` | `{ "amount": "5.00" }` |
@@ -373,15 +373,15 @@ Authentication and validation failures use HTTP errors:
 - Query Shopify before confirmation and match the exact subscription GID.
 - Do not log platform keys, offline Admin API tokens, confirmation URLs, or
   complete sensitive request bodies.
-- Use the API Logs page in Rapi Management for redacted request diagnostics.
+- Use the API Logs page in Rapid for redacted request diagnostics.
 
-Rapi Management scopes every request and redemption to the app associated with
+Rapid scopes every request and redemption to the app associated with
 the platform API key. One app cannot resolve or confirm another app's
 discounts.
 
 ## Production checklist
 
-- [ ] The app is registered and enabled in Rapi Management.
+- [ ] The app is registered and enabled in Rapid.
 - [ ] The platform API key is installed only in the app's backend environment.
 - [ ] Production base URLs use HTTPS.
 - [ ] Every app plan has a stable `externalPlanKey`.

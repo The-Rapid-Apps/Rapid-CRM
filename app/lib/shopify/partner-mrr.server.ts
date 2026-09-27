@@ -215,7 +215,7 @@ const MAX_INFERRED_TRIAL_WINDOW_MS = 90 * DAY_MS;
 /**
  * How long a charge gets the benefit of the doubt after its due date passes
  * with still no sale, before its amount stops being trusted. Confirmed
- * 2026-08-26 against live Shopify Partner data: Rapi Bundle grants some
+ * 2026-08-26 against live Shopify Partner data: one app grants some
  * shops a manual permanent discount (observed down to $0/yr) that produces
  * no event of its own — a $0 charge never creates a sale either, so those
  * shops looked identical to "first invoice just hasn't landed yet" and were

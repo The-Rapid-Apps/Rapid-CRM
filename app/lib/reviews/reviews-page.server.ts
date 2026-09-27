@@ -19,7 +19,7 @@ import {
  * name most stores have — `ShopProfile` (Mantle's Customers export).
  *
  * Measured 2026-09-25 by hiding the known store of every Mantle-linked review
- * and matching blind: Rapid Bundle found 79% with 0.7% wrong, Tracking 75% and
+ * and matching blind: one app found 79% with 0.7% wrong, another 75% and
  * Cart 88% with none wrong. Two rules that lost:
  * - Also requiring the install date to fit "N months using the app": 0.2%
  *   wrong but only 56% found — install dates are too imprecise to require.
@@ -29,7 +29,7 @@ import {
  * Dense names are what make it safe — a generic name now matches many stores
  * and is never "exactly one".)
  *
- * Whole-app loads are fine at today's size (Rapid Bundle: ~1,600 reviews);
+ * Whole-app loads are fine at today's size (a large app has ~1,600 reviews);
  * filtering and paging happen on the result.
  */
 

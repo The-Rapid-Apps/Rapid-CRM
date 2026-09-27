@@ -324,7 +324,7 @@ function withChartHeight<T extends { chartContainer: { minHeight: number } }>(
   };
 }
 
-const DISMISSED_INSIGHTS_KEY = "rapi.overview.dismissedInsights";
+const DISMISSED_INSIGHTS_KEY = "rapid.overview.dismissedInsights";
 
 const CUSTOMER_STATUS_LABELS: Record<TopCustomerStatus, string> = {
   active: "Active",

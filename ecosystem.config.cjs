@@ -1,4 +1,4 @@
-// pm2 process configuration for rapi-management.
+// pm2 process configuration for rapid.
 //
 //   pm2 startOrReload ecosystem.config.cjs --update-env
 //
@@ -38,7 +38,7 @@ function cronJob(name, npmScript, cronRestart, env = {}) {
 module.exports = {
   apps: [
     {
-      name: "rapi-management",
+      name: "rapid",
       cwd,
 
       // A real JS entry, not `npm run start`. Cluster mode forks through Node's
@@ -80,16 +80,16 @@ module.exports = {
     // The Shopify sync lanes (app/lib/shopify/sync-lanes.server.ts). Every lane
     // is resumable, so a killed run loses no progress; the script's own 4-minute
     // deadline ends each run inside the 5-minute window.
-    cronJob("rapi-management-sync", "sync:shopify", "*/5 * * * *"),
+    cronJob("rapid-sync", "sync:shopify", "*/5 * * * *"),
 
     // Org-wide logo-churn snapshot writer. Talks to the database directly.
-    cronJob("rapi-management-org-logo-churn", "sync:org-logo-churn", "*/5 * * * *"),
+    cronJob("rapid-org-logo-churn", "sync:org-logo-churn", "*/5 * * * *"),
 
     // Re-checks live Shopify discounts on Partner charges, which feed MRR.
-    cronJob("rapi-management-live-discounts", "sync:live-discounts", "20 * * * *"),
+    cronJob("rapid-live-discounts", "sync:live-discounts", "20 * * * *"),
 
     // API request log retention, weekly (Sunday 03:00).
-    cronJob("rapi-management-cleanup-api-logs", "cleanup:api-logs", "0 3 * * 0", {
+    cronJob("rapid-cleanup-api-logs", "cleanup:api-logs", "0 3 * * 0", {
       API_LOG_RETENTION_DAYS: "30",
     }),
   ],

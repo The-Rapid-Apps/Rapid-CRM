@@ -50,7 +50,7 @@ export async function action({ request }: Route.ActionArgs) {
 }
 
 export function meta() {
-  return [{ title: "Account · Rapid Apps" }];
+  return [{ title: "Account · Rapid" }];
 }
 
 export default function Account({ loaderData, actionData }: Route.ComponentProps) {

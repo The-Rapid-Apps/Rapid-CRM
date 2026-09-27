@@ -121,7 +121,7 @@ test("local read path: direct funnel counts, dimension grouping, and the visitor
     eventName: "view_item",
     eventTimestamp: day(1),
     userPseudoId: "visitor-a",
-    pageLocation: "https://apps.shopify.com/rapi?utm_campaign=spring-launch",
+    pageLocation: "https://apps.shopify.com/acme?utm_campaign=spring-launch",
     trafficSourceSource: "(direct)",
   });
   await seedFact(appId, {
@@ -138,7 +138,7 @@ test("local read path: direct funnel counts, dimension grouping, and the visitor
     eventName: "view_item",
     eventTimestamp: day(2),
     userPseudoId: "visitor-b",
-    pageLocation: "https://apps.shopify.com/rapi",
+    pageLocation: "https://apps.shopify.com/acme",
     trafficSourceSource: "google",
   });
 
@@ -195,7 +195,7 @@ test("local read path: MRR/CLV shop-domain attribution finds no shops when nothi
     eventName: "view_item",
     eventTimestamp: day(1),
     userPseudoId: "visitor-x",
-    pageLocation: "https://apps.shopify.com/rapi",
+    pageLocation: "https://apps.shopify.com/acme",
     trafficSourceSource: "shopify",
   });
 

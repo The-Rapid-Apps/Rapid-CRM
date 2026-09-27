@@ -32,7 +32,7 @@ import { env, isProd } from "~/lib/env.server";
  * redirects to the bare URL, so the token does not stay in the address bar,
  * the browser history, a `Referer` header or the web server's access log.
  */
-const resetCookie = createCookie("__rapi_pw_reset", {
+const resetCookie = createCookie("__rapid_pw_reset", {
   httpOnly: true,
   secure: isProd,
   // Lax, not Strict: the user arrives by a top-level link from their mail
@@ -98,7 +98,7 @@ export async function action({ request }: Route.ActionArgs) {
 }
 
 export function meta() {
-  return [{ title: "Choose a new password · Rapid Apps" }];
+  return [{ title: "Choose a new password · Rapid" }];
 }
 
 export default function ResetPassword({ loaderData, actionData }: Route.ComponentProps) {

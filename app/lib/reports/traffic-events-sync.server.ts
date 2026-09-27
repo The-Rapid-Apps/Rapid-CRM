@@ -32,7 +32,7 @@ const DAY_MS = 86_400_000;
  * advanced past it, and never came back — so every day kept whatever partial
  * count it happened to have at that moment.
  *
- * Measured on Rapi Bundle 2026-09-11, before this change: the 61 days covered
+ * Measured on a production app 2026-09-11, before this change: the 61 days covered
  * by the one-time backfill (which reads finalized tables) matched live
  * BigQuery to -0.4%, while the newest 30 days — everything the recent lane has
  * owned — were short by a uniform 19%: -22.3% over the last 7 days, -21.5%
@@ -165,7 +165,7 @@ const SELECT_LIST = `
  * it can only collapse two reads of an event if GA4 reports the same timestamp
  * both times. It does not: `shopify_app_install` is re-timestamped when the
  * day is finalized, so the intraday copy and the finalized copy hash
- * differently and an insert-only write keeps BOTH. Measured on Rapi Bundle
+ * differently and an insert-only write keeps BOTH. Measured on a production app
  * 2026-09-11: 2026-08-18 held 224 install rows — 104 written live while the
  * day was intraday, 120 written by a later re-read — against a true 120. Every
  * re-read day was inflated to almost exactly double, while `view_item` (a
@@ -206,7 +206,7 @@ export async function resyncTrafficEventWindow(
 
          GA4 names each daily table for the PROPERTY's local date, while this
          window is a UTC instant range, so an event's table and its UTC day
-         disagree whenever the property is not on UTC. Measured on Rapi Bundle
+         disagree whenever the property is not on UTC. Measured on a production app
          2026-09-11: of the events timestamped on UTC day 2026-07-29, 378 sit
          in `events_20260729` and 50 sit in `events_20260728`. A suffix range
          of exactly [20260729, 20260730] skips that second table — so the

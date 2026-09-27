@@ -13,7 +13,7 @@ import { renderToPipeableStream } from "react-dom/server";
  *
  * Raised from the 5s default (React Router's own is 4,950ms) because the app
  * dashboard streams its Partner reconstruction rather than blocking the page
- * on it. That work is measured at 7-14s for Rapi Bundle, so under the default
+ * on it. That work is measured at 7-14s for a large app, so under the default
  * every one of those promises was killed mid-flight and the page rendered an
  * error instead of the charts — the page paints in ~300ms either way, which is
  * exactly why the overrun was invisible until the boundary failed.

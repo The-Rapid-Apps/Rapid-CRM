@@ -61,7 +61,7 @@ export default [
   // --- Merchant-facing pricing / plan-picker page ---
   route("billing/:installId", "routes/billing.tsx"),
 
-  // --- Public API (rapi consumes) ---
+  // --- Public API (your apps consume) ---
   ...prefix("api/flex", [
     route("installs", "routes/api/installs.tsx"),
     route("apps", "routes/api/installed-apps.tsx"),

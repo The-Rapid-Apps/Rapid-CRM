@@ -1509,7 +1509,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   //
   // This used to silently fall back to `apps[0]` instead, which meant the
   // page-level selector could say "All apps" while the panel below it showed
-  // Rapi Bundle alone, with nothing saying so.
+  // a single app alone, with nothing saying so.
   const trafficAppId = appId;
   const trafficSavedFilters =
     report === "traffic" ? await listSavedViews(org.id, "traffic") : [];

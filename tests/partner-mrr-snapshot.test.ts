@@ -296,11 +296,11 @@ test("parity (plans): buildDailySnapshotRows' plan rows match buildPartnerRecurr
   const periodStart = utcDay("2026-07-01T00:00:00.000Z");
   const periodEnd = utcDay("2026-07-20T00:00:00.000Z");
   const days = daysBetween(periodStart.toISOString(), periodEnd.toISOString());
-  const appNames = new Map([["app-1", "Rapi Bundle"]]);
+  const appNames = new Map([["app-1", "My App"]]);
 
   const { planRows } = buildDailySnapshotRows({
     appId: "app-1",
-    appName: "Rapi Bundle",
+    appName: "My App",
     events: EVENTS,
     sales: SALES,
     days,
@@ -351,7 +351,7 @@ test("buildDailySnapshotRows: a plan with no MRR produces no row for that day", 
   const days = daysBetween("2026-07-01T00:00:00.000Z", "2026-07-20T00:00:00.000Z");
   const { planRows } = buildDailySnapshotRows({
     appId: "app-1",
-    appName: "Rapi Bundle",
+    appName: "My App",
     events: EVENTS,
     sales: SALES,
     days,

@@ -167,7 +167,7 @@ export async function action({ request }: Route.ActionArgs) {
           // Generated here rather than left to the column default, so the hash
           // and encrypted copy exist from the first moment and the row is never
           // plaintext-only.
-          ...appApiKeyFields(`rapi_${randomUUID().replace(/-/g, "")}`),
+          ...appApiKeyFields(`rapid_${randomUUID().replace(/-/g, "")}`),
           partnerConnectionId: connection.id,
           shopifyApiKey: verified.clientId,
           shopifyApiSecret,
@@ -354,7 +354,7 @@ export default function Apps({ loaderData, actionData }: Route.ComponentProps) {
                         value={fields.name}
                         onChange={set("name")}
                         autoComplete="off"
-                        placeholder="e.g. Rapid Bundle"
+                        placeholder="e.g. My App"
                         requiredIndicator
                       />
                       <TextField

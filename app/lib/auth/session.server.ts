@@ -14,7 +14,7 @@ import { env, isProd } from "../env.server";
  */
 const sessionStorage = createCookieSessionStorage<{ userId: string; issuedAt: number }>({
   cookie: {
-    name: "__rapi_dashboard_session",
+    name: "__rapid_session",
     httpOnly: true,
     path: "/",
     sameSite: "lax",
