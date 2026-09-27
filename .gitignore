@@ -1,0 +1,17 @@
+.DS_Store
+.env
+# Backups and variants hold the same live credentials as .env itself.
+.env.*
+!.env.example
+/node_modules
+/logs/
+
+# GCP service account keys — never committed
+/secrets/
+
+# React Router
+/.react-router/
+/build/
+
+/generated/prisma
+

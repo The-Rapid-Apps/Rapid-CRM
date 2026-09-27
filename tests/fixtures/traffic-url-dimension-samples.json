@@ -1,0 +1,1538 @@
+[
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?search_id=42e5474d-60c3-42b6-b57b-4ec1031ec531&surface_detail=AI+Bundle+Upsell&surface_inter_position=1&surface_intra_position=15&surface_type=search",
+  "ts_medium": "(none)",
+  "search_term_sql": "ai bundle upsell",
+  "language_sql": "en",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "installs",
+  "page_location": "https://apps.shopify.com/rapi?locale=es&search_id=de7fbad1-1a5e-4efb-9d37-c6ec31ba2e2d&surface_detail=RAPY+BANDEL&surface_inter_position=1&surface_intra_position=5&surface_type=search",
+  "ts_medium": null,
+  "search_term_sql": "rapy bandel",
+  "language_sql": "es",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "installs",
+  "page_location": "https://apps.shopify.com/rapi?mref=unhvlfoo&locale=fr",
+  "ts_medium": "(none)",
+  "search_term_sql": "(not set)",
+  "language_sql": "fr",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "installs",
+  "page_location": "https://apps.shopify.com/rapi?mref=unhvlfoo",
+  "ts_medium": "(none)",
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "installs",
+  "page_location": "https://apps.shopify.com/rapi?mref=Partner20",
+  "ts_medium": "referral",
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "referral"
+ },
+ {
+  "event_name": "installs",
+  "page_location": "https://apps.shopify.com/rapi?ot=dc085d2c-1496-4c96-bdcb-d43da5b91ff7&search_id=bd593a73-47bc-4cb5-bfbe-030e19470f5b&surface_detail=bundle&surface_inter_position=1&surface_intra_position=4&surface_type=search_ad",
+  "ts_medium": "(none)",
+  "search_term_sql": "bundle",
+  "language_sql": "en",
+  "medium_sql": "cpc"
+ },
+ {
+  "event_name": "installs",
+  "page_location": "https://apps.shopify.com/rapi?search_id=4b370998-0408-4e4b-901d-ac0782409f5a&surface_detail=rapidbun&surface_inter_position=1&surface_intra_position=1&surface_type=search",
+  "ts_medium": null,
+  "search_term_sql": "rapidbun",
+  "language_sql": "en",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "installs",
+  "page_location": "https://apps.shopify.com/rapi?locale=pt-PT&st_campaign=admin-search&st_source=admin-web&utm_campaign=admin-search&utm_source=shopify",
+  "ts_medium": null,
+  "search_term_sql": "(not set)",
+  "language_sql": "pt-PT",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "installs",
+  "page_location": "https://apps.shopify.com/rapi?locale=es&search_id=df5a3e0c-4463-446d-a623-b0c9cec569d6&surface_detail=bundles&surface_inter_position=1&surface_intra_position=1&surface_type=search",
+  "ts_medium": "(none)",
+  "search_term_sql": "bundles",
+  "language_sql": "es",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "installs",
+  "page_location": "https://apps.shopify.com/rapi?ot=72ee7cd5-5d9a-4fe2-b20f-95f9111fd0b9&search_id=2bb8b85c-e05f-4e15-a4bc-7a04ce502157&surface_detail=rapid+bundles&surface_inter_position=1&surface_intra_position=1&surface_type=search_ad",
+  "ts_medium": "(none)",
+  "search_term_sql": "rapid bundles",
+  "language_sql": "en",
+  "medium_sql": "cpc"
+ },
+ {
+  "event_name": "installs",
+  "page_location": "https://apps.shopify.com/rapi?search_id=a5aa2138-bc99-4f6e-97d2-526eeae24c28&surface_detail=rapid+b&surface_inter_position=1&surface_intra_position=1&surface_type=search",
+  "ts_medium": "referral",
+  "search_term_sql": "rapid b",
+  "language_sql": "en",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "installs",
+  "page_location": "https://apps.shopify.com/rapi?search_id=278caf6f-0c10-4e40-afba-077a96689bd0&surface_detail=bundle&surface_inter_position=1&surface_intra_position=15&surface_type=search",
+  "ts_medium": "(none)",
+  "search_term_sql": "bundle",
+  "language_sql": "en",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "installs",
+  "page_location": "https://apps.shopify.com/rapi?mref=Partner20",
+  "ts_medium": "(none)",
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "installs",
+  "page_location": "https://apps.shopify.com/rapi?locale=pt-PT&ot=7276f223-71fc-472d-afba-65176cb9b949&search_id=c4bddea2-f844-44b3-bcd3-99acff7c22e9&surface_detail=bundle&surface_inter_position=1&surface_intra_position=4&surface_type=search_ad",
+  "ts_medium": "(none)",
+  "search_term_sql": "bundle",
+  "language_sql": "pt-PT",
+  "medium_sql": "cpc"
+ },
+ {
+  "event_name": "installs",
+  "page_location": "https://apps.shopify.com/rapi?search_id=9dea064a-2a4b-409c-b92e-a4049785b98b&surface_detail=Bundles&surface_inter_position=1&surface_intra_position=16&surface_type=search",
+  "ts_medium": "(none)",
+  "search_term_sql": "bundles",
+  "language_sql": "en",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "installs",
+  "page_location": "https://apps.shopify.com/rapi?search_id=80272611-edce-48ed-9f43-bcce9a2c7f60&shallow_install_type=search&surface_detail=Rapi+bundle&surface_inter_position=1&surface_intra_position=1&surface_type=search",
+  "ts_medium": "(none)",
+  "search_term_sql": "rapi bundle",
+  "language_sql": "en",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "installs",
+  "page_location": "https://apps.shopify.com/rapi?locale=fr&search_id=a35abb68-fd1a-4369-9b09-d45bf4425ee9&surface_detail=bundle&surface_inter_position=1&surface_intra_position=15&surface_type=search",
+  "ts_medium": "(none)",
+  "search_term_sql": "bundle",
+  "language_sql": "fr",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "installs",
+  "page_location": "https://apps.shopify.com/rapi?ot=d4f82473-d083-435d-bf72-d9be3743d764&search_id=4e93865e-a4b3-4d95-bf2d-fb45a91ba073&surface_detail=bundle&surface_inter_position=1&surface_intra_position=3&surface_type=search_ad",
+  "ts_medium": "(none)",
+  "search_term_sql": "bundle",
+  "language_sql": "en",
+  "medium_sql": "cpc"
+ },
+ {
+  "event_name": "installs",
+  "page_location": "https://apps.shopify.com/rapi?locale=fr&search_id=3afba63c-cbef-431c-bb91-f419d8b2eb12&shallow_install_type=search&surface_detail=rapid+bundle+&surface_inter_position=1&surface_intra_position=1&surface_type=search",
+  "ts_medium": "(none)",
+  "search_term_sql": "rapid bundle",
+  "language_sql": "fr",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "installs",
+  "page_location": "https://apps.shopify.com/rapi?st_campaign=admin-search&st_source=admin-mobile-app&utm_campaign=admin-search&utm_source=admin-mobile-app",
+  "ts_medium": null,
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?st_campaign=about-app&st_source=admin-web&utm_campaign=installed&utm_source=shopify",
+  "ts_medium": null,
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?locale=tr&ot=a2b70a38-0381-4d9d-9a33-430472f785e0&search_id=fb01b860-fa8d-495d-82ec-79df7a943f8a&surface_detail=bundle&surface_inter_position=1&surface_intra_position=2&surface_type=search_ad",
+  "ts_medium": "(none)",
+  "search_term_sql": "bundle",
+  "language_sql": "tr",
+  "medium_sql": "cpc"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?mref=acmeref&locale=fr",
+  "ts_medium": "(none)",
+  "search_term_sql": "(not set)",
+  "language_sql": "fr",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?mref=wmkufzuw",
+  "ts_medium": "referral",
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "referral"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?locale=da&search_id=dc678ba3-28ac-47fb-9aa4-03cbc2d14358&surface_detail=bundle&surface_inter_position=1&surface_intra_position=15&surface_type=search",
+  "ts_medium": "(none)",
+  "search_term_sql": "bundle",
+  "language_sql": "da",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?ot=f0b0e3ea-5e03-44e1-94f2-4b8a47bdf819&search_id=53993598-8225-4ad3-9715-c93c0453ae41&surface_detail=BUNDLE&surface_inter_position=1&surface_intra_position=4&surface_type=search_ad",
+  "ts_medium": "(none)",
+  "search_term_sql": "bundle",
+  "language_sql": "en",
+  "medium_sql": "cpc"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?mref=mlddqeyo",
+  "ts_medium": "referral",
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "referral"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?locale=tr&ot=c3db8ec1-135b-4fb5-aaf3-7759e1267663&search_id=1777e87e-347c-4a87-854a-e9880dd4b931&surface_detail=bundle&surface_inter_position=1&surface_intra_position=3&surface_type=search_ad",
+  "ts_medium": "(none)",
+  "search_term_sql": "bundle",
+  "language_sql": "tr",
+  "medium_sql": "cpc"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?irclickid=wbKTHvzeDxyPTV3zibX6sxejUkCQb2RkZXhp1g0&irgwc=1&partner=4979675&affpt=excluded&utm_channel=affiliates&utm_source=4979675-impact&utm_medium=cpa&iradid=1061744&locale=fr",
+  "ts_medium": "(none)",
+  "search_term_sql": "(not set)",
+  "language_sql": "fr",
+  "medium_sql": "cpa"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?locale=es&ot=258f3d93-96cb-436b-8a99-5fdbf5ca6191&search_id=bc9e7a33-c704-4235-b6c8-5ed5942d85fc&surface_detail=Bundle&surface_inter_position=1&surface_intra_position=1&surface_type=search_ad",
+  "ts_medium": "(none)",
+  "search_term_sql": "bundle",
+  "language_sql": "es",
+  "medium_sql": "cpc"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?mref=mlddqeyo",
+  "ts_medium": "(none)",
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?locale=zh-CN&search_id=bc885fd3-218a-471e-9b91-034ae07609cb&surface_detail=Rapid++bundle+ai&surface_inter_position=1&surface_intra_position=2&surface_type=search",
+  "ts_medium": "(none)",
+  "search_term_sql": "rapid  bundle ai",
+  "language_sql": "zh-CN",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?search_id=badbb628-9a1c-4866-a857-1d81d73926c1&surface_detail=bundle+&surface_inter_position=1&surface_intra_position=15&surface_type=search",
+  "ts_medium": "(none)",
+  "search_term_sql": "bundle",
+  "language_sql": "en",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?surface_detail=retargeting&surface_type=search&utm_medium=paid&utm_id=120240532227710652&utm_content=120240532614970652&utm_term=120240532614990652&utm_campaign=120240532227710652&fbclid=PAdGRleAPh9q5leHRuA2FlbQEwAGFkaWQBqy4jR4qg3HNydGMGYXBwX2lkDzEyNDAyNDU3NDI4NzQxNAABp1Hsn9Ym2i3Ltgppqk39p0kIfNaxZG_fNhVTAe7Tl84NEuKs0Wu8_kSsLESt_aem_AfQ5MuwFvlO8_MaxN2GgdA&utm_source=facebook&campaign_id=120240532227710652&ad_id=120240532614970652",
+  "ts_medium": "paid",
+  "search_term_sql": "retargeting",
+  "language_sql": "en",
+  "medium_sql": "paid"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?mref=bkhkybrt",
+  "ts_medium": null,
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?utm_source=in-app&utm_medium=Rapid&utm_campaign=cart&locale=fr",
+  "ts_medium": "Rapid",
+  "search_term_sql": "(not set)",
+  "language_sql": "fr",
+  "medium_sql": "Rapid"
+ },
+ {
+  "event_name": "installs",
+  "page_location": "https://apps.shopify.com/rapi?locale=fr&st_source=autocomplete&surface_detail=autocomplete_apps",
+  "ts_medium": "(none)",
+  "search_term_sql": "(not set)",
+  "language_sql": "fr",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "installs",
+  "page_location": "https://apps.shopify.com/rapi?locale=nl&st_campaign=admin-search&st_source=admin-web&utm_campaign=admin-search&utm_source=shopify",
+  "ts_medium": null,
+  "search_term_sql": "(not set)",
+  "language_sql": "nl",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "installs",
+  "page_location": "https://apps.shopify.com/rapi?mref=Partner20&locale=it",
+  "ts_medium": null,
+  "search_term_sql": "(not set)",
+  "language_sql": "it",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "installs",
+  "page_location": "https://apps.shopify.com/rapi?utm_source=in-app&utm_medium=bucks&utm_campaign=partnership",
+  "ts_medium": "bucks",
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "bucks"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?utm_source=fwebsitw&utm_medium=homepage&utm_campaign=seo",
+  "ts_medium": "homepage",
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "homepage"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?ot=24022213-62ad-439e-a300-f006e6b1e1a2&search_id=bae45851-aff0-43f2-ad26-d2289c9f097d&surface_detail=Bundle&surface_inter_position=1&surface_intra_position=1&surface_type=search_ad",
+  "ts_medium": "(none)",
+  "search_term_sql": "bundle",
+  "language_sql": "en",
+  "medium_sql": "cpc"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?search_id=3f169c70-db3d-4209-b810-5cf31a44f37b&shallow_install_type=search&surface_detail=Rapi+Bundles+&surface_inter_position=1&surface_intra_position=1&surface_type=search",
+  "ts_medium": "(none)",
+  "search_term_sql": "rapi bundles",
+  "language_sql": "en",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?locale=zh-CN&search_id=50f276bb-d8d7-4d3a-a93c-29499a39a69d&shallow_install_type=search&surface_detail=Rapi+Bundle&surface_inter_position=1&surface_intra_position=1&surface_type=search",
+  "ts_medium": "(none)",
+  "search_term_sql": "rapi bundle",
+  "language_sql": "zh-CN",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?locale=zh-CN&preferred_listing_locale=en&search_id=50f276bb-d8d7-4d3a-a93c-29499a39a69d&shallow_install_type=search&surface_detail=Rapi%20Bundle&surface_inter_position=1&surface_intra_position=1&surface_type=search",
+  "ts_medium": "(none)",
+  "search_term_sql": "rapi bundle",
+  "language_sql": "zh-CN",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?locale=zh-CN&search_id=50f276bb-d8d7-4d3a-a93c-29499a39a69d&shallow_install_type=search&surface_detail=Rapi%20Bundle&surface_inter_position=1&surface_intra_position=1&surface_type=search",
+  "ts_medium": "(none)",
+  "search_term_sql": "rapi bundle",
+  "language_sql": "zh-CN",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?st_source=autocomplete&surface_detail=autocomplete_apps&locale=es",
+  "ts_medium": "referral",
+  "search_term_sql": "(not set)",
+  "language_sql": "es",
+  "medium_sql": "referral"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?locale=es&ot=3ea73e90-fc80-4eeb-85c4-4332afeae0d6&search_id=7c08dd31-d106-40b1-8037-d077a266b598&surface_detail=Pumper+Bundles+Quantity+Breaks&surface_inter_position=1&surface_intra_position=3&surface_type=search_ad",
+  "ts_medium": "(none)",
+  "search_term_sql": "pumper bundles quantity breaks",
+  "language_sql": "es",
+  "medium_sql": "cpc"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?search_id=912353f8-674b-4570-87b3-fd626599bc95&surface_detail=bundling+&surface_inter_position=1&surface_intra_position=20&surface_type=search",
+  "ts_medium": "(none)",
+  "search_term_sql": "bundling",
+  "language_sql": "en",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?utm_source=in-app&utm_medium=Rapid&utm_campaign=cart&locale=es",
+  "ts_medium": "Rapid",
+  "search_term_sql": "(not set)",
+  "language_sql": "es",
+  "medium_sql": "Rapid"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?mref=acmeref&locale=fr",
+  "ts_medium": "cpa",
+  "search_term_sql": "(not set)",
+  "language_sql": "fr",
+  "medium_sql": "cpa"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?mref=mlddqeyo&locale=zh-TW",
+  "ts_medium": "referral",
+  "search_term_sql": "(not set)",
+  "language_sql": "zh-TW",
+  "medium_sql": "referral"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?search_id=381a4edb-5954-4409-ba16-a435540a1e0a&shallow_install_type=search&surface_detail=rapid+bundle+&surface_inter_position=1&surface_intra_position=1&surface_type=search",
+  "ts_medium": "(none)",
+  "search_term_sql": "rapid bundle",
+  "language_sql": "en",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?locale=fr&search_id=96e575e0-39f9-4272-bfe8-e689eb5c24dd&surface_detail=Bundles+App+%26+Upsells&surface_inter_position=1&surface_intra_position=11&surface_type=search",
+  "ts_medium": "(none)",
+  "search_term_sql": "bundles app & upsells",
+  "language_sql": "fr",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?search_id=be991b55-d2f5-4a49-9b6a-d47a8998710d&surface_detail=mix+%26+match+bundle&surface_inter_position=1&surface_intra_position=10&surface_type=search",
+  "ts_medium": "(none)",
+  "search_term_sql": "mix & match bundle",
+  "language_sql": "en",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?mref=mlvkdiui&locale=es",
+  "ts_medium": "referral",
+  "search_term_sql": "(not set)",
+  "language_sql": "es",
+  "medium_sql": "referral"
+ },
+ {
+  "event_name": "installs",
+  "page_location": "https://apps.shopify.com/rapi/reviews?locale=es&page=52",
+  "ts_medium": "organic",
+  "search_term_sql": "(not set)",
+  "language_sql": "es",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?ot=0912b89c-8b4a-4c8f-a496-4de42a184b3a&search_id=63511d4f-9481-4c48-85bc-2d3afc93d0ad&surface_detail=Bundle+app&surface_inter_position=1&surface_intra_position=2&surface_type=search_ad",
+  "ts_medium": "(none)",
+  "search_term_sql": "bundle app",
+  "language_sql": "en",
+  "medium_sql": "cpc"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?locale=ja",
+  "ts_medium": "organic",
+  "search_term_sql": "(not set)",
+  "language_sql": "ja",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?search_id=8004efd7-a207-4261-ab93-c1b9e1ebc8ff&surface_detail=mix+%26+match&surface_inter_position=1&surface_intra_position=15&surface_type=search",
+  "ts_medium": "(none)",
+  "search_term_sql": "mix & match",
+  "language_sql": "en",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?utm_source=chatgpt.com",
+  "ts_medium": "ai-assistant",
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "ai-assistant"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?locale=fr&ot=fc61895b-3d5a-442c-ab25-58692a896a4e&search_id=1668e505-c745-4521-85c2-6c34a68c9948&surface_detail=Bundles&surface_inter_position=1&surface_intra_position=3&surface_type=search_ad",
+  "ts_medium": "(none)",
+  "search_term_sql": "bundles",
+  "language_sql": "fr",
+  "medium_sql": "cpc"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?locale=es&search_id=cb003b5f-b5cd-40bb-b299-0476252063b5&surface_detail=Rapid+&surface_inter_position=1&surface_intra_position=4&surface_type=search",
+  "ts_medium": "(none)",
+  "search_term_sql": "rapid",
+  "language_sql": "es",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?mref=mouyiejc&locale=fr",
+  "ts_medium": "organic",
+  "search_term_sql": "(not set)",
+  "language_sql": "fr",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "installs",
+  "page_location": "https://apps.shopify.com/rapi?source=in-app&medium=FoxEcom&UTM=partnership&_gl=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "ts_medium": "homepage",
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "homepage"
+ },
+ {
+  "event_name": "installs",
+  "page_location": "https://apps.shopify.com/rapi?locale=fr&search_id=ee4fa0ee-0f21-4fc2-9480-ced56bbbca53&shallow_install_type=search&surface_detail=rapi+&surface_inter_position=1&surface_intra_position=1&surface_type=search",
+  "ts_medium": null,
+  "search_term_sql": "rapi",
+  "language_sql": "fr",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?utm_source=letsmetrix.com&utm_medium=app_detail&utm_content=Rapid%20Bundles%20&%20Upsell%20app",
+  "ts_medium": "homepage",
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "app_detail"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?search_id=0259ee5e-8417-4654-b69b-b29e73f9ed58&surface_detail=Rapid+bundle+&surface_inter_position=1&surface_intra_position=4&surface_type=search",
+  "ts_medium": "(none)",
+  "search_term_sql": "rapid bundle",
+  "language_sql": "en",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "installs",
+  "page_location": "https://apps.shopify.com/rapi?utm_source=announcement_medium%3Dmantle&utm_campaign=email&_mlid=4bd3ffb110fbd466",
+  "ts_medium": "referral",
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "referral"
+ },
+ {
+  "event_name": "installs",
+  "page_location": "https://apps.shopify.com/rapi?search_id=d3343579-3827-4c31-847c-03baa9d73b50&surface_detail=Zoorix+%E2%80%93+Bundle+%26+Upsell&surface_inter_position=1&surface_intra_position=15&surface_type=search",
+  "ts_medium": "(none)",
+  "search_term_sql": "zoorix – bundle & upsell",
+  "language_sql": "en",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?locale=sv",
+  "ts_medium": "partner",
+  "search_term_sql": "(not set)",
+  "language_sql": "sv",
+  "medium_sql": "partner"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?utm_source=announcement_medium%3Dmantle&utm_campaign=email&_mlid=4bd3ffb110fbd466",
+  "ts_medium": null,
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?utm_source=announcement_medium%3Dmantle&utm_campaign=email&_mlid=4bd3ffb110fbd466&locale=es",
+  "ts_medium": "(none)",
+  "search_term_sql": "(not set)",
+  "language_sql": "es",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?locale=it&ot=002c62e5-c9fe-4b2d-abdb-e70d237a22c4&search_id=9922c49e-d0be-408c-9e9f-289267af7cf2&surface_detail=bundle+&surface_inter_position=1&surface_intra_position=4&surface_type=search_ad",
+  "ts_medium": "(none)",
+  "search_term_sql": "bundle",
+  "language_sql": "it",
+  "medium_sql": "cpc"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?locale=de&ot=06626d2b-d4ba-4f16-be0a-532a13fa40a4&search_id=4b65d22c-0589-48ca-be13-417010e28bd8&surface_detail=bundle+&surface_inter_position=2&surface_intra_position=1&surface_type=search_ad",
+  "ts_medium": "(none)",
+  "search_term_sql": "bundle",
+  "language_sql": "de",
+  "medium_sql": "cpc"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?search_id=76dcda65-d108-4e4f-946e-1ded0a45ee55&surface_detail=Bundle+&surface_inter_position=1&surface_intra_position=14&surface_type=search",
+  "ts_medium": "(none)",
+  "search_term_sql": "bundle",
+  "language_sql": "en",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?locale=fr&search_id=947f9c80-b910-4716-b6b5-ec1a2f51bc27&surface_detail=bundle+&surface_inter_position=1&surface_intra_position=15&surface_type=search",
+  "ts_medium": "(none)",
+  "search_term_sql": "bundle",
+  "language_sql": "fr",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "installs",
+  "page_location": "https://apps.shopify.com/rapi?locale=fr&search_id=57f0eb95-b373-4285-8641-23e23fa9c280&surface_detail=rapid+bundles+%26+upsell+cart&surface_inter_position=1&surface_intra_position=6&surface_type=search",
+  "ts_medium": "(none)",
+  "search_term_sql": "rapid bundles & upsell cart",
+  "language_sql": "fr",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?ot=1b3b77df-545e-48cc-9e66-04075142a5aa&search_id=d418e1bf-310f-4cc7-9777-a9995e615f23&surface_detail=rapi+&surface_inter_position=1&surface_intra_position=3&surface_type=search_ad",
+  "ts_medium": "(none)",
+  "search_term_sql": "rapi",
+  "language_sql": "en",
+  "medium_sql": "cpc"
+ },
+ {
+  "event_name": "installs",
+  "page_location": "https://apps.shopify.com/rapi?locale=pt-BR&utm_source=chatgpt.com",
+  "ts_medium": "ai-assistant",
+  "search_term_sql": "(not set)",
+  "language_sql": "pt-BR",
+  "medium_sql": "ai-assistant"
+ },
+ {
+  "event_name": "installs",
+  "page_location": "https://apps.shopify.com/rapi?ot=c791d578-8686-490b-aafa-84fd2cf455e0&search_id=25e078a7-ed32-484e-9495-b42b2ea36db7&surface_detail=bundle+&surface_inter_position=1&surface_intra_position=4&surface_type=search_ad",
+  "ts_medium": "(none)",
+  "search_term_sql": "bundle",
+  "language_sql": "en",
+  "medium_sql": "cpc"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?medium=website&utm_source=chatgpt.com",
+  "ts_medium": "ai-assistant",
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "ai-assistant"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?ot=28d208fb-bb03-4af2-9010-55c91fefd395&search_id=22c33094-c14c-4196-99ea-b26ce1df22fc&surface_detail=bundle+&surface_inter_position=1&surface_intra_position=4&surface_type=search_ad",
+  "ts_medium": "(none)",
+  "search_term_sql": "bundle",
+  "language_sql": "en",
+  "medium_sql": "cpc"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?search_id=09f18191-a74c-422f-9183-1902a0af3e24&surface_detail=Rp%2Bapi+bunle&surface_inter_position=1&surface_intra_position=7&surface_type=search",
+  "ts_medium": null,
+  "search_term_sql": "rp+api bunle",
+  "language_sql": "en",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?search_id=24773995-1258-49f1-8bfa-3317d4ab0158&surface_detail=Rapi+Bundles+Builder+%26+Upsell&surface_inter_position=1&surface_intra_position=2&surface_type=search",
+  "ts_medium": "(none)",
+  "search_term_sql": "rapi bundles builder & upsell",
+  "language_sql": "en",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "installs",
+  "page_location": "https://apps.shopify.com/rapi/reviews",
+  "ts_medium": "organic",
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?locale=de&ot=ef9135cf-7ddd-4ad3-a070-a35f0e4d8455&search_id=d91fe24c-1f74-4301-a415-9c50d8629db3&surface_detail=bundel+&surface_inter_position=1&surface_intra_position=3&surface_type=search_ad",
+  "ts_medium": "(none)",
+  "search_term_sql": "bundel",
+  "language_sql": "de",
+  "medium_sql": "cpc"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?mref=kvvnofmq",
+  "ts_medium": "Rapi",
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "Rapi"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?utm_source=chatgpt.com&locale=tr",
+  "ts_medium": "ai-assistant",
+  "search_term_sql": "(not set)",
+  "language_sql": "tr",
+  "medium_sql": "ai-assistant"
+ },
+ {
+  "event_name": "installs",
+  "page_location": "https://apps.shopify.com/rapi/reviews?locale=es&ratings%5B%5D=1",
+  "ts_medium": null,
+  "search_term_sql": "(not set)",
+  "language_sql": "es",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?locale=es&search_id=d001911a-73cd-44e8-8175-0d35df013355&shallow_install_type=search&surface_detail=Rapi+&surface_inter_position=1&surface_intra_position=1&surface_type=search",
+  "ts_medium": null,
+  "search_term_sql": "rapi",
+  "language_sql": "es",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?join=1",
+  "ts_medium": "Rapi",
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "Rapi"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?medium=FB&utm_source=chatgpt.com&locale=es",
+  "ts_medium": "ai-assistant",
+  "search_term_sql": "(not set)",
+  "language_sql": "es",
+  "medium_sql": "ai-assistant"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?locale=fr&st_campaign=about-app-extensions&st_source=admin-mobile-web&utm_campaign=installed&utm_source=shopify",
+  "ts_medium": "bucks",
+  "search_term_sql": "(not set)",
+  "language_sql": "fr",
+  "medium_sql": "bucks"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?mref=Partner20",
+  "ts_medium": "organic",
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?mref=vkjvveuy",
+  "ts_medium": "homepage",
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "homepage"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?locale=fr&search_id=72254608-7f7a-4049-b027-747c0807da54&shallow_install_type=search&surface_detail=rapi%20bundle&surface_inter_position=1&surface_intra_position=1&surface_type=search",
+  "ts_medium": "(none)",
+  "search_term_sql": "rapi bundle",
+  "language_sql": "fr",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "installs",
+  "page_location": "https://apps.shopify.com/rapi?sref=rl_7NTwx5UG&gad_source=1&gad_source=1&gad_campaignid=24155048634&gclid=CjwKCAjw7p_UBhBlEiwAhpIs70lr0thu8UxLpMq0f2Wxc0ETQ5zf7QbuFHC4XtXEk6HtiEGvHOANwRoCvKQQAvD_BwE&locale=es",
+  "ts_medium": "cpc",
+  "search_term_sql": "(not set)",
+  "language_sql": "es",
+  "medium_sql": "cpc"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?sref=rl_7NTwx5UG&gad_source=1&gad_source=1&gad_campaignid=24155048634&gbraid=0AAAABBWMHLK4Xtj9bn7O-Uk862_fZ2BLM&gclid=CjwKCAjw7p_UBhBlEiwAhpIs7x-NAmBi4y6iphiIjHTX4i-2JnuZVFJQojkSiq-g9BfeEfuVeLvW1hoCLKoQAvD_BwE&locale=es",
+  "ts_medium": "cpc",
+  "search_term_sql": "(not set)",
+  "language_sql": "es",
+  "medium_sql": "cpc"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?sref=rl_7NTwx5UG&gad_source=1&gad_source=1&gad_campaignid=24155048634&gclid=CjwKCAjw7p_UBhBlEiwAhpIs7_6nei0DvjGatGft-7hkfIfgfiouXAOe3G2mP6ZEKyy5PvzNol0IlhoCLLAQAvD_BwE&locale=es",
+  "ts_medium": "cpc",
+  "search_term_sql": "(not set)",
+  "language_sql": "es",
+  "medium_sql": "cpc"
+ },
+ {
+  "event_name": "installs",
+  "page_location": "https://apps.shopify.com/rapi?utm_source=announcement_medium%3Dmantle&utm_campaign=email&_mlid=87120d9ca644a026",
+  "ts_medium": null,
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "installs",
+  "page_location": "https://apps.shopify.com/rapi?utm_source=announcement_medium%3Dmantle&utm_campaign=email&_mlid=9e8c6532e7b38ebd",
+  "ts_medium": "referral",
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "referral"
+ },
+ {
+  "event_name": "installs",
+  "page_location": "https://apps.shopify.com/rapi?ot=581e3ab0-5cef-4045-90ba-0215f36bc0f7&search_id=115ad140-afba-497b-9ad0-4f8169c16720&surface_detail=Bundle+&surface_inter_position=1&surface_intra_position=1&surface_type=search_ad",
+  "ts_medium": "(none)",
+  "search_term_sql": "bundle",
+  "language_sql": "en",
+  "medium_sql": "cpc"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?utm_source=announcement_medium%3Dmantle&utm_campaign=email&_mlid=b25d0c047e476c21",
+  "ts_medium": "(none)",
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?ot=2b689028-dd4f-4e42-ac37-f9cf72d4fa35&search_id=25fd3e7e-6d38-4377-bbe3-3de0b826f3f6&surface_detail=Bundle+&surface_inter_position=1&surface_intra_position=1&surface_type=search_ad",
+  "ts_medium": "(none)",
+  "search_term_sql": "bundle",
+  "language_sql": "en",
+  "medium_sql": "cpc"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?mref=partner30&gclid=56406522",
+  "ts_medium": "cpc",
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "cpc"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?mref=bobref",
+  "ts_medium": "organic",
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?locale=tr&search_id=94470b89-ca50-4e4a-8d02-29b1e5b679a5&shallow_install_type=search&surface_detail=Rapi+Bundles+&surface_inter_position=1&surface_intra_position=1&surface_type=search",
+  "ts_medium": "(none)",
+  "search_term_sql": "rapi bundles",
+  "language_sql": "tr",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?utm_source=announcement_medium%3Dmantle&utm_campaign=email&_mlid=928e6b0c1b820bce",
+  "ts_medium": null,
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?ot=5ce2ba9d-fdf9-4055-b1bf-807f54781501&search_id=02903224-4e83-432a-a31d-71da856b905c&surface_detail=%27KACHING&surface_inter_position=1&surface_intra_position=2&surface_type=search_ad",
+  "ts_medium": "(none)",
+  "search_term_sql": "'kaching",
+  "language_sql": "en",
+  "medium_sql": "cpc"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?search_id=6e8f710d-a86e-4b58-81ac-23196ef6aee5&shallow_install_type=search&surface_detail=rapi%20bundles&surface_inter_position=1&surface_intra_position=1&surface_type=search&locale=de",
+  "ts_medium": "reply",
+  "search_term_sql": "rapi bundles",
+  "language_sql": "de",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?search_id=3a0aea37-5a36-4824-94e0-dd9cb16be53f&surface_detail=cross+sell+%26+upsell+bundles&surface_inter_position=1&surface_intra_position=27&surface_type=search",
+  "ts_medium": "(none)",
+  "search_term_sql": "cross sell & upsell bundles",
+  "language_sql": "en",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?ot=916893e1-3ac1-40a4-88ea-3c282587ca27&search_id=a5312934-c777-4667-9aa5-9b655a12cd47&surface_detail=Fast+Bundle+&surface_inter_position=1&surface_intra_position=4&surface_type=search_ad",
+  "ts_medium": "(none)",
+  "search_term_sql": "fast bundle",
+  "language_sql": "en",
+  "medium_sql": "cpc"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?mref=nbcbbcd",
+  "ts_medium": "Rapi",
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "Rapi"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?ot=acc2f804-3238-45ae-bd56-6f60882d75c0&search_id=6e8d20c7-be67-4785-aaf0-0556ca65aac4&surface_detail=bundle+%26+upsell&surface_inter_position=1&surface_intra_position=2&surface_type=search_ad",
+  "ts_medium": "(none)",
+  "search_term_sql": "bundle & upsell",
+  "language_sql": "en",
+  "medium_sql": "cpc"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?utm_source=announcement_medium%3Dmantle&utm_campaign=email&_mlid=0289aedd025e8cad&locale=zh-CN",
+  "ts_medium": "organic",
+  "search_term_sql": "(not set)",
+  "language_sql": "zh-CN",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?st_campaign=admin-search&st_source=admin-mobile-app&utm_campaign=admin-search&utm_source=admin-mobile-app",
+  "ts_medium": "homepage",
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "homepage"
+ },
+ {
+  "event_name": "installs",
+  "page_location": "https://apps.shopify.com/rapi/reviews?locale=nl&ratings%5B%5D=5",
+  "ts_medium": "(none)",
+  "search_term_sql": "(not set)",
+  "language_sql": "nl",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "installs",
+  "page_location": "https://apps.shopify.com/rapi?locale=de&st_campaign=admin-search&st_source=admin-web&utm_campaign=admin-search&utm_source=shopify",
+  "ts_medium": "reply",
+  "search_term_sql": "(not set)",
+  "language_sql": "de",
+  "medium_sql": "reply"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?source=backlink&medium=pagefly&source=partnership&irclickid=VyMyZuRicxyZTUfUNKUB%3A2rEUkr0yqzF020VS00&irgwc=1&partner=337322&affpt=excluded&utm_channel=affiliates&utm_source=337322-impact&utm_medium=cpa&iradid=1061744&locale=zh-CN",
+  "ts_medium": "cpa",
+  "search_term_sql": "(not set)",
+  "language_sql": "zh-CN",
+  "medium_sql": "cpa"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?affpt=excluded&iradid=1061744&irclickid=VyMyZuRicxyZTUfUNKUB%3A2rEUkr0yqzF020VS00&irgwc=1&locale=zh-CN&medium=pagefly&partner=337322&preferred_listing_locale=en&source=partnership&utm_channel=affiliates&utm_medium=cpa&utm_source=337322-impact",
+  "ts_medium": "cpa",
+  "search_term_sql": "(not set)",
+  "language_sql": "zh-CN",
+  "medium_sql": "cpa"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?search_id=82b525d4-9e9f-4295-ab43-a0b16feb9f2c&surface_detail=Rapi+bundles+%26+upsell+&surface_inter_position=1&surface_intra_position=5&surface_type=search",
+  "ts_medium": "(none)",
+  "search_term_sql": "rapi bundles & upsell",
+  "language_sql": "en",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?utm_source=announcement_medium%3Dmantle&utm_campaign=email&_mlid=d1c502506b8893f9",
+  "ts_medium": "(none)",
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?st_source=autocomplete&surface_detail=autocomplete_apps&locale=fr",
+  "ts_medium": "koala-inspector",
+  "search_term_sql": "(not set)",
+  "language_sql": "fr",
+  "medium_sql": "koala-inspector"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?utm_source=announcement_medium%3Dmantle&utm_campaign=email&_mlid=d1c502506b8893f9",
+  "ts_medium": "referral",
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "referral"
+ },
+ {
+  "event_name": "installs",
+  "page_location": "https://apps.shopify.com/rapi/reviews?ratings%5B%5D=5",
+  "ts_medium": "(none)",
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?locale=fr&st_campaign=about-app&st_source=admin-web&utm_campaign=installed&utm_source=shopify",
+  "ts_medium": "Rapi",
+  "search_term_sql": "(not set)",
+  "language_sql": "fr",
+  "medium_sql": "Rapi"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?search_id=4416c9b4-6a87-4dac-9974-60a682f37196&surface_detail=%E2%80%A2%09Rapi+Volume+Discounts+%26+Bundles+&surface_inter_position=1&surface_intra_position=5&surface_type=search",
+  "ts_medium": "(none)",
+  "search_term_sql": "•\trapi volume discounts & bundles",
+  "language_sql": "en",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?locale=fr&st_campaign=about-app&st_source=admin-mobile-web&utm_campaign=installed&utm_source=shopify",
+  "ts_medium": "smart-seo",
+  "search_term_sql": "(not set)",
+  "language_sql": "fr",
+  "medium_sql": "smart-seo"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?utm_source=announcement_medium%3Dmantle&utm_campaign=email&_mlid=87120d9ca644a026&locale=fr",
+  "ts_medium": "(none)",
+  "search_term_sql": "(not set)",
+  "language_sql": "fr",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?mref=bxvnzrsm",
+  "ts_medium": "cpa",
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "cpa"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?locale=de&st_source=autocomplete&surface_detail=autocomplete_apps",
+  "ts_medium": "reply",
+  "search_term_sql": "(not set)",
+  "language_sql": "de",
+  "medium_sql": "reply"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?mref=bxvnzrsm&locale=fr",
+  "ts_medium": "trendtrack",
+  "search_term_sql": "(not set)",
+  "language_sql": "fr",
+  "medium_sql": "trendtrack"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?st_campaign=admin-search&st_source=admin-mobile-web&utm_campaign=admin-search&utm_source=shopify",
+  "ts_medium": "ai-assistant",
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "ai-assistant"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?ot=ddf02ea2-b0c1-4d28-a024-8152cd7698c8&search_id=5aac85b5-c2ab-4d09-8f5d-96352fcb3794&surface_detail=upsell+%26+cross+sell&surface_inter_position=1&surface_intra_position=2&surface_type=search_ad",
+  "ts_medium": null,
+  "search_term_sql": "upsell & cross sell",
+  "language_sql": "en",
+  "medium_sql": "cpc"
+ },
+ {
+  "event_name": "installs",
+  "page_location": "https://apps.shopify.com/rapi?search_id=837df633-b336-46f1-a5d7-2358cc24898e&surface_detail=Upsell+%26+Cart+&surface_inter_position=1&surface_intra_position=11&surface_type=search",
+  "ts_medium": "(none)",
+  "search_term_sql": "upsell & cart",
+  "language_sql": "en",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?ot=de6800a2-0ca3-4795-b93a-fb0e13ed4883&search_id=46ee58d3-ddcc-4713-b70f-249257c0f7cb&surface_detail=Judge.me+%2F+Loox&surface_inter_position=1&surface_intra_position=1&surface_type=search_ad",
+  "ts_medium": "(none)",
+  "search_term_sql": "judge.me / loox",
+  "language_sql": "en",
+  "medium_sql": "cpc"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?locale=es&ot=252172be-bca8-419a-828d-797675872561&search_id=9b41d4c6-8eba-4663-9d12-2e74d5e8f093&surface_detail=BUNDLE+&surface_inter_position=1&surface_intra_position=1&surface_type=search_ad",
+  "ts_medium": "(none)",
+  "search_term_sql": "bundle",
+  "language_sql": "es",
+  "medium_sql": "cpc"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?locale=es&ot=475bb3f2-f7a4-45dd-b6a8-81a6e0e27715&search_id=dd66d3ea-0cf6-4312-a2f3-f71894bd0a12&surface_detail=R%C3%A1pi&surface_inter_position=1&surface_intra_position=4&surface_type=search_ad",
+  "ts_medium": "(none)",
+  "search_term_sql": "rápi",
+  "language_sql": "es",
+  "medium_sql": "cpc"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?locale=es&ot=6a7ac368-32b9-4b39-983f-49b3c545f082&search_id=2d5aaf24-909a-458e-bb11-31f741826ec9&surface_detail=Bundle+&surface_inter_position=1&surface_intra_position=2&surface_type=search_ad",
+  "ts_medium": "(none)",
+  "search_term_sql": "bundle",
+  "language_sql": "es",
+  "medium_sql": "cpc"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?ot=dd4662dd-2b85-4e10-bdb2-8c801134d837&search_id=91474235-c060-4ce3-b8a5-9877285480dd&surface_detail=Build%20Your%20Own%20Bundle%20Builder&surface_inter_position=1&surface_intra_position=4&surface_type=search_ad",
+  "ts_medium": "(none)",
+  "search_term_sql": "build your own bundle builder",
+  "language_sql": "en",
+  "medium_sql": "cpc"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi??utm_source=blog%2Fkaching-bundle-alternatives&utm_medium=skailama-blog&utm_campaign=7-best-kaching-bundle-alternatives-for-shopify-(2026)---compared",
+  "ts_medium": "skailama-blog",
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "skailama-blog"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?locale=es&ot=1dce8cc8-3f15-4eb7-b759-0543f9a0b344&search_id=306cfdc1-69bb-45b5-97c3-409c0deb6de5&surface_detail=Bundle+&surface_inter_position=1&surface_intra_position=2&surface_type=search_ad",
+  "ts_medium": "(none)",
+  "search_term_sql": "bundle",
+  "language_sql": "es",
+  "medium_sql": "cpc"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?utm_source=announcement_medium%3Dmantle&utm_campaign=email&_mlid=c38fd8757af8b235",
+  "ts_medium": "organic",
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?locale=pt-BR&ot=b4017dd1-bc3c-499a-bc9a-acde8468859f&search_id=aabb2696-a407-4b6c-9d71-0530ab0d2c58&surface_detail=bundle+mix+%26+match&surface_inter_position=1&surface_intra_position=2&surface_type=search_ad",
+  "ts_medium": "(none)",
+  "search_term_sql": "bundle mix & match",
+  "language_sql": "pt-BR",
+  "medium_sql": "cpc"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?locale=es&utm_source=chatgpt.com",
+  "ts_medium": "cpa",
+  "search_term_sql": "(not set)",
+  "language_sql": "es",
+  "medium_sql": "cpa"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?locale=fr&st_source=autocomplete&surface_detail=autocomplete_apps",
+  "ts_medium": "koala-inspector",
+  "search_term_sql": "(not set)",
+  "language_sql": "fr",
+  "medium_sql": "koala-inspector"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?source=backlink&medium=pagefly&source=partnership&irclickid=3ymU%3A1zMhxyZRqSSA5XRrW4DUkuXHlWDxVLU1s0&irgwc=1&partner=337322&affpt=excluded&utm_channel=affiliates&utm_source=337322-impact&utm_medium=cpa&iradid=1061744&locale=zh-CN",
+  "ts_medium": "cpa",
+  "search_term_sql": "(not set)",
+  "language_sql": "zh-CN",
+  "medium_sql": "cpa"
+ },
+ {
+  "event_name": "shopify_app_install",
+  "page_location": null,
+  "ts_medium": "",
+  "search_term_sql": "(not set)",
+  "language_sql": "(not set)",
+  "medium_sql": "(not set)"
+ },
+ {
+  "event_name": "shopify_app_install",
+  "page_location": null,
+  "ts_medium": null,
+  "search_term_sql": "(not set)",
+  "language_sql": "(not set)",
+  "medium_sql": "(not set)"
+ },
+ {
+  "event_name": "shopify_app_install",
+  "page_location": null,
+  "ts_medium": "(none)",
+  "search_term_sql": "(not set)",
+  "language_sql": "(not set)",
+  "medium_sql": "(not set)"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi",
+  "ts_medium": "top-10",
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "top-10"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi",
+  "ts_medium": "content-translation",
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "content-translation"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi",
+  "ts_medium": "smart-seo",
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "smart-seo"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi",
+  "ts_medium": "reply",
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "reply"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi",
+  "ts_medium": "partner",
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "partner"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi",
+  "ts_medium": "bucks",
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "bucks"
+ },
+ {
+  "event_name": "installs",
+  "page_location": "https://apps.shopify.com/rapi?locale=es&st_campaign=admin-search&st_source=admin-web&utm_campaign=admin-search&utm_source=shopify",
+  "ts_medium": "",
+  "search_term_sql": "(not set)",
+  "language_sql": "es",
+  "medium_sql": ""
+ },
+ {
+  "event_name": "installs",
+  "page_location": "https://apps.shopify.com/rapi?locale=es&st_campaign=admin-search&st_source=admin-web&utm_campaign=admin-search&utm_source=shopify",
+  "ts_medium": "cpa",
+  "search_term_sql": "(not set)",
+  "language_sql": "es",
+  "medium_sql": "cpa"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?locale=es&st_source=autocomplete&surface_detail=autocomplete_apps",
+  "ts_medium": "reply",
+  "search_term_sql": "(not set)",
+  "language_sql": "es",
+  "medium_sql": "reply"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?locale=fr&st_campaign=admin-search&st_source=admin-web&utm_campaign=admin-search&utm_source=shopify",
+  "ts_medium": "",
+  "search_term_sql": "(not set)",
+  "language_sql": "fr",
+  "medium_sql": ""
+ },
+ {
+  "event_name": "installs",
+  "page_location": "https://apps.shopify.com/rapi?locale=fr&st_campaign=admin-search&st_source=admin-web&utm_campaign=admin-search&utm_source=shopify",
+  "ts_medium": "koala-inspector",
+  "search_term_sql": "(not set)",
+  "language_sql": "fr",
+  "medium_sql": "koala-inspector"
+ },
+ {
+  "event_name": "installs",
+  "page_location": "https://apps.shopify.com/rapi?locale=fr&st_campaign=admin-search&st_source=admin-web&utm_campaign=admin-search&utm_source=shopify",
+  "ts_medium": "trendtrack",
+  "search_term_sql": "(not set)",
+  "language_sql": "fr",
+  "medium_sql": "trendtrack"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?locale=zh-CN&st_campaign=admin-search&st_source=admin-web&utm_campaign=admin-search&utm_source=shopify",
+  "ts_medium": "",
+  "search_term_sql": "(not set)",
+  "language_sql": "zh-CN",
+  "medium_sql": ""
+ },
+ {
+  "event_name": "installs",
+  "page_location": "https://apps.shopify.com/rapi?st_campaign=admin-search&st_source=admin-web&utm_campaign=admin-search&utm_source=shopify",
+  "ts_medium": "",
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": ""
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?st_source=autocomplete&surface_detail=autocomplete_apps",
+  "ts_medium": "",
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": ""
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?st_source=autocomplete&surface_detail=autocomplete_apps",
+  "ts_medium": "content-translation",
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "content-translation"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi?st_source=autocomplete&surface_detail=autocomplete_apps",
+  "ts_medium": "koala-inspector",
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "koala-inspector"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi-tracking?locale=fr",
+  "ts_medium": "Rapi",
+  "search_term_sql": "(not set)",
+  "language_sql": "fr",
+  "medium_sql": "Rapi"
+ },
+ {
+  "event_name": "installs",
+  "page_location": "https://apps.shopify.com/rapi-tracking/reviews?ratings%5B%5D=5",
+  "ts_medium": "Rapi",
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "Rapi"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi-cart?utm_source=letsmetrix.com&utm_medium=app_detail&utm_content=Rapi%20Cart%20Drawer%20|%20Cart%20Upsell",
+  "ts_medium": "app_detail",
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "app_detail"
+ },
+ {
+  "event_name": "view_item",
+  "page_location": "https://apps.shopify.com/rapi-cart?locale=es",
+  "ts_medium": "Rapi",
+  "search_term_sql": "(not set)",
+  "language_sql": "es",
+  "medium_sql": "Rapi"
+ },
+ {
+  "event_name": "synthetic",
+  "page_location": "https://apps.shopify.com/x?surface_type=search&surface_detail=100%25+off",
+  "ts_medium": null,
+  "search_term_sql": "100% off",
+  "language_sql": "en",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "synthetic",
+  "page_location": "https://apps.shopify.com/x?surface_type=search&surface_detail=50%+off",
+  "ts_medium": null,
+  "search_term_sql": "50% off",
+  "language_sql": "en",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "synthetic",
+  "page_location": "https://apps.shopify.com/x?surface_type=search&surface_detail=bad%FFbyte",
+  "ts_medium": null,
+  "search_term_sql": "bad%ffbyte",
+  "language_sql": "en",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "synthetic",
+  "page_location": "https://apps.shopify.com/x?surface_type=search&surface_detail=+++",
+  "ts_medium": null,
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "synthetic",
+  "page_location": "https://apps.shopify.com/x?surface_type=search&surface_detail=%20Caf%C3%A9%20",
+  "ts_medium": null,
+  "search_term_sql": "café",
+  "language_sql": "en",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "synthetic",
+  "page_location": "https://apps.shopify.com/x?surface_type=search_ad&surface_detail=%CE%A3%CE%9F%CE%A3",
+  "ts_medium": null,
+  "search_term_sql": "σος",
+  "language_sql": "en",
+  "medium_sql": "cpc"
+ },
+ {
+  "event_name": "synthetic",
+  "page_location": "https://apps.shopify.com/x?surface_type=search&surface_detail=%EF%BB%BFbom",
+  "ts_medium": null,
+  "search_term_sql": "﻿bom",
+  "language_sql": "en",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "synthetic",
+  "page_location": "https://apps.shopify.com/x?surface_type=search&surface_detail=tab%09",
+  "ts_medium": null,
+  "search_term_sql": "tab",
+  "language_sql": "en",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "synthetic",
+  "page_location": "https://apps.shopify.com/x?surface_type=search&surface_detail=nbsp%C2%A0",
+  "ts_medium": null,
+  "search_term_sql": "nbsp",
+  "language_sql": "en",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "synthetic",
+  "page_location": "https://apps.shopify.com/x?surface_type=search",
+  "ts_medium": null,
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "synthetic",
+  "page_location": "https://apps.shopify.com/x?surface_type=category_ad&surface_detail=Store",
+  "ts_medium": "referral",
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "cpc"
+ },
+ {
+  "event_name": "synthetic",
+  "page_location": "https://apps.shopify.com/x?surface_type=category&locale=pt-BR#reviews",
+  "ts_medium": "referral",
+  "search_term_sql": "(not set)",
+  "language_sql": "pt-BR",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "synthetic",
+  "page_location": "https://apps.shopify.com/x?locale=zh-CN&utm_medium=Rapi",
+  "ts_medium": "organic",
+  "search_term_sql": "(not set)",
+  "language_sql": "zh-CN",
+  "medium_sql": "Rapi"
+ },
+ {
+  "event_name": "synthetic",
+  "page_location": "https://apps.shopify.com/x",
+  "ts_medium": "(none)",
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "synthetic",
+  "page_location": "https://apps.shopify.com/x",
+  "ts_medium": "(not set)",
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "synthetic",
+  "page_location": "https://apps.shopify.com/x",
+  "ts_medium": null,
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "organic"
+ },
+ {
+  "event_name": "synthetic",
+  "page_location": "https://apps.shopify.com/x",
+  "ts_medium": "referral",
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "referral"
+ },
+ {
+  "event_name": "synthetic",
+  "page_location": "https://apps.shopify.com/x?xlocale=fr",
+  "ts_medium": "cpc",
+  "search_term_sql": "(not set)",
+  "language_sql": "en",
+  "medium_sql": "cpc"
+ },
+ {
+  "event_name": "synthetic",
+  "page_location": null,
+  "ts_medium": "organic",
+  "search_term_sql": "(not set)",
+  "language_sql": "(not set)",
+  "medium_sql": "(not set)"
+ },
+ {
+  "event_name": "synthetic",
+  "page_location": "https://apps.shopify.com/x?surface_type=search&surface_detail=%C2%85%C2%85Ab%C2%85",
+  "ts_medium": null,
+  "search_term_sql": "ab",
+  "language_sql": "en",
+  "medium_sql": "organic"
+ }
+]

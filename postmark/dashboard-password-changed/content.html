@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light"><title>Your password was changed</title></head>
+<body style="margin:0;padding:0;background:#f4f4f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#1d1d1f;">
+  <div style="display:none;font-size:1px;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;color:#f4f4f5;">Your Rapid Apps dashboard password was just changed.</div>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f4f4f5;padding:40px 16px;">
+    <tr><td align="center">
+      <table role="presentation" width="520" cellpadding="0" cellspacing="0" border="0" style="max-width:520px;width:100%;">
+        <tr><td style="background:#ffffff;border:1px solid #e4e4e7;border-radius:10px;padding:32px;">
+          <p style="margin:0 0 16px;font-size:16px;">Hi {{name}},</p>
+          <p style="margin:0 0 16px;font-size:16px;line-height:1.5;color:#3f3f46;">The password for your {{company_name}} dashboard account was changed on <strong style="color:#1d1d1f;">{{changed_at}}</strong>. Every session that was signed in before then has been signed out.</p>
+          <p style="margin:0 0 24px;font-size:16px;line-height:1.5;color:#3f3f46;">If this was you, there's nothing to do.</p>
+          <p style="margin:0 0 8px;font-size:14px;line-height:1.5;color:#b42318;font-weight:600;">Didn't change it? Reset it now and tell a team admin straight away.</p>
+          <p style="margin:0;">
+            <a href="{{action_url}}" style="display:inline-block;background:#b42318;color:#ffffff;text-decoration:none;font-weight:600;font-size:15px;padding:12px 20px;border-radius:6px;">Reset my password</a>
+          </p>
+        </td></tr>
+        <tr><td align="center" style="padding:20px 4px 0;font-size:12px;line-height:1.6;color:#a1a1aa;">
+          This is a security email about your {{company_name}} dashboard account, so it is sent even if you have unsubscribed from other mail.<br>
+          &copy; {{current_year}} {{company_name}}
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>

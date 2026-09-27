@@ -1,0 +1,10 @@
+Hi {{name}},
+
+The password for your {{company_name}} dashboard account was changed on {{changed_at}}. Every session that was signed in before then has been signed out.
+
+If this was you, there's nothing to do.
+
+Didn't change it? Reset it now and tell a team admin straight away:
+{{action_url}}
+
+This is a security email about your {{company_name}} dashboard account.

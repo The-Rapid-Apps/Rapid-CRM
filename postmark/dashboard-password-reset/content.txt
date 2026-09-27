@@ -1,0 +1,9 @@
+Hi {{name}},
+
+Someone asked to reset the password for your {{company_name}} dashboard account. If it was you, choose a new password here — the link works once and expires in {{expires_in}}:
+
+{{action_url}}
+
+If you didn't ask for this, ignore this email. Your password stays the same, and the link expires on its own.
+
+This is a security email about your {{company_name}} dashboard account.

@@ -1,0 +1,2240 @@
+// rapi-management — standalone, multi-tenant Shopify app billing and analytics
+// platform. It holds many apps' credentials and bills merchants on their behalf.
+//
+// Tenancy chain: Organization -> App -> AppInstall (a merchant's install) -> Subscription.
+//
+// docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+/// The tier's list interval (customer-facing cadence).
+enum PlanInterval {
+  EVERY_30_DAYS
+  ANNUAL
+  QUARTERLY
+}
+
+/// The unit we advance the local billing clock by. Normalize away from
+/// Shopify's day/30 default (spec §1.1 recurringInterval).
+enum RecurringInterval {
+  DAY
+  WEEK
+  MONTH
+  YEAR
+}
+
+enum OnUsageLimitReached {
+  NONE
+  UPGRADE
+}
+
+enum UsageLimitsPeriod {
+  MONTH_TO_DATE
+  CURRENT_BILLING_PERIOD
+}
+
+/// How a plan's `revenueCapLimit` is measured. Mantle expresses a revenue cap
+/// as either a per-period ceiling that resets, or a lifetime total. The
+/// consuming app enforces this; the platform only stores the choice.
+enum RevenueCapPeriod {
+  BILLING_PERIOD
+  LIFETIME
+}
+
+enum LineItemType {
+  SUBSCRIPTION // the recurring line ($0 under flex, the real price under standard)
+  USAGE // the capped usage line every charge posts against
+  /// A priced component sold alongside the base plan. Standard billing only —
+  /// flex expresses everything through the single usage line.
+  ADDON
+}
+
+enum SubscriptionStatus {
+  PENDING // created on Shopify, awaiting merchant approval
+  ACTIVE
+  FROZEN
+  CANCELLED
+  DECLINED
+  EXPIRED
+}
+
+enum ChargeStatus {
+  PENDING
+  ACTIVE
+  DECLINED
+  FAILED
+}
+
+enum DiscountType {
+  PERCENTAGE // value = percent off (0-100)
+  AMOUNT // value = flat amount off the list price
+  FLAT_PRICE // value = the absolute discounted price
+}
+
+/// How a discount is realized. PRICE_REDUCTION lowers the charged usage-record
+/// amount (spec §4.2). APP_CREDITS leaves the fee at list price and issues a
+/// separate credit instead — the charge path must NOT reduce the amount.
+enum DiscountMethod {
+  PRICE_REDUCTION
+  APP_CREDITS
+}
+
+enum DiscountRedemptionStatus {
+  RESERVED
+  APPLIED
+  RELEASED
+}
+
+enum FlexBillingEventType {
+  SUBSCRIBED
+  SUBSCRIPTION_CHARGED
+  UPGRADED
+  DOWNGRADED
+}
+
+enum AppDistribution {
+  PUBLIC // required for the Shopify Billing API
+  PRIVATE
+}
+
+enum BillingProvider {
+  SHOPIFY
+}
+
+enum PartnerConnectionStatus {
+  UNTESTED
+  CONNECTED
+  ERROR
+}
+
+/// The clean, derived account-lifecycle event types (customer-events pipeline,
+/// account-lifecycle slice only — see .claude/skills/shopify-customer-events).
+/// Subscription/MRR lifecycle (subscribed/upgraded/downgraded) is intentionally
+/// NOT re-derived here: flex billing already writes that authoritatively to
+/// FlexBillingEvent from source, and re-deriving it from the Partner app-events
+/// feed would both duplicate and (for flex-billed installs, whose Shopify
+/// recurring charge never changes) MISCLASSIFY it.
+enum AccountLifecycleEventType {
+  INSTALLED
+  REINSTALLED
+  UNINSTALLED
+  REACTIVATED
+  DEACTIVATED
+}
+
+// ---------------------------------------------------------------------------
+// Tenancy: Organization -> App -> AppInstall
+// ---------------------------------------------------------------------------
+
+/// A platform account (e.g. rapi's company). Owns apps and dashboard users.
+model Organization {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  /// High-water mark for the org-wide logo-churn snapshot writer (see
+  /// PartnerDailyLogoChurnSnapshot). No lease needed — the writer is
+  /// idempotent, so a rare concurrent race costs a redundant recompute, never
+  /// a wrong value.
+  logoSnapshotSyncedAt            DateTime?
+  /// Cursor for the one-time historical org-wide backfill (mirrors
+  /// App.mrrSnapshotBackfillCursor). Reset when an app's `enabled` flag
+  /// changes, since the org-wide fold's membership changed.
+  logoSnapshotBackfillCursor      DateTime?
+  logoSnapshotBackfillCompletedAt DateTime?
+
+  apps                           App[]
+  users                          User[]
+  userInvites                    UserInvite[]
+  flexBillingEvents              FlexBillingEvent[]
+  partnerConnections             ShopifyPartnerConnection[]
+  apiRequestLogs                 ApiRequestLog[]
+  trafficSavedFilters            TrafficSavedFilter[]
+  savedReportViews               SavedReportView[]
+  partnerDailyLogoChurnSnapshots PartnerDailyLogoChurnSnapshot[]
+  customerComments               CustomerComment[]
+
+  @@map("organizations")
+}
+
+/// A dashboard login for the management UI. Email + password for now (SSO is
+/// planned as a later addition) — created via `prisma/seed.ts` or directly by
+/// an admin; there is no self-serve signup.
+/// Who may administer the dashboard itself — invite people, and deactivate
+/// them again. Deliberately NOT a data-access role: every signed-in user, of
+/// either role, still sees every app's Shopify credentials and all merchant
+/// billing data, exactly as before this enum existed. This gates the team
+/// management screen and nothing else.
+enum UserRole {
+  ADMIN
+  MEMBER
+}
+
+model User {
+  id             String    @id @default(cuid())
+  organizationId String
+  email          String    @unique
+  passwordHash   String
+  lastLoginAt    DateTime?
+  name           String?
+  role           UserRole  @default(MEMBER)
+  /// Set instead of deleting the row. `CustomerComment.author` cascades on
+  /// delete, so removing a user would take their comment history with them —
+  /// and a comment's value is largely that you know who wrote it. A
+  /// deactivated user cannot log in and every live session of theirs dies on
+  /// its next request (`getUser` re-reads this row per request).
+  deactivatedAt  DateTime?
+  /// Every session issued before this instant is dead. Moved by a password
+  /// reset or change, so "change your password" also means "sign everyone
+  /// else out" — the dashboard cookie is stateless and otherwise lives 30
+  /// days whatever happens to the password. Null = no cut-off yet.
+  sessionsValidFrom DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  organization      Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  passwordResets    UserPasswordReset[]
+  customerComments  CustomerComment[]
+  invitesSent       UserInvite[]      @relation("UserInviteInvitedBy")
+  identifyApiKeys   IdentifyApiKey[]  @relation("IdentifyApiKeyCreatedBy")
+
+  @@index([organizationId])
+  @@map("users")
+}
+
+/// A pending invitation to create a dashboard login.
+///
+/// A separate model rather than a half-built `User` row: `passwordHash` is
+/// required and `email` unique, so a pending user would need either a nullable
+/// password (weakening the invariant every login path relies on) or a
+/// placeholder hash, and would show up anywhere users are listed.
+///
+/// Rows are kept after they are accepted or revoked — who invited whom, and
+/// when, is the audit trail for how someone got access.
+model UserInvite {
+  id             String    @id @default(cuid())
+  organizationId String
+  email          String
+  role           UserRole  @default(MEMBER)
+  /// SHA-256 of the invite token — never the token itself. The link is an
+  /// account-creation credential; storing it would be strictly worse than
+  /// logging it, because a table persists.
+  tokenHash      String    @unique @db.VarChar(64)
+  expiresAt      DateTime
+  createdAt      DateTime  @default(now())
+  /// Null once the inviter is deleted; the invite itself stays auditable.
+  invitedById    String?
+  acceptedAt     DateTime?
+  revokedAt      DateTime?
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  invitedBy    User?        @relation("UserInviteInvitedBy", fields: [invitedById], references: [id], onDelete: SetNull)
+
+  /// Drives the pending list: open invites for an org, soonest to expire.
+  @@index([organizationId, acceptedAt, revokedAt, expiresAt])
+  @@index([email])
+  @@index([invitedById])
+  @@map("user_invites")
+}
+
+/// A Shopify app managed by the platform (e.g. "rapi"). Holds the Shopify app
+/// credentials the platform uses to act on behalf of the app, plus the API key
+/// the app uses to authenticate to *our* public API.
+model App {
+  id             String @id @default(cuid())
+  organizationId String
+  name           String
+  handle         String @unique
+  /// The app's icon, as an absolute https URL — typically the image from its
+  /// App Store listing.
+  ///
+  /// Stored rather than synced because the Partner API has no icon field at
+  /// all: its `App` object exposes only `apiKey` and `events`, and
+  /// `AppReference` only `id`, `apiKey` and `name`. Null everywhere it has not
+  /// been set, and every reader falls back to a monogram of the app's name —
+  /// so this is decoration that improves scanning, never something a screen
+  /// depends on.
+  logoUrl        String? @db.VarChar(512)
+  /// The App Store listing's handle — `rapid-tracking` in
+  /// apps.shopify.com/rapid-tracking. Not `handle`: a listing can be renamed
+  /// (rapi-tracking → rapid-tracking, and the old address 404s) while the
+  /// Partner app keeps its handle. Null = reviews are not collected.
+  appStoreHandle String? @db.VarChar(191)
+  /// Review collection state (app-reviews-sync.server.ts). The listing page is
+  /// the only source: the Partner API exposes no reviews.
+  reviewsSyncedAt            DateTime?
+  /// Next page of the one-time full read; null once it has finished.
+  reviewsBackfillNextPage    Int?
+  reviewsBackfillCompletedAt DateTime?
+  /// When the current full re-read began. A review not seen since then, once
+  /// the re-read finishes, has left the listing (archived).
+  reviewsSweepStartedAt      DateTime?
+  /// The listing's own headline rating and review count, as last read.
+  appStoreRating             Decimal?  @db.Decimal(3, 2)
+  appStoreReviewCount        Int?
+  /// Whether this row is the real, published app rather than a development or
+  /// staging instance of it.
+  ///
+  /// Nothing else in the model tells them apart — `rapi-dev` and `rapi-staging`
+  /// carry a Shopify app id, a verified partner connection and real installs,
+  /// exactly like the live ones. So it has to be stated rather than inferred.
+  ///
+  /// Defaults to TRUE so a newly connected app is visible immediately; hiding
+  /// one is the deliberate act. It currently governs only the sidebar's app
+  /// switcher — a non-production app keeps all its data, and every page still
+  /// reaches it through Manage apps or an explicit `?appId=` link.
+  isProduction   Boolean @default(true)
+
+  // --- Shopify app credentials (used to call the merchant Admin API) ---
+  shopifyApiKey    String
+  shopifyApiSecret String
+  /// The app's Shopify numeric/GID id, used for Partner API calls (appId).
+  shopifyAppId     String?
+  distribution     AppDistribution @default(PUBLIC)
+
+  // --- Partner API (used for both downgrade credits and the account-lifecycle
+  // events poller below; each feature gates on it independently) ---
+  partnerApiToken                    String?
+  partnerOrganizationId              String?
+  /// Reusable organization-owned Partner connection. New writes use this
+  /// relation; the two legacy fields above remain as a rollout fallback only.
+  partnerConnectionId                String?
+  partnerAppVerifiedAt               DateTime?
+  partnerAppVerificationError        String?   @db.Text
+  /// High-water mark for the account-lifecycle events poller (see
+  /// app/lib/customer-events/). This advances only after the complete fixed
+  /// recent window has been imported. Null = never refreshed.
+  lifecycleEventsSyncedAt            DateTime?
+  /// Fixed, resumable recent account-lifecycle window. Cursor connection
+  /// arguments must remain immutable until every page in the window is saved.
+  lifecycleEventsIncrementalCursor   String?   @db.Text
+  lifecycleEventsIncrementalMinAt    DateTime?
+  lifecycleEventsIncrementalMaxAt    DateTime?
+  /// Cursor for the older historical account-lifecycle backfill. The upper
+  /// bound is fixed when the backfill starts so the cursor stays valid.
+  lifecycleEventsBackfillCursor      String?   @db.Text
+  lifecycleEventsBackfillMaxAt       DateTime?
+  lifecycleEventsBackfillCompletedAt DateTime?
+  /// Prevents cron and interactive refreshes in different Node workers from
+  /// advancing the same Partner lifecycle cursors concurrently.
+  lifecycleSyncLeaseToken            String?
+  lifecycleSyncLeaseExpiresAt        DateTime?
+  /// Prevents multiple workers from deriving the same raw lifecycle batch.
+  lifecycleDeriveLeaseToken          String?
+  lifecycleDeriveLeaseExpiresAt      DateTime?
+  /// High-water mark for Partner subscription billing events. Null means the
+  /// app still needs its initial full-history MRR backfill.
+  billingEventsSyncedAt              DateTime?
+  /// Fixed, resumable incremental window. These three fields stay together
+  /// until every Partner API page in the window has been imported.
+  billingEventsIncrementalCursor     String?   @db.Text
+  billingEventsIncrementalMinAt      DateTime?
+  billingEventsIncrementalMaxAt      DateTime?
+  /// Cursor for the bounded, resumable initial event backfill.
+  billingEventsBackfillCursor        String?   @db.Text
+  /// Keeps the Partner connection arguments stable while a cursor is resumed.
+  billingEventsBackfillMaxAt         DateTime?
+  billingEventsBackfillCompletedAt   DateTime?
+  /// Subscription-sale facts supply billing cadence and the all-time raw
+  /// revenue flow. Raw facts here are always the source of truth; a narrow,
+  /// additive subset of derived numbers (MRR/ARR/subscription counts,
+  /// revenue, and — since 2026-08-16 — subscription-churn flow) may be
+  /// persisted as a rebuildable cache — see PartnerDailyMrrSnapshot. Rolling-
+  /// window churn IS safely persistable once decomposed into signed daily
+  /// transitions summed over the window against a stock denominator (see
+  /// that model's own doc comment); only genuine cross-app distinct-count
+  /// metrics (activeCustomers) stay live, since summing distinct-shop counts
+  /// across apps double-counts shops that install more than one.
+  billingSalesSyncedAt               DateTime?
+  billingSalesIncrementalCursor      String?   @db.Text
+  billingSalesIncrementalMinAt       DateTime?
+  billingSalesIncrementalMaxAt       DateTime?
+  billingSalesBackfillCursor         String?   @db.Text
+  billingSalesBackfillMaxAt          DateTime?
+  billingSalesBackfillCompletedAt    DateTime?
+  /// High-water mark for the daily MRR/revenue snapshot writer (see
+  /// PartnerDailyMrrSnapshot): the latest UTC day for which every currency's
+  /// row is known correct as of the last write. Null = never snapshotted.
+  /// Guarded by the same billingSyncLeaseToken below, not a separate lease —
+  /// the writer only ever runs inside that lease's already-held window.
+  mrrSnapshotSyncedAt                DateTime?
+  /// Cursor for the one-time historical snapshot backfill (oldest UTC day
+  /// walked so far, descending). Mirrors billingEventsBackfillCursor's role
+  /// but stores a date directly since this backfill walks local rows, not
+  /// Shopify API pages.
+  mrrSnapshotBackfillCursor          DateTime?
+  mrrSnapshotBackfillCompletedAt     DateTime?
+  /// Oldest UTC day whose row(s) may be wrong because a fact affecting it
+  /// arrived after that day was last written (a historical Partner-events
+  /// backfill delivering a years-old cancellation, a late sale, etc.). Added
+  /// 2026-08-16 — this table's revenue flow field alone would self-heal
+  /// within its own day regardless, but the stock fields (mrr,
+  /// activeSubscriptions, ...) and the new churn-flow columns are each
+  /// recomputed independently per day from full history, and only the
+  /// trailing 7-day rewrite (writeTrailingDailySnapshots) ever revisits an
+  /// already-written day — a late fact older than that window would
+  /// otherwise leave stale rows with nothing to ever fix them. Null =
+  /// nothing dirty. Mirrors installSnapshotDirtyFrom's semantics exactly:
+  /// the writer rewrites [dirtyFrom, todayStart) oldest-first each tick and
+  /// clears this once caught up; the read path must treat any app with
+  /// dirtyFrom set and < the requested range's end as not ready.
+  mrrSnapshotDirtyFrom               DateTime?
+  /// Separate dirty watermark for the ORG-WIDE logo-churn writer (see
+  /// PartnerDailyLogoChurnSnapshot) — not shared with mrrSnapshotDirtyFrom,
+  /// which the per-app writer clears far more often and would otherwise
+  /// starve this independently-ticked writer of its signal.
+  logoSnapshotDirtyFrom              DateTime?
+
+  /// High-water mark for the daily install/churn snapshot writer (see
+  /// PartnerDailyInstallSnapshot): the latest UTC day known correct as of the
+  /// last write. Null = never snapshotted. Guarded by lifecycleSyncLeaseToken
+  /// above, not a separate lease — same reasoning as mrrSnapshotSyncedAt.
+  installSnapshotSyncedAt            DateTime?
+  /// UTC midnight of startOfUtcDay(min(AppInstall.installedAt,
+  /// AccountLifecycleEvent.occurredAt)) for this app, computed once. Days
+  /// before this are structurally zero-active (no install can exist yet), so
+  /// readiness treats them as covered-with-zero rather than missing — without
+  /// this, an org-wide all_time range would never look "complete" for an app
+  /// whose history starts later than a sibling app's.
+  installSnapshotFloorDate           DateTime?
+  /// Cursor for the one-time historical snapshot backfill (oldest UTC day
+  /// walked so far, descending). Mirrors mrrSnapshotBackfillCursor's role.
+  installSnapshotBackfillCursor      DateTime?
+  installSnapshotBackfillCompletedAt DateTime?
+  /// Oldest UTC day whose stock (a prefix sum) may be wrong because a fact
+  /// affecting it arrived after that day was last written — e.g. a historical
+  /// lifecycle backfill delivering a years-old event, or installedAt moving
+  /// earlier on a late RELATIONSHIP_INSTALLED. Unlike PartnerDailyMrrSnapshot
+  /// (a flow — a late fact only corrupts its own day), a late fact here
+  /// corrupts every day from that point forward, so this table needs an
+  /// explicit dirty watermark the MRR snapshot never needed. Null = nothing
+  /// dirty. The writer rewrites [dirtyFrom, todayStart) oldest-first each
+  /// tick and clears this once it catches up; the read path must treat any
+  /// app with dirtyFrom set and < the requested range's end as not ready.
+  installSnapshotDirtyFrom           DateTime?
+
+  /// Short database lease that prevents cron/manual refreshes (including
+  /// different Node workers) from mutating the same Partner cursors at once.
+  billingSyncLeaseToken     String?
+  billingSyncLeaseExpiresAt DateTime?
+
+  /// Cursor for the one-time historical backfill of PartnerSubscriptionState/
+  /// PartnerCustomerState (see partner-state-sync.server.ts): the last
+  /// processed chargePlatformId, ordered ascending, resumable. Unlike the
+  /// day-bucketed MRR/Traffic snapshots, this needs no dirty-watermark field
+  /// — it's identity-keyed (one row per charge/shop), so a late-arriving
+  /// event only ever needs to recompute its own charge's row, never a range
+  /// of other rows. Guarded by billingSyncLeaseToken above, not a separate
+  /// lease — the incremental writer only ever runs inside persistEventEdges/
+  /// persistSaleEdges, already inside that lease's held window.
+  partnerStateBackfillCursor             String?
+  partnerStateBackfillCompletedAt        DateTime?
+  /// Second, separate backfill pass over AppInstall (not PartnerSubscriptionEvent)
+  /// — cursor is the last processed shopDomain, ordered ascending. Needed
+  /// because customers.tsx's live query treats a "customer" as any shop in
+  /// EITHER PartnerSubscriptionEvent OR AppInstall; the charge-keyed backfill
+  /// above only ever discovers shops with at least one subscription charge,
+  /// silently missing every install-only shop (found via the production
+  /// parity check, 2026-08-17). Incremental freshness for NEW install-only
+  /// shops going forward is handled separately by syncCustomerStateForInstall
+  /// hooked into every AppInstall create/uninstall site — this field is only
+  /// for the one-time catch-up over installs that already existed.
+  partnerStateInstallBackfillCursor      String?
+  partnerStateInstallBackfillCompletedAt DateTime?
+
+  // --- GA4/BigQuery access for the Traffic Source Report. Each app can have
+  // its own GA4 property/dataset/GCP project. gcpProjectId is nullable and
+  // falls back to the shared GCP_PROJECT_ID env var (the common case: one GCP
+  // project hosting multiple GA4 properties) — only set it when an app's
+  // export genuinely lives in a separate GCP project the service account has
+  // been separately granted cross-project BigQuery access to. Null
+  // ga4PropertyId/bigqueryDataset = not configured for this app (Traffic
+  // shows the existing "connect analytics" empty state).
+  ga4PropertyId   String?
+  bigqueryDataset String?
+  gcpProjectId    String?
+
+  /// High-water mark for the local GA4 traffic-event mirror (see
+  /// TrafficEventFact / traffic-events-sync.server.ts). Only the 3 event
+  /// names the Traffic report actually reads (view_item, shopify_app_install,
+  /// installs) are mirrored — this exists so the Traffic report's dimension
+  /// pivots can run as a local GROUP BY instead of a live BigQuery query on
+  /// every request. Null = never synced (Traffic falls back to live BigQuery,
+  /// same as before this existed).
+  trafficEventsSyncedAt            DateTime?
+  /// Cursor for the one-time historical backfill (oldest UTC day walked so
+  /// far, descending) — mirrors mrrSnapshotBackfillCursor's shape. BigQuery
+  /// has no opaque page cursor for this query shape, just a date filter, so a
+  /// plain Date is enough (unlike the Partner API's Relay cursors).
+  trafficEventsBackfillCursor      DateTime?
+  trafficEventsBackfillCompletedAt DateTime?
+  /// Own lease, deliberately not shared with billingSyncLeaseToken — GA4/
+  /// BigQuery is independent infrastructure from Shopify's Partner API, the
+  /// same reason lifecycleSyncLeaseToken above is already its own lease
+  /// rather than piggybacking on the billing one.
+  trafficEventsSyncLeaseToken      String?
+  trafficEventsSyncLeaseExpiresAt  DateTime?
+
+  // --- Auth for the app -> platform public API ---
+  /// DEPRECATED, kept only until the backfill is verified and dropped in a
+  /// follow-up migration. Reads go through `apiKeyHash` / `apiKeyCipher`; this
+  /// remains as the fallback so an unbackfilled row cannot lose authentication.
+  apiKey        String  @unique @default(cuid())
+  /// SHA-256 (hex) of the api key. Authentication is one indexed lookup on this
+  /// and never needs the plaintext.
+  ///
+  /// Nullable only while the backfill runs — every row gets one.
+  apiKeyHash    String? @unique @db.VarChar(64)
+  /// The api key encrypted at rest (AES-256-GCM envelope, CREDENTIAL_ENCRYPTION_KEY).
+  ///
+  /// Encrypted rather than hashed because this value MUST stay recoverable: it
+  /// is shown to operators so they can configure their app. A one-way hash
+  /// would break every consumer's signature verification. The guarantee is
+  /// therefore "a database dump alone is useless" — recovery needs the database
+  /// AND the encryption key, which lives only in the environment.
+  apiKeyCipher  String? @db.Text
+  apiSecretHash String?
+
+
+  // --- Flex billing knobs ---
+  /// Per-app opt-out of Partner-API downgrade credits (they are irreversible).
+  disableDowngradeCredits Boolean @default(false)
+
+  // --- Cron selector gates (spec §4.1) ---
+  enabled                Boolean   @default(true)
+  removed                Boolean   @default(false)
+  scheduledForDeletionAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  organization                  Organization                   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  partnerConnection             ShopifyPartnerConnection?      @relation(fields: [partnerConnectionId], references: [id], onDelete: Restrict)
+  installs                      AppInstall[]
+  reviews                       AppReview[]
+  plans                         Plan[]
+  planFeatures                  PlanFeature[]
+  discounts                     Discount[]
+  discountApps                  DiscountApp[]
+  discountRedemptions           DiscountRedemption[]
+  apiRateLimitBuckets           ApiRateLimitBucket[]
+  apiRequestLogs                ApiRequestLog[]
+  rawPartnerEvents              RawPartnerEvent[]
+  partnerSubscriptionEvents     PartnerSubscriptionEvent[]
+  partnerSubscriptionSales      PartnerSubscriptionSaleFact[]
+  partnerDailyMrrSnapshots      PartnerDailyMrrSnapshot[]
+  partnerDailyPlanMrrSnapshots  PartnerDailyPlanMrrSnapshot[]
+  partnerDailyInstallSnapshots  PartnerDailyInstallSnapshot[]
+  accountLifecycleEvents        AccountLifecycleEvent[]
+  trafficEventFacts             TrafficEventFact[]
+  partnerSubscriptionStates     PartnerSubscriptionState[]
+  partnerCustomerStates         PartnerCustomerState[]
+  partnerOfferCadenceInferences PartnerOfferCadenceInference[]
+  partnerChargeLiveDiscountChecks PartnerChargeLiveDiscountCheck[]
+  identifyApiKeys              IdentifyApiKey[]
+
+  @@unique([organizationId, shopifyAppId])
+  @@index([organizationId])
+  @@index([partnerConnectionId])
+  @@index([lifecycleSyncLeaseExpiresAt], map: "apps_lifecycleSyncLeaseExpiresAt_idx")
+  @@index([lifecycleDeriveLeaseExpiresAt], map: "apps_lifecycleDeriveLeaseExpiresAt_idx")
+  @@index([billingSyncLeaseExpiresAt], map: "apps_billingSyncLeaseExpiresAt_idx")
+  @@index([trafficEventsSyncLeaseExpiresAt], map: "apps_trafficEventsSyncLeaseExpiresAt_idx")
+  @@map("apps")
+}
+
+/// Facts about a Shopify store that no Shopify feed we read gives us: its
+/// Shopify plan (only an app installed on the store can ask Shopify) and, for
+/// most stores, even its name. Keyed by domain — a store, not an install.
+///
+/// Filled from Mantle's Customers export (126k stores, 2026-09-25) by
+/// `npm run import:mantle-customers`; `source` + `asOf` say where each row came
+/// from and how current it is, so a newer source (an identify record) can win.
+model ShopProfile {
+  id          String   @id @default(cuid())
+  shopDomain  String   @unique @db.VarChar(255)
+  name        String?  @db.VarChar(255)
+  /// As the source names it ("Basic", "Shopify Plus"); shown via
+  /// `shopifyPlanLabel`.
+  shopifyPlan String?  @db.VarChar(64)
+  countryCode String?  @db.VarChar(8)
+  source      String   @db.VarChar(32)
+  /// When the source's data was true — for an export, the day it was taken.
+  asOf        DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("shop_profiles")
+}
+
+/// A review from the app's public App Store listing
+/// (apps.shopify.com/<appStoreHandle>/reviews). Kept once seen — a review that
+/// later leaves the listing (Shopify archives some) stays here.
+model AppReview {
+  id               String   @id @default(cuid())
+  appId            String
+  /// The listing's own review id (`data-review-content-id`).
+  platformReviewId String   @db.VarChar(64)
+  rating           Int
+  body             String   @db.Text
+  /// The store name the listing shows. The listing gives no shop domain.
+  reviewerName     String   @db.VarChar(255)
+  reviewerCountry  String?  @db.VarChar(191)
+  /// As the listing words it: "1 day using the app".
+  timeUsingApp     String?  @db.VarChar(191)
+  /// The developer's public reply, when there is one.
+  replyBody        String?  @db.Text
+  /// The day the listing shows (no time of day is published). For an edited
+  /// review that is the edit's day — the listing shows "Edited <date>" in
+  /// place of the original, as Mantle's export does too.
+  reviewedAt       DateTime
+  edited           Boolean  @default(false)
+  /// When the review was found missing from the listing — Shopify's
+  /// "archived". Set by the daily full re-read, cleared if the review comes
+  /// back; imported from Mantle for reviews archived before we collected.
+  archivedAt       DateTime?
+  /// The store this review is KNOWN to be from (Mantle's export links it). A
+  /// review read off the listing has only a store name, so this stays null
+  /// and the page matches by name instead.
+  shopDomain       String?  @db.VarChar(255)
+  /// "mantle" for reviews that came from a Mantle export; null when read off
+  /// the listing.
+  importedFrom     String?  @db.VarChar(32)
+  firstSeenAt      DateTime @default(now())
+  lastSeenAt       DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  app App @relation(fields: [appId], references: [id], onDelete: Cascade)
+
+  @@unique([appId, platformReviewId])
+  @@index([appId, reviewedAt])
+  @@index([reviewedAt])
+  @@map("app_reviews")
+}
+
+/// SUPERSEDED by `SavedReportView` (2026-09-24): its rows were copied there by
+/// migration 20260924180000_saved_report_views and nothing reads or writes
+/// this table any more. Kept, untouched, so rolling the code back still finds
+/// every filter saved before the switch; drop it in a later cleanup.
+///
+/// A named, reusable Traffic Source report view (Mantle calls these "Saved
+/// filters") — captures the whole view (app, pivot dimensions, funnel
+/// events, dimension-value filters, date range, compare-to setting) so
+/// applying one restores exactly what was saved, not just a value filter.
+/// Org-scoped, not per-user (matches Mantle's shared team-visible list).
+model TrafficSavedFilter {
+  id             String    @id @default(cuid())
+  organizationId String
+  name           String
+  /// Comma-separated PivotDimensionKey[].
+  dimensions     String    @db.Text
+  /// Comma-separated FunnelEventKey[].
+  funnelEvents   String    @db.Text
+  /// JSON-encoded DimensionFilters (Partial<Record<PivotDimensionKey, string[]>>).
+  filters        String    @db.Text
+  appId          String?
+  /// Shared Period selector value, used when no custom date range is saved.
+  period         String?
+  dateStart      DateTime?
+  dateEnd        DateTime?
+  compareMode    String?
+  compareStart   DateTime?
+  compareEnd     DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@map("traffic_saved_filters")
+}
+
+/// A named, saved view of any report ("Saved filters" in Mantle), shared by
+/// the whole organization. `report` names the report ("traffic", "insights")
+/// and `state` holds that report's own settings, validated on read by its
+/// schema in app/lib/saved-views/saved-view-schemas.ts — so a new report can
+/// offer saved filters without a database change.
+model SavedReportView {
+  id             String   @id @default(cuid())
+  organizationId String
+  report         String   @db.VarChar(64)
+  name           String
+  state          Json
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, report])
+  @@map("saved_report_views")
+}
+
+/// Local mirror of the GA4 events the Traffic Source Report actually reads
+/// (view_item, shopify_app_install, installs only — everything else in GA4's
+/// raw export is irrelevant here and stays untouched in BigQuery). Added
+/// 2026-08-16 so the Traffic report's dimension pivots run as a local GROUP
+/// BY instead of two live BigQuery round-trips per request (the direct
+/// funnel-event query plus the visitor-lookback join for page-view-only
+/// dimensions) — see docs/... or the plan history for why a precomputed
+/// per-dimension-combination rollup doesn't work here (13 user-choosable
+/// pivot dimensions, unbounded cardinality) while mirroring the raw rows
+/// does: any dimension combination is just a GROUP BY over local data.
+/// Mirrors PartnerSubscriptionEvent's shape/conventions exactly. All 13
+/// pivot dimensions (see traffic-sources.shared.ts) are derived at read time
+/// from just the handful of raw columns below.
+model TrafficEventFact {
+  id                  String   @id @default(cuid())
+  appId               String
+  dedupeKey           String   @unique @db.VarChar(64)
+  eventName           String   @db.VarChar(32)
+  /// UTC day, from GA4's event_date — cheap range/day filtering without
+  /// re-deriving it from eventTimestamp on every query.
+  eventDate           DateTime
+  /// Precise instant, from GA4's event_timestamp (microseconds since epoch).
+  eventTimestamp      DateTime
+  userPseudoId        String   @db.VarChar(191)
+  /// Only present on shopify_app_install/installs.
+  shopUrl             String?  @db.VarChar(255)
+  /// Raw, only present on view_item — every page-view-only dimension
+  /// (referral code, search term, surface type/detail/position) is derived from
+  /// this at read time, mirroring pageLocationParam() in
+  /// traffic-sources.shared.ts today.
+  pageLocation        String?  @db.Text
+  pageReferrer        String?  @db.Text
+  /// A GA4 event param read directly. NO LONGER what the Campaign pivot
+  /// reads — that param is null on ~99% of events, so the pivot now derives
+  /// utm_campaign from pageLocation like the other page-view-only dimensions
+  /// above. Still synced; kept only as raw captured data.
+  campaign            String?  @db.VarChar(191)
+  trafficSourceName   String?  @db.VarChar(191)
+  trafficSourceMedium String?  @db.VarChar(191)
+  trafficSourceSource String?  @db.VarChar(191)
+  language            String?  @db.VarChar(32)
+  country             String?  @db.VarChar(191)
+  fetchedAt           DateTime @default(now())
+
+  app App @relation(fields: [appId], references: [id], onDelete: Cascade)
+
+  @@index([appId, eventName, eventDate], map: "traffic_event_fact_app_event_date_idx")
+  /// The visitor-lookback join (resolvePageViewOnlyDimensions in
+  /// traffic-sources.server.ts): find a user's most recent view_item at or
+  /// before some later event's timestamp.
+  @@index([appId, userPseudoId, eventTimestamp], map: "traffic_event_fact_app_user_ts_idx")
+  @@map("traffic_event_facts")
+}
+
+/// Immutable subscription-charge lifecycle events imported from Shopify's
+/// Partner API. These make existing app MRR observable before merchant OAuth
+/// tokens have been synchronized into this management platform.
+model PartnerSubscriptionEvent {
+  id               String    @id @default(cuid())
+  appId            String
+  dedupeKey        String    @unique @db.VarChar(64)
+  type             String    @db.VarChar(64)
+  occurredAt       DateTime
+  shopDomain       String    @db.VarChar(255)
+  shopPlatformId   String?   @db.VarChar(191)
+  chargePlatformId String    @db.VarChar(191)
+  chargeName       String    @db.VarChar(255)
+  amount           Decimal   @db.Decimal(18, 6)
+  currencyCode     String    @db.VarChar(3)
+  billingOn        DateTime?
+  test             Boolean   @default(false)
+  fetchedAt        DateTime  @default(now())
+
+  app App @relation(fields: [appId], references: [id], onDelete: Cascade)
+
+  @@index([appId, occurredAt], map: "partner_sub_event_app_occurred_idx")
+  @@index([appId, chargePlatformId, occurredAt], map: "partner_sub_event_charge_occurred_idx")
+  /// Supports the Customers page: grouped by (appId, shopDomain) to build the
+  /// customer list, and filtered by the same pair to fetch each page's
+  /// current-charge events. Previously unindexed, forcing a full scan.
+  @@index([appId, shopDomain], map: "partner_sub_event_app_shop_idx")
+  /// For the snapshot read path's "today" top-up, which asks for charges whose
+  /// `billingOn` crosses a threshold today (see
+  /// `clockTransitionBillingOnWindows`). Without it that query is a full scan of
+  /// the app's events — 106k rows on this database — on a render path.
+  @@index([appId, billingOn], map: "partner_sub_event_app_billing_on_idx")
+  @@map("partner_subscription_events")
+}
+
+/// Immutable Shopify Partner subscription-sale facts. They provide cadence
+/// and first-billed evidence for the subscription lifecycle state
+/// reconstructed from PartnerSubscriptionEvent, and the all-time raw revenue
+/// flow. These rows are always the source of truth; PartnerDailyMrrSnapshot
+/// persists a narrow, additive, rebuildable-from-these-facts cache of
+/// calculated revenue — it does not replace this table as the ground truth.
+model PartnerSubscriptionSaleFact {
+  id                    String   @id @default(cuid())
+  appId                 String
+  transactionPlatformId String   @unique @db.VarChar(191)
+  chargePlatformId      String?  @db.VarChar(191)
+  occurredAt            DateTime
+  shopDomain            String?  @db.VarChar(255)
+  shopPlatformId        String?  @db.VarChar(191)
+  billingInterval       String?  @db.VarChar(32)
+  grossAmount           Decimal? @db.Decimal(18, 6)
+  /// What actually reached us: gross minus Shopify's revenue share. Null on
+  /// every row written before net amounts were captured.
+  netAmount             Decimal? @db.Decimal(18, 6)
+  /// Shopify's cut. Stored alongside net rather than derived, so a gross/net
+  /// discrepancy is visible instead of being absorbed into a subtraction.
+  shopifyFee            Decimal? @db.Decimal(18, 6)
+  currencyCode          String?  @db.VarChar(3)
+  fetchedAt             DateTime @default(now())
+
+  app App @relation(fields: [appId], references: [id], onDelete: Cascade)
+
+  @@index([appId, occurredAt], map: "partner_sub_sale_app_occurred_idx")
+  @@index([appId, chargePlatformId, occurredAt], map: "partner_sub_sale_charge_occurred_idx")
+  /// Supports the Customers page's lifetime-value groupBy(appId, shopDomain).
+  /// Previously unindexed, forcing a full scan per page load.
+  @@index([appId, shopDomain], map: "partner_sub_sale_app_shop_idx")
+  @@map("partner_subscription_sale_facts")
+}
+
+/// One row per (appId, chargePlatformId): the CURRENT status/amount of one
+/// Shopify Partner subscription charge, incrementally maintained by
+/// partner-state-sync.server.ts whenever a new PartnerSubscriptionEvent/
+/// PartnerSubscriptionSaleFact lands for that charge — never a scheduled
+/// rebuild. Added 2026-08-17 so the Subscriptions page reads a plain indexed
+/// row per charge instead of a `ROW_NUMBER() OVER (PARTITION BY appId,
+/// chargePlatformId ...)` window query over the full event history on every
+/// request (a cost that scales with total historical row count, not with
+/// what changed). Deliberately computed as a direct port of
+/// subscriptions.tsx's/customers.tsx's OWN existing per-charge logic (latest
+/// event + latest sale, same annual-normalization formula customers.tsx
+/// already applies inline) rather than routing through contributionAt() —
+/// contributionAt has a materially different, more sophisticated cadence-
+/// inference fallback chain (charge-name pattern, trial-window inference)
+/// that neither route's current output reflects, so reusing it here would
+/// make this table's numbers subtly diverge from today's live reconstruction
+/// instead of matching it byte-for-byte, defeating the mandatory parity
+/// check. Correctness improvements to the cadence logic are a separate,
+/// later decision — this table's only job is to make today's exact numbers
+/// fast. Raw PartnerSubscriptionEvent/PartnerSubscriptionSaleFact remain the
+/// source of truth; this table is always fully rebuildable from them.
+model PartnerSubscriptionState {
+  appId            String
+  chargePlatformId String    @db.VarChar(191)
+  shopDomain       String    @db.VarChar(255)
+  chargeName       String    @db.VarChar(255)
+  /// ACTIVE | FROZEN | CANCELLED | DECLINED | EXPIRED — mirrors
+  /// subscriptions.tsx's currentStatus() exactly (mapped from the latest
+  /// event's type only, no trial category — the existing UI has none).
+  status           String    @db.VarChar(16)
+  /// Annual-to-monthly-normalized amount, matching customers.tsx's own
+  /// inline MRR formula (`billingInterval === "ANNUAL" ? amount/12 : amount`,
+  /// preferring the latest sale's grossAmount over the event's amount when a
+  /// sale exists). Feeds PartnerCustomerState's mrr rollup — NOT displayed
+  /// directly on the Subscriptions page, which shows approvedAmount instead.
+  amount           Decimal   @db.Decimal(18, 6)
+  /// Raw latest-event amount, unnormalized — what the Subscriptions page's
+  /// "Approved price" column actually shows today.
+  approvedAmount   Decimal   @db.Decimal(18, 6)
+  currencyCode     String    @db.VarChar(3)
+  /// The latest sale's raw billingInterval, or null — exactly what
+  /// subscriptions.tsx's cadenceLabel() reads today (a scalar subquery on the
+  /// live path), not contributionAt's inferred cadence (see model doc above).
+  billingInterval  String?   @db.VarChar(32)
+  nextBillingOn    DateTime?
+  lastEventAt      DateTime
+  lastEventType    String    @db.VarChar(64)
+  updatedAt        DateTime  @updatedAt
+
+  app App @relation(fields: [appId], references: [id], onDelete: Cascade)
+
+  @@id([appId, chargePlatformId])
+  @@index([appId, status, lastEventAt], map: "partner_sub_state_app_status_idx")
+  @@index([appId, shopDomain], map: "partner_sub_state_app_shop_idx")
+  @@map("partner_subscription_states")
+}
+
+/// One row per (appId, shopDomain): a rollup of that shop's
+/// PartnerSubscriptionState rows plus its lifetime PartnerSubscriptionSaleFact
+/// total, incrementally recomputed by partner-state-sync.server.ts whenever
+/// any of that shop's charges change. Added 2026-08-17 so the Customers page
+/// reads one row per shop instead of a grouped UNION across the full
+/// PartnerSubscriptionEvent/AppInstall history plus per-page 50-way `OR`
+/// lookups on every request. oauthConnected is refreshed from AppInstall only
+/// at the same time a Partner event/sale triggers a rewrite for that shop —
+/// an accepted staleness tradeoff (see the plan), not real-time on every
+/// AppInstall mutation.
+model PartnerCustomerState {
+  appId                String
+  shopDomain           String   @db.VarChar(255)
+  firstSeen            DateTime
+  lastActivity         DateTime
+  activeChargeCount    Int
+  attentionChargeCount Int
+  mrr                  Decimal  @db.Decimal(18, 6)
+  currencyCode         String   @db.VarChar(3)
+  lifetimeValue        Decimal  @db.Decimal(18, 6)
+  saleCount            Int
+  oauthConnected       Boolean
+  updatedAt            DateTime @updatedAt
+
+  app App @relation(fields: [appId], references: [id], onDelete: Cascade)
+
+  @@id([appId, shopDomain])
+  @@index([appId, lastActivity], map: "partner_customer_state_app_activity_idx")
+  @@map("partner_customer_states")
+}
+
+/// A manually-added note on the Customer Details page's timeline. Keyed by
+/// shopDomain (not appId) since the page now shows one customer across every
+/// app they're installed on — a comment is about the merchant, not one app's
+/// view of them.
+model CustomerComment {
+  id             String   @id @default(cuid())
+  organizationId String
+  shopDomain     String   @db.VarChar(255)
+  authorUserId   String
+  body           String   @db.Text
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  author       User         @relation(fields: [authorUserId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, shopDomain, createdAt])
+  @@map("customer_comments")
+}
+
+/// One row per (appId, snapshotDate, currencyCode): precomputed additive
+/// stock (MRR/ARR/subscription counts) and flow (revenue, and — since
+/// 2026-08-16 — subscription-level churn) numbers for that UTC day, built
+/// ONLY by re-running the existing live-reconstruction functions
+/// (contributionAt/historiesFromFacts/buildPartnerRevenueFromFacts/
+/// buildPartnerChurnFromFacts in partner-mrr.server.ts) at day boundaries and
+/// persisting their output. Holds no field that can't be independently
+/// regenerated byte-for-byte from PartnerSubscriptionEvent +
+/// PartnerSubscriptionSaleFact — a cache, not a new source of truth.
+///
+/// The subscription-churn columns below reproduce `buildPartnerChurnFromFacts`'s
+/// `subscription.lost`/`recovered` — a plain bucket-boundary diff with no
+/// rolling lookback, decomposed into signed daily transitions the same way
+/// install churn was (see tests/partner-mrr-snapshot-churn.test.ts for the
+/// brute-force proof). `subscriptionChurnAt` (recurring/LTV's rolling 30-day
+/// churn rate) was tried and found NOT to decompose this way — its
+/// eligibility gate is a genuine per-charge historical fact tied to whatever
+/// instant a caller queries, not a fixed property of the cancellation event
+/// itself — so that metric stays computed live, permanently. Only genuine
+/// cross-app distinct-count metrics (activeCustomers) and that rolling-window
+/// rate remain deliberately absent. See docs/shopify-analytics.md and
+/// app/lib/shopify/partner-mrr-snapshot.server.ts.
+model PartnerDailyMrrSnapshot {
+  id           String   @id @default(cuid())
+  appId        String
+  /// UTC midnight of the snapshotted day. Always a full day boundary, never
+  /// today (today is always provisional and never trusted from this table).
+  snapshotDate DateTime
+  currencyCode String   @db.VarChar(3)
+
+  /// Stock, as-of the instant just before the next day begins
+  /// (contributionAt(history, dayEnd - 1ms)) — the same `at` convention
+  /// buildPartnerRecurringFromFacts's bucket loop already uses.
+  mrr                  Decimal @db.Decimal(18, 6)
+  arr                  Decimal @db.Decimal(18, 6)
+  /// Dollar amounts (sum of contribution.amount for that kind), NOT counts —
+  /// matches summarizeContributions'/RecurringPoint's existing semantics
+  /// exactly. `activeSubscriptions` below is the only genuine count.
+  monthlySubscriptions Decimal @db.Decimal(18, 6)
+  annualSubscriptions  Decimal @db.Decimal(18, 6)
+  trialSubscriptions   Decimal @db.Decimal(18, 6)
+  usageCharges         Decimal @db.Decimal(18, 6)
+  activeSubscriptions  Int
+
+  /// Flow, summed over the whole day (buildPartnerRevenueFromFacts's
+  /// per-bucket gross sum). credits is always 0 today; stored anyway so a
+  /// future discount-aware revenue builder can populate it without a schema
+  /// change.
+  revenueGross   Decimal @db.Decimal(18, 6)
+  revenueCredits Decimal @db.Decimal(18, 6)
+  revenueNet     Decimal @db.Decimal(18, 6)
+
+  /// Subscription-level churn flow, day-additive — reproduces
+  /// `buildPartnerChurnFromFacts`'s `subscription.lost`/`recovered` exactly
+  /// (see tests/partner-mrr-snapshot-churn.test.ts). Safe to persist as a
+  /// plain bucket-boundary diff, unlike `subscriptionChurnAt`'s rolling
+  /// 30-day rate, which stays live. Logo-level (shop-aggregated) churn lives
+  /// separately in `PartnerDailyLogoChurnSnapshot` — see its doc comment.
+  subscriptionChurnedCount   Int
+  subscriptionRecoveredCount Int
+  /// This day's contribution to grossRevenue.lostMrr — the MRR value of
+  /// subscriptions counted in subscriptionChurnedCount, just before they
+  /// canceled.
+  churnedRevenueLost         Decimal @db.Decimal(18, 6)
+
+  // --- MRR movement, decomposed (2026-09-07) -------------------------------
+  //
+  // Mantle's seven-category MRR-changes waterfall. Persistable for the same
+  // reason the churn columns above are: each is a signed, day-additive delta,
+  // not a rolling-window rate.
+  //
+  // The categories exist because Shopify has no upgrade or downgrade event —
+  // a plan change arrives as a CANCELED plus an ACTIVATED milliseconds apart.
+  // Booking that cancel as churn double-counts it and makes churn fiction, so
+  // the writer applies the customer-events spec's cancel trap (§4.a/§4.b):
+  // suppress a cancel when an activation for the same install lands within
+  // 60s, and classify the pair by amount instead. A meaningful share of
+  // cancels turn out to be plan changes, whose expansion and contraction churn
+  // would otherwise absorb.
+  //
+  // `>=` is an upgrade, so an equal-price swap is expansion of 0 rather than
+  // contraction (spec §3.2's stated boundary; 809 of those pairs exist).
+  /// New MRR from an install's FIRST paid subscription.
+  mrrNew           Decimal @default(0) @db.Decimal(18, 6)
+  /// A previously-churned install subscribing again.
+  mrrReactivation  Decimal @default(0) @db.Decimal(18, 6)
+  /// Plan change upward on an already-paying install. Positive.
+  mrrExpansion     Decimal @default(0) @db.Decimal(18, 6)
+  /// Plan change downward. Stored POSITIVE; the reader applies the sign, so a
+  /// column never has to be read twice to know which way it points.
+  mrrContraction   Decimal @default(0) @db.Decimal(18, 6)
+  /// Genuine cancellation — a cancel the trap did NOT suppress. Positive.
+  mrrChurn         Decimal @default(0) @db.Decimal(18, 6)
+  /// MRR removed by a freeze, and restored by an unfreeze. Both positive.
+  mrrFrozen        Decimal @default(0) @db.Decimal(18, 6)
+  mrrUnfrozen      Decimal @default(0) @db.Decimal(18, 6)
+  /// Plan changes inside an install's first 30 days, remapped to `subscribed`
+  /// and therefore already counted in `mrrNew`. Kept as its own figure because
+  /// it is the single biggest reason our expansion differs from a platform
+  /// that does not recategorize — 1,893 of the 3,385 pairs on production —
+  /// and a number that large should be inspectable, not just absorbed.
+  mrrEarlyPlanChange Decimal @default(0) @db.Decimal(18, 6)
+
+  /// Provenance: the sync high-water marks this row was computed against.
+  builtFromEventsSyncedAt DateTime?
+  builtFromSalesSyncedAt  DateTime?
+
+  computedAt DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  app App @relation(fields: [appId], references: [id], onDelete: Cascade)
+
+  @@unique([appId, snapshotDate, currencyCode], map: "partner_daily_mrr_snapshot_app_date_ccy_key")
+  @@index([appId, snapshotDate], map: "partner_daily_mrr_snapshot_app_date_idx")
+  @@map("partner_daily_mrr_snapshots")
+}
+
+/// Per-plan MRR for one UTC day — the data behind "Top plans by MRR".
+///
+/// Split from `PartnerDailyMrrSnapshot` rather than added as columns to it
+/// because the plan dimension is open-ended: plan labels come from the Partner
+/// feed's charge names, new ones appear whenever an app launches a tier, and
+/// per-merchant custom names make the tail genuinely long. A column per plan is
+/// not a schema.
+///
+/// A stock, like `PartnerDailyMrrSnapshot.mrr`, measured at the same instant
+/// (just before the next day begins) — NOT a flow. Safe to sum across apps for
+/// an "All apps" view for the same reason the parent table is: a charge belongs
+/// to exactly one app, so no contribution is counted twice. Never sum across
+/// DAYS; that would add a stock to itself.
+///
+/// `plan` is the label `mantlePlanLabel` resolves, i.e. Mantle's own plan name
+/// where the catalogue knows the plan and the raw Shopify charge name
+/// otherwise. Stored resolved rather than raw so this table and the live
+/// reconstruction group revenue identically — if the label rule changes, both
+/// paths change together and this table is rebuilt, same as every other
+/// snapshot here.
+///
+/// ROWS ARE WRITTEN ONLY WHERE THERE IS MRR. Unlike the parent table, a day
+/// with no revenue on a plan has no row rather than an explicit zero — the
+/// cross product of days x currencies x every plan ever sold is mostly zeros.
+/// So absence here is NOT a coverage gap, and the read path must not treat it
+/// as one: coverage is established by the parent table having a row for that
+/// (app, day, currency), which the writer guarantees by producing both row sets
+/// in one pass.
+model PartnerDailyPlanMrrSnapshot {
+  id           String   @id @default(cuid())
+  appId        String
+  snapshotDate DateTime
+  currencyCode String   @db.VarChar(3)
+  /// Resolved plan label. Long enough for a merchant-authored charge name;
+  /// Shopify caps its own at 255.
+  ///
+  /// COLLATION MATTERS and is not expressible here: the column is
+  /// `utf8mb4_bin`, set by migration 20260909130000, because two different
+  /// plans can differ only in case — Rapi Tracking carries both
+  /// `Monthly Plan (early user)` ($8.99) and `Monthly Plan (Early user)`
+  /// ($7.99). Under this schema's default `utf8mb4_unicode_ci` they collide on
+  /// the unique key below and one tier's revenue disappears.
+  plan         String   @db.VarChar(255)
+
+  mrr                 Decimal @db.Decimal(18, 6)
+  /// Charges contributing to `mrr` on this plan that day. A genuine count,
+  /// unlike the parent table's `monthlySubscriptions` dollar figures.
+  activeSubscriptions Int
+
+  computedAt DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  app App @relation(fields: [appId], references: [id], onDelete: Cascade)
+
+  @@unique([appId, snapshotDate, currencyCode, plan], map: "partner_daily_plan_mrr_snapshot_app_date_ccy_plan_key")
+  @@index([appId, snapshotDate], map: "partner_daily_plan_mrr_snapshot_app_date_idx")
+  @@map("partner_daily_plan_mrr_snapshots")
+}
+
+/// Cadence/amount inference for charges with no explicit billingInterval,
+/// computed ONCE per offer (appId + normalized charge name + price) and
+/// never recomputed. Fixes a real bug: the old live majority-vote inference
+/// in historiesFromFacts() could silently reclassify a charge's cadence
+/// weeks later as more sibling sales settled. Deliberately STICKY, unlike
+/// this project's other rebuildable-from-facts tables — recomputing it later
+/// would defeat the point. `chargeName` is pre-normalized by the caller
+/// (trim().toLowerCase()).
+model PartnerOfferCadenceInference {
+  appId      String
+  chargeName String  @db.VarChar(255)
+  amount     Decimal @db.Decimal(18, 6)
+
+  /// EVERY_30_DAYS | ANNUAL | null — null means no charge sharing this offer
+  /// has ever had an explicit billingInterval on a sale, matching
+  /// historiesFromFacts' existing "no evidence" fallthrough (charge-name
+  /// pattern -> billingOn-distance -> default monthly) exactly; still worth
+  /// persisting so we don't re-scan for evidence on every future request.
+  interval        String?  @db.VarChar(32)
+  effectiveAmount Decimal? @db.Decimal(18, 6)
+
+  pinnedAt DateTime @default(now())
+
+  app App @relation(fields: [appId], references: [id], onDelete: Cascade)
+
+  @@id([appId, chargeName, amount])
+  @@map("partner_offer_cadence_inferences")
+}
+
+/// Live Shopify discount check for one specific charge whose latest sale is
+/// below its listed price without a second sale to corroborate it yet (see
+/// `ambiguousDiscount` in partner-mrr.server.ts) — resolves that ambiguity
+/// with ground truth from the Partner API's `activeSubscription` query
+/// instead of waiting for a real billing cycle to confirm it naturally.
+/// Deliberately NOT permanent like PartnerOfferCadenceInference above: a
+/// live discount can genuinely expire or change, so `syncLiveDiscountChecksForApp`
+/// re-checks any row older than its staleness window for as long as the
+/// charge remains ambiguous. Keyed per-charge (not per shared offer) since
+/// discount state belongs to one specific subscription, not a plan shared
+/// across shops.
+model PartnerChargeLiveDiscountCheck {
+  appId            String
+  chargePlatformId String @db.VarChar(191)
+
+  /// Monthly-normalized, ready for contributionAt to use as-is. Null when
+  /// Shopify reported no active subscription at all for this charge.
+  effectiveAmount         Decimal?  @db.Decimal(18, 6)
+  discountPercentage      Float?
+  discountEndsAt          DateTime?
+  remainingDiscountCycles Int?
+  /// False when the Partner API's activeSubscription query returned nothing
+  /// for this charge — recorded only so the job doesn't re-query it every
+  /// run; never used as evidence by contributionAt (that's a separate,
+  /// already-identified event-ingestion gap, not this table's job).
+  subscriptionActive Boolean @default(true)
+
+  /// Shopify's own trial end for this subscription — ground truth, as against
+  /// the activation-to-`billingOn` heuristic `contributionAt` infers when this
+  /// is absent. Null BOTH for a subscription with no trial and for a charge
+  /// this job has not reached yet, so a reader must not read null as "no
+  /// trial"; it means "nothing recorded".
+  trialEndsAt        DateTime?
+  /// True when the merchant has cancelled but the paid cycle is still running.
+  cancelAtEndOfCycle Boolean?
+  currentCycleStart  DateTime?
+  currentCycleEnd    DateTime?
+  /// Metered cost and quantity for the CURRENT billing cycle only — Shopify
+  /// exposes no history of either, which is why this has to be recorded daily
+  /// to build one. `PartnerDailyMrrSnapshot.usageCharges` has been 0.000000 on
+  /// every row ever written because nothing supplied it.
+  usageCost          Decimal?  @db.Decimal(18, 6)
+  usageQuantity      Float?
+
+  checkedAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  app App @relation(fields: [appId], references: [id], onDelete: Cascade)
+
+  @@id([appId, chargePlatformId])
+  @@map("partner_charge_live_discount_checks")
+}
+
+/// Sentinel `appId` for ORG-WIDE (all enabled apps combined) rows in this
+/// table, instead of `null` — MySQL treats every `NULL` as distinct in a
+/// unique index, so a nullable `appId` would let duplicate org-wide rows in.
+/// Not a real `App.id`.
+///
+/// Distinct-SHOP-level churn, decomposed into day-additive deltas like
+/// `subscriptionChurnedCount` above, generalized to shops. Needs both a
+/// per-app scope and an org-wide scope (its own writer folding every enabled
+/// app together), since a shop active in 2+ apps must never be
+/// double-counted by summing per-app numbers (confirmed in production: 68 of
+/// 4257 active shops are active in 2 apps at once). Freshness is tracked via
+/// `App.logoSnapshotDirtyFrom` and `Organization.logoSnapshot*` fields.
+///
+/// Same churn-then-recovery bucket tradeoff as `subscriptionChurnedCount`/
+/// `RecoveredCount`. `test` events are NOT excluded, matching
+/// `buildPartnerChurnFromFacts`.
+model PartnerDailyLogoChurnSnapshot {
+  id             String   @id @default(cuid())
+  organizationId String
+  /// Real `App.id` for per-app rows; `ORG_WIDE_LOGO_SCOPE_ID` for org-wide
+  /// rows (see the sentinel doc above) — not a real FK target.
+  appId          String
+  snapshotDate   DateTime
+
+  /// Stock: distinct shops with >=1 active/trial paid charge in scope, as of
+  /// the instant just before the next day begins (same convention as
+  /// PartnerDailyMrrSnapshot.mrr).
+  activeShops    Int
+  /// Delta: distinct shops whose in-scope active-charge-count crossed 1->0
+  /// on this day.
+  churnedShops   Int
+  /// Delta: same, crossing 0->1 — requires a real prior activation (not a
+  /// first-ever install), matching buildPartnerChurnFromFacts' own
+  /// earliestActivationByShop gate on `recoveredShops`.
+  recoveredShops Int
+
+  computedAt DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, appId, snapshotDate], map: "partner_daily_logo_churn_snapshot_org_app_date_key")
+  @@index([organizationId, appId, snapshotDate], map: "partner_daily_logo_churn_snapshot_org_app_date_idx")
+  @@map("partner_daily_logo_churn_snapshots")
+}
+
+/// One row per (appId, snapshotDate): precomputed stock (active-install
+/// counts) and flow (new/uninstall/reinstall counts) numbers for that UTC
+/// day, replacing the live O(installs x events) scan in
+/// analytics.server.ts's loadInstalls for getChurnReport/getPortfolioReport/
+/// getLtvReport. No currency dimension, so no per-currency gap detection is
+/// needed (unlike PartnerDailyMrrSnapshot).
+///
+/// Every field here is a plain per-app INSTALL ROW count, never a distinct
+/// SHOP count — safe to sum across apps for an "All apps" view (an
+/// AppInstall row already belongs to exactly one app; summing installs
+/// across apps double-counts nothing). This is deliberately narrower than
+/// what the old "distinct-count metrics are never persisted" comment implied
+/// — the genuinely non-summable metric is activeCustomers (a distinct-shop
+/// count via mrrAt's Set in this same file), which stays live and excluded,
+/// same as before. See docs/REPORTS-PERFORMANCE-AUDIT.md and
+/// app/lib/reports/install-snapshot.server.ts.
+model PartnerDailyInstallSnapshot {
+  id           String   @id @default(cuid())
+  appId        String
+  /// UTC midnight of the snapshotted day. Always a full day boundary, never
+  /// today (today is always provisional and never trusted from this table).
+  snapshotDate DateTime
+
+  /// Stock, left-closed at exact midnight (installIsActiveAt semantics) —
+  /// the count of installs active as of snapshotDate 00:00:00.000. Stored
+  /// separately from AtDayEnd because an event landing at exact midnight
+  /// (rare but real at production event volume) shifts these by one, and
+  /// since each is a prefix sum over the app's whole history, an unnoticed
+  /// shift would silently propagate to every later day.
+  activeInstallsAtDayStart Int
+  /// Stock at snapshotDate + 1 day - 1ms — matches PartnerDailyMrrSnapshot's
+  /// own dayEnd-1ms convention for its `mrr` field exactly.
+  activeInstallsAtDayEnd   Int
+
+  /// Flows below are all day-additive and safe to sum across days/apps.
+  /// installedAt-based (not event-based), matching InstallPoint.newInstalls/
+  /// installedInPeriod exactly.
+  newInstalls   Int
+  /// Every UNINSTALLED event that day, any reason — matches
+  /// InstallPoint.uninstalls/uninstalledInPeriod.
+  uninstallsAll Int
+  /// UNINSTALLED excluding store-closure — matches logoMovement's "lost".
+  logoLost      Int
+  logoRecovered Int // REINSTALLED
+  reactivations Int // REACTIVATED
+  deactivations Int // DEACTIVATED
+
+  /// Provenance: the sync high-water mark this row was computed against.
+  builtFromLifecycleSyncedAt DateTime?
+
+  computedAt DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  app App @relation(fields: [appId], references: [id], onDelete: Cascade)
+
+  @@unique([appId, snapshotDate], map: "partner_daily_install_snapshot_app_date_key")
+  @@index([appId, snapshotDate], map: "partner_daily_install_snapshot_app_date_idx")
+  @@map("partner_daily_install_snapshots")
+}
+
+/// One Shopify Partner API client shared by every app in an organization.
+/// The token is encrypted before it reaches the database and is never returned
+/// from a route loader.
+model ShopifyPartnerConnection {
+  id                    String                  @id @default(cuid())
+  organizationId        String
+  name                  String
+  partnerOrganizationId String
+  encryptedAccessToken  String                  @db.Text
+  tokenLastFour         String
+  status                PartnerConnectionStatus @default(UNTESTED)
+  lastTestedAt          DateTime?
+  lastConnectedAt       DateTime?
+  lastErrorCode         String?
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime                @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  apps         App[]
+
+  @@unique([organizationId, partnerOrganizationId])
+  @@index([organizationId])
+  @@map("shopify_partner_connections")
+}
+
+/// A merchant's install of an App. This is the OAuth session store: the offline
+/// access token lives here, keyed by (app, shopDomain).
+model AppInstall {
+  id             String  @id @default(cuid())
+  appId          String
+  /// e.g. "acme.myshopify.com".
+  shopDomain     String
+  /// Shopify numeric shop id, for Partner API gid://partners/Shop/<id>.
+  shopPlatformId String?
+
+  // --- OAuth ---
+  accessToken String?
+  scope       String?
+
+  /// Latest store name seen for this shop on the Partner feed. Denormalized
+  /// from `RawPartnerEvent.shopName` so a customer can be labelled without
+  /// walking their events, and nullable because a shop whose events all
+  /// predate this column has never had one captured.
+  shopName       String? @db.VarChar(255)
+
+  installedAt               DateTime  @default(now())
+  uninstalledAt             DateTime?
+  /// Latest immutable Partner relationship fact applied to the current-state
+  /// mirror. Older backfill rows may improve installedAt, but cannot revive or
+  /// uninstall a shop after a newer relationship event has been processed.
+  relationshipStateSyncedAt DateTime?
+  /// Set when this merchant activates their first local trial. Prevents
+  /// cancel/resubscribe flows from granting the same install another trial.
+  trialConsumedAt           DateTime?
+
+  app             App                     @relation(fields: [appId], references: [id], onDelete: Cascade)
+  subscriptions   Subscription[]
+  usageEvents     UsageEvent[]
+  oneTimePurchases AppOneTimePurchase[]
+  lifecycleEvents AccountLifecycleEvent[]
+
+  @@unique([appId, shopDomain])
+  @@index([appId])
+  // Supports the Installs list's cursor pagination (ORDER BY installedAt desc).
+  @@index([appId, installedAt])
+  // Supports loadInstalls' activeSince bound (uninstalledAt IS NULL OR >= x) —
+  // without it, every reports page loads and filters the entire install table.
+  @@index([appId, uninstalledAt])
+  @@map("app_installs")
+}
+
+// ---------------------------------------------------------------------------
+// Account-lifecycle events — install/reinstall/uninstall/reactivate/deactivate,
+// derived from the Partner API app-events feed (customer-events pipeline,
+// account-lifecycle slice — see .claude/skills/shopify-customer-events).
+// ---------------------------------------------------------------------------
+
+/// The verbatim Partner API feed, scoped to account-lifecycle event types.
+/// Immutable — never mutated after insert, only read by the derivation pass.
+model RawPartnerEvent {
+  id             String   @id @default(cuid())
+  appId          String
+  /// The raw Shopify type string, e.g. "RELATIONSHIP_INSTALLED".
+  type           String
+  occurredAt     DateTime
+  shopDomain     String
+  /// Partner API shop gid (gid://partners/Shop/1234), when present.
+  shopPlatformId String?
+  /// The merchant's store name as the feed reported it at this instant
+  /// ("Vayrin", "CozyPet"). Recorded here because the events feed is the ONLY
+  /// place the Partner API exposes it — there is no `shop(id:)` query — so a
+  /// name not captured when the event arrives cannot be looked up later.
+  shopName       String?  @db.VarChar(255)
+  /// Present only on RELATIONSHIP_UNINSTALLED.
+  reason         String?  @db.Text
+  description    String?  @db.LongText
+
+  fetchedAt DateTime @default(now())
+
+  app            App                    @relation(fields: [appId], references: [id], onDelete: Cascade)
+  lifecycleEvent AccountLifecycleEvent?
+
+  // Dedup key: the feed overlaps itself on every poll (since-buffer), and has
+  // no native per-event id — this is what makes re-polling free.
+  @@unique([appId, type, occurredAt, shopDomain])
+  @@index([appId, occurredAt])
+  @@map("raw_partner_events")
+}
+
+/// One row per derived, clean account-lifecycle event.
+model AccountLifecycleEvent {
+  id           String                    @id @default(cuid())
+  appInstallId String
+  /// Denormalized from appInstall.appId, set at create time and never
+  /// updated. Exists solely so the install-snapshot writer (see
+  /// PartnerDailyInstallSnapshot) can scan "all events for app X in a date
+  /// range" — without it, that query has no supporting index (only
+  /// [appInstallId, occurredAt] and [type, occurredAt] exist) and would full
+  /// scan/join this table on every writer tick. Not a source of truth: an
+  /// install can never move between apps, so this can always be recomputed
+  /// from appInstall.appId if it's ever wrong.
+  appId        String
+  type         AccountLifecycleEventType
+  occurredAt   DateTime
+
+  /// Deterministic idempotency key derived from the raw event (a pure function
+  /// of rawPartnerEventId) — re-deriving never creates duplicates.
+  platformEventId   String  @unique
+  rawPartnerEventId String? @unique
+
+  createdAt DateTime @default(now())
+
+  app             App                   @relation(fields: [appId], references: [id], onDelete: Cascade)
+  appInstall      AppInstall            @relation(fields: [appInstallId], references: [id], onDelete: Cascade)
+  rawPartnerEvent RawPartnerEvent?      @relation(fields: [rawPartnerEventId], references: [id], onDelete: SetNull)
+  uninstallDetail UninstallEventDetail?
+
+  @@index([appInstallId, occurredAt])
+  // Churn reports scan lifecycle movements by type inside a bounded UTC range.
+  @@index([type, occurredAt])
+  // Supports the install-snapshot writer's per-app date-range scan.
+  @@index([appId, occurredAt], map: "account_lifecycle_events_app_occurred_idx")
+  @@map("account_lifecycle_events")
+}
+
+/// Uninstall-reason detail, child of an UNINSTALLED AccountLifecycleEvent.
+model UninstallEventDetail {
+  id      String @id @default(cuid())
+  eventId String @unique
+
+  reason      String? @db.Text
+  description String? @db.LongText
+
+  /// The primary normalized code (first of reasonCodes) — see the preset map
+  /// in app/lib/customer-events/uninstall-reason.ts. "unknown_other" when no
+  /// preset token matches (spec §7: LLM fallback is a documented follow-up,
+  /// not built yet).
+  reasonCode     String
+  /// JSON array on MySQL (primitive scalar lists are PostgreSQL-only).
+  reasonCodes    Json
+  /// True for the store-closure subset (store_closing_or_pausing/deactivated/
+  /// scheduled_cancellation) — excluded from product-churn reporting even
+  /// though it's kept in raw counts (spec §7.1).
+  isStoreClosure Boolean @default(false)
+
+  createdAt DateTime @default(now())
+
+  event AccountLifecycleEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@map("uninstall_event_details")
+}
+
+// ---------------------------------------------------------------------------
+// Plans (one plan per tier; spec §1.1)
+// ---------------------------------------------------------------------------
+
+model Plan {
+  id           String       @id @default(cuid())
+  appId        String
+  name         String
+  /// The one-line pitch a pricing page shows under the plan name ("Perfect for
+  /// beginners"). Carried because a consuming app syncs the catalogue into its
+  /// own table and renders it — without this the copy has nowhere to live and
+  /// every synced plan arrives with a null description.
+  description  String?      @db.Text
+  /// The tier's list monthly fee. Billed as a usage record, NOT recurring price.
+  amount       Decimal      @db.Decimal(18, 6)
+  currencyCode String       @default("USD")
+  interval     PlanInterval @default(EVERY_30_DAYS)
+
+  /// The period length we advance the local clock by (e.g. MONTH x 1).
+  recurringInterval      RecurringInterval @default(MONTH)
+  recurringIntervalCount Int               @default(1)
+
+  /// Master flex toggle. MUST be immutable after creation (enforced in service).
+  flexBilling             Boolean @default(true)
+  /// Whether a STANDARD plan carries a metered usage line alongside its
+  /// recurring price, capped at `usageChargeCappedAmount`.
+  ///
+  /// An explicit opt-in rather than inferring it from a non-zero cap, because
+  /// `usageChargeCappedAmount` is NOT NULL and every plan already carries one
+  /// for flex's sake — inferring would hand a usage line to every flat plan
+  /// that ever had a cap set, and Shopify would make the merchant approve a
+  /// metered line that never bills. Meaningless under flex, which always has a
+  /// usage line by construction.
+  usageBilling            Boolean @default(false)
+  /// The Shopify usage line spend ceiling. MUST comfortably exceed the largest
+  /// monthly fee + largest proration ever posted (spec §1.1).
+  usageChargeCappedAmount Decimal @db.Decimal(18, 6)
+  /// Customer-facing text shown on the usage line (Shopify `terms`).
+  flexBillingTerms        String  @default("Flexible usage-based billing")
+
+  // --- Trials (managed locally; never sent to Shopify) ---
+  trialDays              Int     @default(0)
+  chargeUsageDuringTrial Boolean @default(false)
+
+  // --- Automatic tiering (spec §1.1 usage band) ---
+  onUsageLimitReached OnUsageLimitReached @default(NONE)
+  autoUpgradeToPlanId String?
+  limitMetric         String?
+  limitMin            Decimal?            @db.Decimal(18, 6)
+  limitMax            Decimal?            @db.Decimal(18, 6)
+  usageLimitsPeriod   UsageLimitsPeriod   @default(CURRENT_BILLING_PERIOD)
+
+  // --- Revenue cap (business ceiling the CONSUMING APP enforces) ---
+  /// The plan's revenue ceiling, always in USD. Null = no cap (unlimited).
+  ///
+  /// A value the app reads from the catalogue and enforces itself; the platform
+  /// stores and serves it but NEVER computes against it — no currency
+  /// conversion, no period arithmetic here. Merchants bill in many currencies,
+  /// so the app converts their revenue to USD and compares (see Rapi-Bundle's
+  /// CheckExtraRevenueCapLimitJob). Keeping all math in the app is what avoids
+  /// a conversion bug gating or upgrading a merchant on the wrong number.
+  ///
+  /// Distinct from `usageChargeCappedAmount` (a Shopify spend ceiling) and,
+  /// for standard-billing plans, the single source of truth for the revenue
+  /// cap — it supersedes any `revenue_cap_limit` feature entitlement.
+  revenueCapLimit  Decimal?         @db.Decimal(18, 6)
+  revenueCapPeriod RevenueCapPeriod @default(BILLING_PERIOD)
+
+  // --- Availability ---
+  active    Boolean @default(true)
+  isPublic  Boolean @default(true)
+  sortOrder Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  app             App            @relation(fields: [appId], references: [id], onDelete: Cascade)
+  autoUpgradeTo   Plan?          @relation("PlanAutoUpgrade", fields: [autoUpgradeToPlanId], references: [id])
+  autoUpgradeFrom Plan[]         @relation("PlanAutoUpgrade")
+  subscriptions   Subscription[]
+  discounts       Discount[]
+  entitlements    PlanFeatureEntitlement[]
+  oneTimePurchases AppOneTimePurchase[]
+
+  @@index([appId])
+  @@index([autoUpgradeToPlanId])
+  @@map("plans")
+}
+
+// ---------------------------------------------------------------------------
+// Subscriptions (spec §1.2)
+// ---------------------------------------------------------------------------
+
+/// What KIND of thing a plan feature entitles, which is also how its value text
+/// is parsed. Mirrors the four Mantle offers, because an app migrating from it
+/// has features of all four shapes already defined and they have to survive.
+enum PlanFeatureType {
+  /// On or off. `"true"` / `"false"`.
+  BOOLEAN
+  /// A ceiling the app enforces. A decimal string, or `"unlimited"`.
+  LIMIT
+  /// A ceiling that may be exceeded for a price. Same encoding as LIMIT; what
+  /// the overage COSTS is a usage charge, not a property of the entitlement.
+  LIMIT_WITH_OVERAGE
+  /// One of several named variants — a theme, a support tier, a model name.
+  STRING
+}
+
+/// One thing a plan can entitle, defined once per app.
+///
+/// Shopify never sees any of this: it prices a subscription, it does not know
+/// what the subscription grants. So the catalogue lives here, the app reads it
+/// through the API, and the app enforces it. That split is why a feature has a
+/// `key` at all — the app gates on the key, and the key must therefore outlive
+/// renames of `name`.
+model PlanFeature {
+  id             String  @id @default(cuid())
+  appId          String
+  /// What the app gates on, e.g. `revenue_cap_limit`. Treat as immutable once
+  /// any app version reads it: changing it silently removes the entitlement
+  /// from every plan, because the reader looks it up BY key.
+  key            String  @db.VarChar(191)
+  name           String
+  description    String? @db.Text
+  type           PlanFeatureType @default(BOOLEAN)
+  /// The value for a plan that says nothing about this feature.
+  ///
+  /// Not nullable, and that is the point: a feature with no answer for some
+  /// plan would make every reader invent its own fallback. One default, defined
+  /// with the feature, means an entitlement is always resolvable. Encoded per
+  /// `type` — see the enum.
+  defaultValue   String  @db.VarChar(191)
+  /// Whether a pricing page should show it. Purely presentational; it does NOT
+  /// gate the API, because an app still has to enforce a feature it does not
+  /// advertise.
+  visibleToCustomers Boolean @default(true)
+  sortOrder      Int     @default(0)
+  /// Soft, because a plan's entitlements and a customer's history reference it.
+  /// An archived feature stops being offered and keeps resolving.
+  archivedAt     DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  app          App                      @relation(fields: [appId], references: [id], onDelete: Cascade)
+  entitlements PlanFeatureEntitlement[]
+
+  @@unique([appId, key])
+  @@index([appId, sortOrder])
+  @@map("plan_features")
+}
+
+/// What one plan grants for one feature.
+///
+/// A row exists only where a plan DIFFERS from the feature's default, so the
+/// table stays small and adding a feature does not have to fan out across every
+/// plan. Absence means "the default", never "denied".
+model PlanFeatureEntitlement {
+  id        String @id @default(cuid())
+  planId    String
+  featureId String
+
+  /// Encoded exactly like `PlanFeature.defaultValue`, parsed by the feature's
+  /// `type`. One text column rather than one column per type: four nullable
+  /// columns can hold contradictory values at once, and nothing in the schema
+  /// could say which one the type meant.
+  value      String  @db.VarChar(191)
+  /// The entitlement WHILE THE SUBSCRIPTION IS IN TRIAL, when it differs.
+  ///
+  /// Mantle keeps a separate "Trial features" list, and the reason is real: a
+  /// trial that grants everything converts worse than one that shows the tier
+  /// being bought, and a trial that grants nothing converts worse still. Null
+  /// means the trial gets `value` — the common case, and the safe default.
+  trialValue String? @db.VarChar(191)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  plan    Plan        @relation(fields: [planId], references: [id], onDelete: Cascade)
+  feature PlanFeature @relation(fields: [featureId], references: [id], onDelete: Cascade)
+
+  @@unique([planId, featureId])
+  @@index([featureId])
+  @@map("plan_feature_entitlements")
+}
+
+model Subscription {
+  id           String @id @default(cuid())
+  appInstallId String
+  planId       String
+
+  billingProvider BillingProvider    @default(SHOPIFY)
+  status          SubscriptionStatus @default(PENDING)
+  test            Boolean            @default(false)
+
+  // --- Lifecycle (the cron acts only on activated, non-frozen, non-canceled) ---
+  activatedAt DateTime?
+  canceledAt  DateTime?
+  frozenAt    DateTime?
+  /// Hard gate: when set, the main charge path MUST skip (a paused sweep handles it).
+  pausedUntil DateTime?
+
+  // --- The billing clock (OURS, not Shopify's) ---
+  currentPeriodStart DateTime?
+  currentPeriodEnd   DateTime?
+  nextBillingDate    DateTime?
+  /// Copied forward across tier changes so the billing date never resets.
+  billingCycleAnchor DateTime?
+
+  // --- Shopify linkage ---
+  shopifySubscriptionId String?
+  /// Convenience pointer to the usage line item's id (see SubscriptionLineItem).
+  usageLineItemId       String?
+
+  // --- Trials (local only) ---
+  trialStartedAt DateTime?
+  trialEndsAt    DateTime?
+
+  /// Set when an auto-upgrade created this sub — drives auto vs manual analytics.
+  triggeredByUsageChargeId String?
+
+  // --- Approval/idempotency lifecycle ---
+  /// Client-supplied or generated request key used to make subscribe retries safe.
+  idempotencyKey         String?   @unique
+  confirmationUrl        String?   @db.Text
+  approvalExpiresAt      DateTime?
+  /// Set on a cap-full fallback so activation can retire the old Shopify
+  /// subscription only after the replacement has actually been approved.
+  replacesSubscriptionId String?
+  replacementEventId     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  appInstall               AppInstall             @relation(fields: [appInstallId], references: [id], onDelete: Cascade)
+  plan                     Plan                   @relation(fields: [planId], references: [id])
+  lineItems                SubscriptionLineItem[]
+  charges                  Charge[]
+  discounts                SubscriptionDiscount[]
+  flexBillingEvents        FlexBillingEvent[]     @relation("EventSubscription")
+  flexBillingEventsPrev    FlexBillingEvent[]     @relation("EventPreviousSubscription")
+  replacesSubscription     Subscription?          @relation("SubscriptionReplacement", fields: [replacesSubscriptionId], references: [id], onDelete: SetNull)
+  replacementSubscriptions Subscription[]         @relation("SubscriptionReplacement")
+
+  @@index([appInstallId])
+  @@index([planId])
+  @@index([replacesSubscriptionId])
+  // Supports report as-of reconstruction over activation/churn boundaries.
+  @@index([activatedAt, canceledAt])
+  // MySQL has no PostgreSQL-style partial indexes. This composite index narrows
+  // the daily cron scan by provider before applying the lifecycle predicates.
+  @@index([billingProvider, nextBillingDate])
+  @@map("subscriptions")
+}
+
+// ---------------------------------------------------------------------------
+// Subscription line items — the live usage cap (spec §1.3)
+// ---------------------------------------------------------------------------
+
+model SubscriptionLineItem {
+  id             String       @id @default(cuid())
+  subscriptionId String
+  type           LineItemType
+  key            String       @default("default")
+
+  /// THE Shopify usage line-item GID — the subscriptionLineItemId in every
+  /// appUsageRecordCreate. The single most important id to persist.
+  platformId String?
+
+  cappedAmount             Decimal?  @db.Decimal(18, 6)
+  /// The price actually submitted to Shopify for this line, which may differ
+  /// from the plan's when a discount applied. Standard billing only: under flex
+  /// the recurring line is always $0 and the price lives in usage records, so
+  /// there is nothing per-line to record. Null when it does not apply.
+  amount                   Decimal?  @db.Decimal(18, 6)
+  currencyCode             String?   @db.VarChar(3)
+  /// Mirror of Shopify AppUsagePricing.balanceUsed, refreshed from each response.
+  balanceUsed              Decimal   @default(0) @db.Decimal(18, 6)
+  currentPeriodBilledSpend Decimal   @default(0) @db.Decimal(18, 6)
+  spendPeriodStart         DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  subscription Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  @@unique([subscriptionId, type, key])
+  @@index([subscriptionId])
+  @@map("subscription_line_items")
+}
+
+// ---------------------------------------------------------------------------
+// Charges — one row per money movement (spec §1.4)
+// ---------------------------------------------------------------------------
+
+model Charge {
+  id             String @id @default(cuid())
+  subscriptionId String
+
+  /// Normalized amount (USD if mirroring Mantle's rail; see §8).
+  amount              Decimal @db.Decimal(18, 6)
+  chargedAmount       Decimal @db.Decimal(18, 6)
+  chargedCurrencyCode String  @default("USD")
+
+  /// Shopify usage-record or app-credit GID.
+  platformId     String?
+  /// Stable key passed to Shopify and stored locally so retries cannot create
+  /// duplicate recurring charges, prorations, or app credits.
+  idempotencyKey String? @unique
+  /// true for downgrade credits.
+  isCredit       Boolean @default(false)
+  /// MUST be set — separates flex charges in reporting and powers the
+  /// downgrade-credit "collected this period" cap.
+  flexBilling    Boolean @default(true)
+
+  status             ChargeStatus @default(ACTIVE)
+  description        String?
+  /// Period this charge prepays for; also the downgrade-credit cap boundary.
+  billingPeriodStart DateTime?
+  /// Used by the downgrade-credit cap (charges since currentPeriodStart).
+  occurredAt         DateTime     @default(now())
+
+  createdAt DateTime @default(now())
+
+  subscription Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  @@index([subscriptionId])
+  @@index([subscriptionId, flexBilling, isCredit, occurredAt])
+  // Revenue reports filter successful money movement by a bounded UTC range.
+  @@index([status, occurredAt])
+  @@map("charges")
+}
+
+// ---------------------------------------------------------------------------
+// Discounts (the Slack-thread problem — applied as computed amounts, spec §4.2)
+// ---------------------------------------------------------------------------
+
+/// One-off status of an `AppPurchaseOneTime`, mirrored from Shopify.
+enum OneTimePurchaseStatus {
+  PENDING
+  ACTIVE
+  DECLINED
+  EXPIRED
+}
+
+/// A one-time Shopify purchase — an add-on, a lifetime deal, a setup fee.
+///
+/// A SEPARATE table rather than a `charges` row, and deliberately not part of
+/// the subscription mirror (spec §5.5). Two reasons:
+///
+///   1. `appPurchaseOneTimeCreate` returns an `AppPurchaseOneTime`, which is not
+///      an `AppSubscription`: no period, no trial, no interval, nothing to
+///      renew. Putting it in `subscriptions` would make every "one active
+///      subscription per install" query and every period-clock sweep have to
+///      special-case it.
+///   2. `Charge.subscriptionId` is NOT NULL and `Charge` is shaped around flex
+///      (`isCredit`, `flexBilling`, `billingPeriodStart`, the downgrade-credit
+///      cap). The spec models a one-time as a `charges` row with a null
+///      subscription; here that would mean widening a money column every
+///      existing query assumes is present. This diverges from the spec on the
+///      storage and not on the behaviour.
+model AppOneTimePurchase {
+  id           String  @id @default(cuid())
+  appInstallId String
+  /// The plan or add-on this bought, when it maps to one in the catalogue.
+  planId       String?
+
+  /// What the merchant approved, as shown on the confirmation screen.
+  name         String
+  amount       Decimal @db.Decimal(18, 6)
+  currencyCode String  @default("USD") @db.VarChar(3)
+
+  /// The Shopify `AppPurchaseOneTime` GID. Unique — one local row per object.
+  platformId String? @unique @db.VarChar(191)
+  status     OneTimePurchaseStatus @default(PENDING)
+  /// Shopify's approval URL, stored at create. Immutable per purchase.
+  confirmationUrl String? @db.Text
+  test            Boolean @default(false)
+
+  /// Client request key, so a retried purchase does not charge twice.
+  idempotencyKey String? @unique @db.VarChar(191)
+  /// Shopify never expires a confirmation URL, so an abandoned purchase is
+  /// swept locally — same reason the subscription flow carries this.
+  approvalExpiresAt DateTime?
+  /// Set only once Shopify has been re-queried and reported ACTIVE.
+  activatedAt       DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  appInstall AppInstall @relation(fields: [appInstallId], references: [id], onDelete: Cascade)
+  plan       Plan?      @relation(fields: [planId], references: [id], onDelete: SetNull)
+
+  @@index([appInstallId, createdAt])
+  @@index([status])
+  @@map("app_one_time_purchases")
+}
+
+
+model Discount {
+  id              String  @id @default(cuid())
+  /// The PRIMARY app — the one it was created for. Kept so relations and
+  /// cascades stay as they were; the full set of apps a discount is valid in
+  /// is `apps` (DiscountApp), which always includes this one.
+  appId           String
+  /// Denormalised from `app` so a code can be unique per organization.
+  organizationId  String
+  /// `normalizedCode` for a merchant-facing discount, NULL for a code-less one.
+  /// The unique key below makes a code mean ONE discount across every app in
+  /// the organization; MySQL treats NULLs as distinct, so code-less rows are
+  /// exempt.
+  orgCodeKey      String? @db.VarChar(191)
+  /// Optional: restrict to a single plan. Null = applies to any plan on the app.
+  planId          String?
+  /// Stable plan handle supplied by the consuming app. This scopes native
+  /// Shopify billing discounts without copying the app's plan catalog here.
+  externalPlanKey String? @db.VarChar(191)
+
+  code                  String?
+  /// Upper-cased, trimmed code used for deterministic per-app uniqueness.
+  normalizedCode        String?
+  type                  DiscountType   @default(PERCENTAGE)
+  value                 Decimal        @db.Decimal(18, 6)
+  discountMethod        DiscountMethod @default(PRICE_REDUCTION)
+  /// How many billing intervals the discount lasts (null = forever).
+  durationIntervals     Int?
+  /// Required for amount/flat-price native discounts; null for percentages.
+  currencyCode          String?        @db.VarChar(3)
+  startsAt              DateTime?
+  endsAt                DateTime?
+  maxRedemptions        Int?
+  maxRedemptionsPerShop Int?
+  description           String?
+  active                Boolean        @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  app                   App                    @relation(fields: [appId], references: [id], onDelete: Cascade)
+  plan                  Plan?                  @relation(fields: [planId], references: [id])
+  subscriptionDiscounts SubscriptionDiscount[]
+  redemptions           DiscountRedemption[]
+  apps                  DiscountApp[]
+
+  @@unique([appId, normalizedCode])
+  @@unique([organizationId, orgCodeKey])
+  @@index([organizationId])
+  @@index([appId])
+  @@index([appId, externalPlanKey])
+  @@index([code])
+  @@map("discounts")
+}
+
+/// One native Shopify Billing discount intent. A reservation is created before
+/// appSubscriptionCreate and becomes APPLIED only after the consuming app has
+/// verified Shopify's active AppSubscription. The snapshot keeps historical
+/// billing intent immutable when the discount definition is edited later.
+/// Every app a discount is valid in. Includes the discount's primary app, so
+/// eligibility is one question — "is there a row for this app?" — whichever
+/// app the discount was created for.
+model DiscountApp {
+  discountId String
+  appId      String
+  createdAt  DateTime @default(now())
+
+  discount Discount @relation(fields: [discountId], references: [id], onDelete: Cascade)
+  app      App      @relation(fields: [appId], references: [id], onDelete: Cascade)
+
+  @@id([discountId, appId])
+  @@index([appId])
+  @@map("discount_apps")
+}
+
+model DiscountRedemption {
+  id              String                   @id @default(cuid())
+  appId           String
+  discountId      String
+  shopDomain      String                   @db.VarChar(255)
+  externalPlanKey String                   @db.VarChar(191)
+  idempotencyKey  String                   @db.VarChar(191)
+  status          DiscountRedemptionStatus @default(RESERVED)
+
+  listPrice             Decimal      @db.Decimal(18, 6)
+  priceAfterDiscount    Decimal      @db.Decimal(18, 6)
+  currencyCode          String       @db.VarChar(3)
+  discountType          DiscountType
+  discountValue         Decimal      @db.Decimal(18, 6)
+  durationIntervals     Int?
+  shopifyPercentage     Decimal?     @db.Decimal(10, 6)
+  shopifyAmount         Decimal?     @db.Decimal(18, 6)
+  shopifySubscriptionId String?      @unique @db.VarChar(191)
+
+  reservedAt DateTime  @default(now())
+  expiresAt  DateTime
+  appliedAt  DateTime?
+  releasedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  app      App      @relation(fields: [appId], references: [id], onDelete: Cascade)
+  discount Discount @relation(fields: [discountId], references: [id], onDelete: Restrict)
+
+  @@unique([appId, idempotencyKey])
+  @@index([discountId, status, expiresAt])
+  @@index([appId, shopDomain, status])
+  @@map("discount_redemptions")
+}
+
+/// Database-backed fixed-window limiter for app-to-platform APIs. Upserts make
+/// increments atomic across server processes.
+model ApiRateLimitBucket {
+  id           String   @id @default(cuid())
+  appId        String
+  routeKey     String   @db.VarChar(64)
+  windowStart  DateTime
+  requestCount Int      @default(1)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  app App @relation(fields: [appId], references: [id], onDelete: Cascade)
+
+  @@unique([appId, routeKey, windowStart])
+  @@index([updatedAt])
+  @@map("api_rate_limit_buckets")
+}
+
+/// Redacted observability records for app-to-platform API calls. Payloads are
+/// bounded before insert and secrets are never intentionally persisted.
+model ApiRequestLog {
+  id              String   @id @default(cuid())
+  organizationId  String
+  appId           String?
+  requestId       String   @unique @db.VarChar(64)
+  method          String   @db.VarChar(10)
+  path            String   @db.VarChar(500)
+  query           String?  @db.Text
+  status          Int
+  durationMs      Decimal  @db.Decimal(12, 3)
+  ipAddress       String?  @db.VarChar(64)
+  userAgent       String?  @db.Text
+  customer        String?  @db.VarChar(255)
+  requestHeaders  Json?
+  requestBody     Json?
+  responseHeaders Json?
+  responseBody    Json?
+  createdAt       DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  app          App?         @relation(fields: [appId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, createdAt])
+  @@index([organizationId, method, status, createdAt])
+  @@index([organizationId, customer, createdAt])
+  @@index([appId, createdAt])
+  @@map("api_request_logs")
+}
+
+/// A discount applied to a subscription with a date window. `activeDiscountFor`
+/// picks the row where startsAt <= period AND (endsAt IS NULL OR endsAt >= period).
+model SubscriptionDiscount {
+  id             String    @id @default(cuid())
+  subscriptionId String
+  discountId     String
+  startsAt       DateTime  @default(now())
+  endsAt         DateTime?
+
+  createdAt DateTime @default(now())
+
+  subscription Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  discount     Discount     @relation(fields: [discountId], references: [id], onDelete: Cascade)
+
+  @@unique([subscriptionId, discountId])
+  @@index([subscriptionId])
+  @@index([discountId])
+  @@map("subscription_discounts")
+}
+
+// ---------------------------------------------------------------------------
+// Metered usage — feeds automatic tiering (spec §6)
+// ---------------------------------------------------------------------------
+
+/// A raw metered event reported by the app. Auto-upgrade sums these over the
+/// tier's window (month_to_date or current_billing_period) against limitMax.
+model UsageEvent {
+  id             String   @id @default(cuid())
+  appInstallId   String
+  metric         String
+  quantity       Decimal  @db.Decimal(18, 6)
+  occurredAt     DateTime @default(now())
+  /// Client event id used to make metered-usage retries additive exactly once.
+  idempotencyKey String?  @unique
+
+  appInstall AppInstall @relation(fields: [appInstallId], references: [id], onDelete: Cascade)
+
+  @@index([appInstallId, metric, occurredAt])
+  @@map("usage_events")
+}
+
+// ---------------------------------------------------------------------------
+// Audit — append-only, NON load-bearing (spec §1.5)
+// ---------------------------------------------------------------------------
+
+model FlexBillingEvent {
+  id String @id @default(uuid())
+
+  /// On upgrade/downgrade rows this is the *previous* subscription's id.
+  subscriptionId         String?
+  previousSubscriptionId String?
+  organizationId         String
+
+  date DateTime             @default(now())
+  type FlexBillingEventType
+
+  amount       Decimal? @db.Decimal(18, 6)
+  currencyCode String?
+  interval     String?
+  test         Boolean?
+
+  proration               Boolean   @default(false)
+  /// Signed net delta; positive on upgrade. On downgrade rewritten to the
+  /// positive actual credit issued (or 0).
+  prorationAmount         Decimal?  @db.Decimal(18, 6)
+  prorationAmountCurrency String?
+  prorationPlatformId     String?
+  prorationCompletedAt    DateTime?
+
+  completedAt               DateTime?
+  minutesOnPlanBeforeChange Int?
+
+  createdAt DateTime @default(now())
+
+  organization         Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  subscription         Subscription? @relation("EventSubscription", fields: [subscriptionId], references: [id], onDelete: SetNull)
+  previousSubscription Subscription? @relation("EventPreviousSubscription", fields: [previousSubscriptionId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, date])
+  @@index([subscriptionId])
+  @@map("flex_billing_events")
+}
+
+// ---------------------------------------------------------------------------
+// Distributed lock — the per-(org, subscription) mutex (spec §4.2 / §7)
+// ---------------------------------------------------------------------------
+
+/// A TTL mutex row. The charge cron and a simultaneous manual tier change take
+/// this lock per (org, subscription) so they can't double-charge. Expired locks
+/// are stolen atomically (see withLock in lock.server.ts).
+model FlexLock {
+  key       String   @id
+  /// Unique lease owner; prevents an expired holder from deleting a successor.
+  owner     String
+  lockedAt  DateTime @default(now())
+  expiresAt DateTime
+
+  @@index([expiresAt])
+  @@map("flex_locks")
+}
+
+// ---------------------------------------------------------------------------
+// Identify API (POST /v1/identify)
+// ---------------------------------------------------------------------------
+
+/// A customer created/updated through the POST /v1/identify upsert endpoint,
+/// which returns a stable per-customer API token. `appId` is the app UUID from
+/// the env-configured credential registry (IDENTIFY_APP_CREDENTIALS), NOT a row
+/// in `apps`: this is a self-contained API surface with its own app identity.
+/// The (appId, platform, platformId) triple is the customer identity key — a
+/// given platformId under app A is a different customer than under app B.
+model IdentifiedCustomer {
+  id              String   @id @default(cuid())
+  appId           String   @db.VarChar(191)
+  platform        String   @db.VarChar(64)
+  platformId      String   @db.VarChar(191)
+  name            String?  @db.VarChar(255)
+  email           String?  @db.VarChar(320)
+  myshopifyDomain String?  @db.VarChar(255)
+  /// Merchant Admin API access token, encrypted at rest (credential envelope).
+  accessToken     String?  @db.Text
+  /// Free-form flat attribute bag supplied by the caller. Incoming keys are
+  /// merged over the stored object; keys that weren't sent are never wiped.
+  customFields    Json?
+  /// Stable per-customer API token (plaintext, returned on every identify).
+  /// Generated once on first identify and never rotated by this endpoint.
+  apiToken        String   @db.VarChar(255)
+  /// SHA-256 (hex) of apiToken, so a future X-Customer-Api-Token can be
+  /// resolved by an indexed lookup rather than a table scan — the plaintext is
+  /// still compared in constant time after the row is found.
+  apiTokenHash    String   @unique @db.VarChar(64)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([appId, platform, platformId])
+  @@map("identified_customers")
+}
+
+/// A developer-generated credential for the identify API (`POST /v1/identify`),
+/// issued and rotated from the app's page instead of a deploy.
+///
+/// The secret is kept two ways, for two different jobs:
+///
+///   - `tokenHash` — SHA-256, UNIQUE. Authentication is one indexed lookup on
+///     this and never loads the secret. SHA-256 rather than a slow KDF is
+///     deliberate: the secret is 32 random bytes, so there is no guessable
+///     password to harden against.
+///   - `secretCipher` — the secret encrypted at rest (AES-256-GCM). Operators
+///     need to read a key back long after issuing it, so it is recoverable by
+///     design. The guarantee is therefore "a database dump alone is useless":
+///     reading a secret needs the database AND CREDENTIAL_ENCRYPTION_KEY, which
+///     lives only in the environment. That is weaker than the write-only
+///     hashing used for `IdentifiedCustomer.apiTokenHash`, and it is the cost of
+///     being able to show the value again.
+///
+/// `prefix` and `last4` exist so an operator can tell two keys apart without
+/// decrypting either.
+///
+/// **Several live keys per app is the point.** Rotation is generate → move
+/// callers → revoke, which leaves no window where the app cannot authenticate —
+/// the failure mode of a single mutable key.
+///
+/// The app id a developer sends as `X-Mantle-App-Id` is this row's `appId`,
+/// i.e. `App.id`: public, not a credential, and verified against the key so a
+/// key pointed at the wrong app cannot authenticate as whoever owns it.
+model IdentifyApiKey {
+  id          String    @id @default(cuid())
+  appId       String
+  /// Operator-facing label, e.g. "production" or "staging rotation".
+  name        String    @db.VarChar(120)
+  /// SHA-256 (hex) of the secret. Unique so authentication is one indexed
+  /// lookup rather than a scan-and-compare over every key.
+  tokenHash   String    @unique @db.VarChar(64)
+  /// The secret encrypted at rest, so it can be shown and copied again later.
+  /// Null for keys issued before secrets were stored — those can only be
+  /// rotated, never revealed.
+  secretCipher String?  @db.Text
+  /// Leading characters of the secret, for display only (`rpi_live_ab12…`).
+  prefix      String    @db.VarChar(32)
+  /// Trailing characters, so two keys sharing a prefix stay distinguishable.
+  last4       String    @db.VarChar(8)
+  /// Null until the key first authenticates. Written at most once a minute so
+  /// the hot auth path is not a write on every request.
+  lastUsedAt  DateTime?
+  /// Set instead of deleting the row: a revoked key stays listed as the record
+  /// of what was issued and when it stopped working.
+  revokedAt   DateTime?
+  /// Null once the issuing user is deleted; the key itself stays auditable.
+  createdById String?
+  createdAt   DateTime  @default(now())
+
+  app       App   @relation(fields: [appId], references: [id], onDelete: Cascade)
+  createdBy User? @relation("IdentifyApiKeyCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+
+  /// Drives the app's key list: live keys first, newest first.
+  @@index([appId, revokedAt, createdAt])
+  @@index([createdById])
+  @@map("identify_api_keys")
+}
+
+/// Fixed-window per-app rate-limit counter for the identify endpoint. Mirrors
+/// ApiRateLimitBucket but is keyed by the identify app UUID (a string from the
+/// env registry, not an `apps` row), so it carries no foreign key.
+model IdentifyRateLimitBucket {
+  id           String   @id @default(cuid())
+  appId        String   @db.VarChar(191)
+  routeKey     String   @db.VarChar(64)
+  windowStart  DateTime
+  requestCount Int      @default(1)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([appId, routeKey, windowStart])
+  @@index([updatedAt])
+  @@map("identify_rate_limit_buckets")
+}
+
+/// A "forgot password" link. Only the SHA-256 of the token is stored, so a
+/// database read cannot be turned into a working link. Single use (`usedAt`)
+/// and short-lived (`expiresAt`); issuing a new one expires the old.
+model UserPasswordReset {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique @db.VarChar(64)
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@map("user_password_resets")
+}

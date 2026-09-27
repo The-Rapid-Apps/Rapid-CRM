@@ -1,0 +1,4055 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans:
+    "Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+html,
+body {
+  min-height: 100%;
+  background: var(--p-color-bg);
+  color: var(--p-color-text);
+}
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+html[data-theme="light"] {
+  color-scheme: light;
+}
+
+/*
+ * `color-scheme: dark` on <html> (above) is supposed to make every native
+ * <select>'s OS-rendered dropdown list follow the page theme, but some
+ * Chromium builds on Windows render that popup using the OS-level theme
+ * instead, regardless of the page's `color-scheme` — reproduced here (a
+ * WSL app reached from a Windows browser): the popup rendered light-on-
+ * white while the rest of the page was dark, making the option text
+ * unreadable. Setting background/color directly on `select`/`option` is
+ * the one thing Chromium DOES still respect even when it ignores
+ * `color-scheme` for the popup, so this covers every native <select> in
+ * the app (Polaris's `Select` component always renders a real one).
+ */
+html[data-theme="dark"] select,
+html[data-theme="dark"] select option {
+  background-color: #1f1e1e;
+  color: #f6f6f7;
+}
+
+.theme-menu-activator {
+  display: grid;
+  width: 20px;
+  height: 20px;
+  place-items: center;
+  color: #e3e3e3;
+}
+
+.theme-menu-activator svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+.app-brand {
+  display: flex;
+  min-width: 0;
+  height: 100%;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px;
+  color: #f4f4f5;
+  text-decoration: none;
+}
+
+.app-brand:focus-visible {
+  border-radius: 8px;
+  outline: 2px solid var(--p-color-border-focus);
+  outline-offset: -4px;
+}
+
+.app-brand-mark {
+  display: grid;
+  flex: 0 0 auto;
+  width: 31px;
+  height: 31px;
+  place-items: center;
+  border: 1px solid rgb(190 171 255 / 35%);
+  border-radius: 9px;
+  background:
+    linear-gradient(145deg, rgb(255 255 255 / 14%), transparent), #7857d7;
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 16%) inset,
+    0 5px 14px rgb(0 0 0 / 18%);
+  font-size: 14px;
+  font-weight: 760;
+}
+
+.app-brand-mark img {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  object-fit: cover;
+}
+
+.app-brand-copy {
+  display: grid;
+  min-width: 0;
+  gap: 1px;
+  line-height: 1.1;
+}
+
+.app-brand-copy strong {
+  color: #f7f7f8;
+  font-size: 13px;
+  font-weight: 680;
+  letter-spacing: -0.01em;
+}
+
+.app-brand-copy small {
+  overflow: hidden;
+  color: #a9abb1;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.app-shell-content {
+  min-height: calc(100vh - var(--pg-top-bar-height));
+  min-height: calc(100svh - var(--pg-top-bar-height));
+}
+
+.app-shell-content > .Polaris-Page {
+  padding-bottom: 56px;
+  animation: app-page-enter 180ms ease-out both;
+}
+
+.route-focus-anchor {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  outline: none;
+}
+
+.route-announcer {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+  white-space: nowrap;
+}
+
+.route-progress {
+  position: fixed;
+  z-index: 520;
+  top: var(--pg-top-bar-height);
+  right: 0;
+  left: 0;
+  height: 2px;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+
+.route-progress span {
+  display: block;
+  width: 38%;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #6f4dd0, #b9a4ff, #6f4dd0);
+  box-shadow: 0 0 10px rgb(155 124 246 / 55%);
+}
+
+.route-progress--active {
+  opacity: 1;
+}
+
+.route-progress--active span {
+  animation: app-route-progress 1.05s ease-in-out infinite;
+}
+
+.command-search-empty {
+  display: grid;
+  min-height: 82px;
+  place-items: center;
+  padding: 18px;
+  text-align: center;
+}
+
+/* Workspace search results under the top bar. Polaris tokens throughout so
+   the panel tracks the active theme — this list sits over both the light and
+   dark dashboards. */
+
+/* Polaris caps the results panel at 36.25rem, which is sized for a list of
+   page names. These rows carry a store name, a domain and an LTV/MRR pair, so
+   the cap truncated the useful half of every line.
+   `100%` here is the search container the field itself fills (the panel is
+   absolutely positioned inside it), so the two stay aligned by construction
+   instead of by a viewport figure that would drift from the field at some
+   widths. 60rem is the upper bound, past which lines get too long to scan. */
+/* `html` prefix is load-bearing, not decoration: Polaris ships as a <link>
+   from root.tsx's links(), which lands AFTER this bundled stylesheet, so a
+   bare `.Polaris-TopBar-Search` ties on specificity and loses. Every other
+   Polaris override in this file carries a prefix for the same reason. */
+@media (min-width: 30.625em) {
+  html .Polaris-TopBar-Search {
+    max-width: min(60rem, 100%);
+    margin-inline: auto;
+  }
+}
+
+.workspace-search {
+  border-top: 1px solid var(--p-color-border-secondary);
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.workspace-search__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 10px 12px;
+  position: sticky;
+  top: 0;
+  background: var(--p-color-bg-surface);
+  z-index: 1;
+}
+
+.workspace-search__chip {
+  background: var(--p-color-bg-surface-secondary);
+  border: 1px solid transparent;
+  border-radius: var(--p-border-radius-200);
+  color: var(--p-color-text-secondary);
+  cursor: pointer;
+  font-size: var(--p-font-size-300);
+  padding: 3px 10px;
+}
+
+.workspace-search__chip:hover {
+  background: var(--p-color-bg-surface-secondary-hover);
+}
+
+.workspace-search__chip--active {
+  background: var(--p-color-bg-surface-brand-selected);
+  border-color: var(--p-color-border-brand);
+  color: var(--p-color-text-brand-on-bg-fill);
+}
+
+.workspace-search__group {
+  padding: 2px 12px 10px;
+}
+
+.workspace-search__group-head {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  padding: 6px 8px 4px;
+}
+
+.workspace-search__group-count {
+  background: var(--p-color-bg-surface-secondary);
+  border-radius: var(--p-border-radius-100);
+  color: var(--p-color-text-secondary);
+  font-size: var(--p-font-size-275);
+  padding: 0 6px;
+}
+
+.workspace-search__hit-row {
+  align-items: baseline;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.workspace-search__hit {
+  background: none;
+  border: 0;
+  border-radius: var(--p-border-radius-200);
+  cursor: pointer;
+  display: block;
+  padding: 7px 8px;
+  text-align: left;
+  width: 100%;
+}
+
+.workspace-search__hit:hover {
+  background: var(--p-color-bg-surface-hover);
+}
+
+.workspace-search__hit-title {
+  color: var(--p-color-text);
+  font-weight: var(--p-font-weight-semibold);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Never let the metric be the thing that gets truncated: it is short and
+   fixed-width, where the title is the part with room to spare. */
+.workspace-search__hit-meta {
+  color: var(--p-color-text-secondary);
+  flex: none;
+  font-size: var(--p-font-size-300);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.workspace-search__hit-sub {
+  color: var(--p-color-text-secondary);
+  display: block;
+  font-size: var(--p-font-size-300);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.Polaris-IndexTable__TableRow,
+.Polaris-DataTable__TableRow {
+  transition: background-color 120ms ease;
+}
+
+@media (hover: hover) {
+  .Polaris-IndexTable__TableRow:hover,
+  .Polaris-DataTable__TableRow:hover {
+    background: var(--p-color-bg-surface-hover);
+  }
+}
+
+@keyframes app-page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes app-route-progress {
+  from {
+    transform: translateX(-110%);
+  }
+
+  to {
+    transform: translateX(365%);
+  }
+}
+
+.overview-workspace {
+  --overview-border: #e3e3e3;
+  --overview-text: #202223;
+  --overview-muted: #6d7175;
+  padding-bottom: 52px;
+}
+
+/* Overview metric groups — Mantle's Revenue / Subscriptions / Churn rows.
+   Three tiles per card at desktop, stacking on narrow screens. */
+/* Two columns: the reading column, and a narrower reference rail. The rail
+   is fixed-width rather than a fraction so the metric tiles beside it keep a
+   usable width as the window narrows, instead of both shrinking together. */
+.overview-shell {
+  align-items: start;
+  display: grid;
+  gap: var(--p-space-400);
+  grid-template-columns: minmax(0, 1fr) 320px;
+}
+
+@media (max-width: 62em) {
+  .overview-shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.overview-rail {
+  display: grid;
+  gap: var(--p-space-300);
+  /* Follows the metrics down the page; the main column is far taller. */
+  position: sticky;
+  top: var(--p-space-400);
+}
+
+@media (max-width: 62em) {
+  .overview-rail {
+    position: static;
+  }
+}
+
+.overview-rail__head {
+  border-bottom: 1px solid var(--p-color-border-secondary);
+  padding: 12px 16px;
+}
+
+.overview-rail__body {
+  display: grid;
+  gap: 10px;
+  padding: 12px 16px;
+}
+
+.overview-rail__links {
+  display: grid;
+}
+
+.overview-rail__link {
+  align-items: center;
+  border-radius: var(--p-border-radius-200);
+  color: var(--p-color-text);
+  display: flex;
+  justify-content: space-between;
+  padding: 8px;
+  text-decoration: none;
+}
+
+.overview-rail__link:hover {
+  background: var(--p-color-bg-surface-hover);
+}
+
+.overview-filters {
+  align-items: center;
+  border-bottom: 1px solid var(--p-color-border-secondary);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 16px;
+}
+
+.overview-metrics {
+  display: grid;
+}
+
+/* Groups are divided from each other; tiles within a group are not, so the
+   eye runs across a row rather than stopping at every border. */
+.overview-metrics__group {
+  border-bottom: 1px solid var(--p-color-border-secondary);
+  display: grid;
+  gap: 4px;
+  padding: 14px 16px 10px;
+}
+
+.overview-metrics__group:last-child {
+  border-bottom: 0;
+}
+
+.overview-metrics__row {
+  display: grid;
+  gap: var(--p-space-400);
+  grid-template-columns: repeat(3, 1fr);
+}
+
+@media (max-width: 48em) {
+  .overview-metrics__row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.overview-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  /* Min height so a metric whose series is empty (or still loading) keeps the
+     row aligned with its neighbours that drew a chart. */
+  min-height: 104px;
+  padding: 4px 0 0;
+}
+
+.overview-metric__value {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Fixed height so a tile with no series matches one with a chart — otherwise
+   the three tiles in a row misalign while the reports are still landing. */
+.overview-metric__spark {
+  height: 56px;
+  margin-top: 4px;
+  /* Belt and braces: the theme now sets the chart's height, but a chart that
+     ever exceeds it must not paint over the neighbouring tiles again. */
+  overflow: hidden;
+}
+
+/* The last metric group drops its own bottom border, so the rule between the
+   metrics and the movement figures lives here — one line, not two. */
+.overview-movement {
+  border-top: 1px solid var(--p-color-border-secondary);
+}
+
+.overview-movement__head {
+  padding: 12px 16px 6px;
+}
+
+.overview-movement__row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+@media (max-width: 62em) {
+  .overview-movement__row {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 36em) {
+  .overview-movement__row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.overview-movement__item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 16px 14px;
+}
+
+.overview-trials__head {
+  align-items: center;
+  border-bottom: 1px solid var(--p-color-border-secondary);
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  padding: 12px 16px;
+}
+
+.overview-trials {
+  display: grid;
+  gap: var(--p-space-400);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  padding: 14px 16px 16px;
+}
+
+@media (max-width: 48em) {
+  .overview-trials {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.overview-trials__chart {
+  display: grid;
+  gap: 4px;
+}
+
+/* Tall enough for axis labels; the metric sparklines stay 48px because they
+   have none. */
+.overview-trials__chart-canvas {
+  height: 190px;
+  overflow: hidden;
+}
+
+.overview-trials__lost {
+  color: var(--p-color-text-critical);
+}
+
+.overview-trials__grid tfoot td {
+  border-top: 1px solid var(--p-color-border);
+  font-weight: var(--p-font-weight-semibold);
+}
+
+.overview-trials__grid {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.overview-trials__grid th,
+.overview-trials__grid td {
+  border-bottom: 1px solid var(--p-color-border-secondary);
+  font-size: var(--p-font-size-325);
+  padding: 6px 8px;
+  text-align: right;
+}
+
+.overview-trials__grid th:first-child,
+.overview-trials__grid td:first-child {
+  text-align: left;
+}
+
+.overview-trials__grid th {
+  color: var(--p-color-text-secondary);
+  font-weight: var(--p-font-weight-medium);
+}
+
+.overview-trials__grid tr:last-child td {
+  border-bottom: 0;
+}
+
+/* Quick stats — Mantle's pill row under the trials card. */
+.overview-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.overview-pill {
+  align-items: baseline;
+  background: var(--p-color-bg-surface);
+  border: 1px solid var(--p-color-border-secondary);
+  border-radius: var(--p-border-radius-200);
+  color: var(--p-color-text);
+  display: flex;
+  gap: 6px;
+  padding: 7px 12px;
+  text-decoration: none;
+}
+
+.overview-pill:hover {
+  background: var(--p-color-bg-surface-hover);
+  border-color: var(--p-color-border-hover);
+}
+
+/* Nudges right on hover, the way Polaris's own disclosure rows do — the
+   movement is what reads as "this goes somewhere". */
+.overview-pill__chevron {
+  color: var(--p-color-text-secondary);
+  transition: transform 120ms ease;
+}
+
+.overview-pill:hover .overview-pill__chevron {
+  color: var(--p-color-text);
+  transform: translateX(2px);
+}
+
+.overview-pill__value {
+  font-weight: var(--p-font-weight-semibold);
+}
+
+/* Step 3's list cards — two per row at desktop, stacking on narrow screens. */
+.overview-cards {
+  display: grid;
+  gap: var(--p-space-300);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (max-width: 62em) {
+  .overview-cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.overview-card__head {
+  align-items: center;
+  border-bottom: 1px solid var(--p-color-border-secondary);
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  padding: 12px 16px;
+}
+
+.overview-card__table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.overview-card__table th,
+.overview-card__table td {
+  border-bottom: 1px solid var(--p-color-border-secondary);
+  font-size: var(--p-font-size-325);
+  padding: 8px 16px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.overview-card__table th:first-child,
+.overview-card__table td:first-child {
+  max-width: 0;
+  overflow: hidden;
+  text-align: left;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
+.overview-card__table th {
+  color: var(--p-color-text-secondary);
+  font-weight: var(--p-font-weight-medium);
+}
+
+.overview-card__table tr:last-child td {
+  border-bottom: 0;
+}
+
+.overview-card__stats {
+  display: grid;
+  gap: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.overview-card__stat {
+  border-bottom: 1px solid var(--p-color-border-secondary);
+  border-right: 1px solid var(--p-color-border-secondary);
+  display: grid;
+  gap: 2px;
+  padding: 12px 16px;
+}
+
+.overview-card__stat:nth-child(2n) {
+  border-right: 0;
+}
+
+.overview-card__stat:nth-last-child(-n + 2) {
+  border-bottom: 0;
+}
+
+.overview-insights {
+  display: grid;
+}
+
+.overview-insight {
+  align-items: center;
+  border-bottom: 1px solid var(--p-color-border-secondary);
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 8px minmax(0, 1fr) auto auto;
+  padding: 10px 16px;
+}
+
+.overview-insight:last-child {
+  border-bottom: 0;
+}
+
+.overview-insight__dot {
+  border-radius: 50%;
+  height: 8px;
+  width: 8px;
+}
+
+.overview-insight__dot--positive {
+  background: var(--p-color-icon-success);
+}
+
+.overview-insight__dot--warning {
+  background: var(--p-color-icon-caution);
+}
+
+.overview-insight__dot--info {
+  background: var(--p-color-icon-info);
+}
+
+.overview-insight__dismiss {
+  background: none;
+  border: 0;
+  border-radius: var(--p-border-radius-100);
+  color: var(--p-color-text-secondary);
+  cursor: pointer;
+  font-size: var(--p-font-size-300);
+  line-height: 1;
+  padding: 4px 6px;
+}
+
+.overview-insight__dismiss:hover {
+  background: var(--p-color-bg-surface-hover);
+  color: var(--p-color-text);
+}
+
+.overview-card__filters {
+  border-bottom: 1px solid var(--p-color-border-secondary);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px 16px;
+}
+
+/* Customer names read as links — Polaris's own link colour, underlined, so a
+   clickable name is obvious against the plain figures beside it. */
+.overview-card__link {
+  color: var(--p-color-text-link);
+  text-decoration: underline;
+}
+
+.overview-card__link:hover {
+  color: var(--p-color-text-link-hover);
+}
+
+/* NO fixed height. The chart sets its own (210px, via the theme's
+   chartContainer.minHeight), and box-sizing is border-box — so a fixed height
+   here meant the padding ate into it and the chart spilled onto the table
+   instead of sitting above it. Padding alone gives the section real room. */
+.overview-donut {
+  border-bottom: 1px solid var(--p-color-border-secondary);
+  padding: 16px 16px 32px;
+}
+
+/* The installs table carries four columns including a full timestamp, which
+   the "first column absorbs the slack" rule below cannot fit — it squeezed the
+   customer name down to two characters. Here the columns take their natural
+   widths and the card scrolls instead. */
+.overview-card__scroll {
+  overflow-x: auto;
+  /* Firefox */
+  scrollbar-color: var(--p-color-border) transparent;
+  scrollbar-width: thin;
+}
+
+/* WebKit ignores scrollbar-width, so the same bar is styled twice. */
+.overview-card__scroll::-webkit-scrollbar {
+  height: 6px;
+}
+
+.overview-card__scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.overview-card__scroll::-webkit-scrollbar-thumb {
+  background: var(--p-color-border);
+  border-radius: 999px;
+}
+
+.overview-card__scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--p-color-border-hover);
+}
+
+.overview-card__table--installs {
+  min-width: 560px;
+}
+
+/* Six columns, so it scrolls on a narrow window like the installs table. */
+.overview-card__table--activity {
+  min-width: 720px;
+}
+
+.overview-card__table--activity th:first-child,
+.overview-card__table--activity td:first-child {
+  max-width: 240px;
+  min-width: 160px;
+  width: auto;
+}
+
+.overview-card__table--activity th:nth-child(2),
+.overview-card__table--activity td:nth-child(2),
+.overview-card__table--activity th:nth-child(3),
+.overview-card__table--activity td:nth-child(3),
+.overview-card__table--activity th:nth-child(4),
+.overview-card__table--activity td:nth-child(4) {
+  text-align: left;
+}
+
+.overview-card__table--installs th:first-child,
+.overview-card__table--installs td:first-child {
+  max-width: 200px;
+  min-width: 150px;
+  width: auto;
+}
+
+.overview-card__table--installs th:nth-child(2),
+.overview-card__table--installs td:nth-child(2) {
+  text-align: left;
+}
+
+.overview-card__empty {
+  color: var(--p-color-text-secondary);
+  display: grid;
+  min-height: 120px;
+  padding: 24px 16px;
+  place-items: center;
+  text-align: center;
+}
+
+
+
+
+
+
+.overview-metric-link {
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+}
+
+.overview-metric {
+  display: grid;
+  min-height: 146px;
+  height: 100%;
+  gap: 8px;
+  align-content: start;
+  padding: 19px 20px 18px;
+  border: 1px solid var(--overview-border);
+  border-radius: 15px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 4%);
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.overview-metric-link:hover .overview-metric {
+  transform: translateY(-2px);
+  border-color: #cfc7df;
+  box-shadow: 0 10px 26px rgb(49 34 84 / 8%);
+}
+
+.overview-metric-link:focus-visible {
+  border-radius: 15px;
+  outline: 3px solid #91c8ff;
+  outline-offset: 2px;
+}
+
+.overview-metric-label {
+  color: var(--overview-muted);
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0.015em;
+}
+
+.overview-metric-value {
+  min-width: 0;
+  overflow: hidden;
+  color: #242126;
+  font-size: clamp(25px, 2.3vw, 34px);
+  font-weight: 735;
+  letter-spacing: -0.04em;
+  line-height: 1.12;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.overview-metric-detail {
+  color: var(--overview-muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+
+.overview-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  min-height: 76px;
+  padding: 17px 20px;
+  border-bottom: 1px solid #ededee;
+}
+
+.overview-section-header > div:first-child {
+  display: grid;
+  gap: 3px;
+}
+
+.overview-app-list,
+
+
+
+
+
+
+
+.overview-app-copy {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
+.overview-app-copy strong {
+  overflow: hidden;
+  color: var(--overview-text);
+  font-size: 13px;
+  font-weight: 680;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.overview-app-copy small {
+  overflow: hidden;
+  color: var(--overview-muted);
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.overview-workspace-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  overflow: hidden;
+  border: 1px solid #e7e7e8;
+  border-radius: 12px;
+  background: #fafafa;
+}
+
+.overview-workspace-stats > div {
+  display: grid;
+  gap: 3px;
+  padding: 14px;
+  text-align: center;
+  border-inline-start: 1px solid #e7e7e8;
+}
+
+.overview-workspace-stats > div:first-child {
+  border-inline-start: 0;
+}
+
+.overview-workspace-stats strong {
+  color: #262328;
+  font-size: 22px;
+  font-weight: 720;
+  font-variant-numeric: tabular-nums;
+}
+
+.overview-workspace-stats span {
+  color: var(--overview-muted);
+  font-size: 11px;
+}
+
+.overview-quick-actions {
+  display: grid;
+  gap: 8px;
+}
+
+
+
+
+
+
+
+@media (max-width: 640px) {
+
+  .overview-section-header {
+    align-items: flex-start;
+  }
+
+}
+
+.subscriptions-workspace {
+  --subscriptions-border: #e3e3e3;
+  --subscriptions-muted: #6d7175;
+  padding-bottom: 52px;
+}
+
+.subscriptions-context {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  min-height: 96px;
+  padding: 20px 22px;
+  border: 1px solid var(--subscriptions-border);
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 0% 0%, rgb(73 149 255 / 11%), transparent 36%),
+    #fff;
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 4%),
+    0 8px 24px rgb(30 72 120 / 4%);
+}
+
+.subscriptions-context > div:first-child {
+  display: grid;
+  gap: 3px;
+}
+
+.subscriptions-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2px;
+  color: #62666b;
+  font-size: 11px;
+  font-weight: 720;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.subscriptions-eyebrow i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #2888e8;
+  box-shadow: 0 0 0 4px rgb(40 136 232 / 12%);
+}
+
+.subscriptions-summary-card {
+  display: grid;
+  min-height: 118px;
+  gap: 8px;
+  align-content: start;
+  padding: 17px 18px;
+  border: 1px solid var(--subscriptions-border);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 4%);
+}
+
+.subscriptions-summary-card span {
+  color: var(--subscriptions-muted);
+  font-size: 12px;
+  font-weight: 640;
+}
+
+.subscriptions-summary-card strong {
+  color: #242126;
+  font-size: clamp(25px, 2.3vw, 34px);
+  font-weight: 735;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.subscriptions-summary-card small {
+  color: var(--subscriptions-muted);
+  font-size: 11px;
+}
+
+.subscriptions-table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  min-height: 78px;
+  padding: 17px 20px;
+  border-bottom: 1px solid #ededee;
+}
+
+.subscriptions-table-header > div:first-child {
+  display: grid;
+  gap: 3px;
+}
+
+.subscriptions-shop-cell {
+  display: grid;
+  min-width: 200px;
+  gap: 2px;
+}
+
+.subscriptions-shop-cell strong {
+  overflow: hidden;
+  max-width: 310px;
+  font-size: 13px;
+  font-weight: 670;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.subscriptions-shop-cell span {
+  color: var(--subscriptions-muted);
+  font-size: 11px;
+}
+
+.discounts-workspace {
+  padding-bottom: 52px;
+}
+
+.discounts-summary-card {
+  display: grid;
+  min-height: 116px;
+  gap: 7px;
+  align-content: start;
+  padding: 17px 18px;
+  border: 1px solid #e3e3e3;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 4%);
+}
+
+.discounts-summary-card span,
+.discounts-summary-card small {
+  color: #6d7175;
+  font-size: 11px;
+}
+
+.discounts-summary-card span {
+  font-size: 12px;
+  font-weight: 640;
+}
+
+.discounts-summary-card strong {
+  color: #242126;
+  font-size: clamp(25px, 2.3vw, 34px);
+  font-weight: 735;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.discounts-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  min-height: 78px;
+  padding: 17px 20px;
+  border-bottom: 1px solid #ededee;
+}
+
+.discounts-section-header > div:first-child,
+.discounts-primary-cell {
+  display: grid;
+  gap: 3px;
+}
+
+.discounts-primary-cell strong {
+  color: #242126;
+  font-size: 13px;
+  font-weight: 680;
+}
+
+.discounts-primary-cell span {
+  color: #6d7175;
+  font-size: 11px;
+}
+
+.discounts-empty {
+  display: grid;
+  min-height: 150px;
+  place-items: center;
+  padding: 28px;
+  text-align: center;
+}
+
+.activity-workspace {
+  --activity-border: #e3e3e3;
+  --activity-muted: #6d7175;
+  padding-bottom: 52px;
+}
+
+.activity-context {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 28px;
+  min-height: 108px;
+  padding: 22px 24px;
+  border: 1px solid var(--activity-border);
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 0% 0%, rgb(53 142 255 / 12%), transparent 37%),
+    #fff;
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 4%),
+    0 8px 24px rgb(30 72 120 / 4%);
+}
+
+.activity-context > div:first-child {
+  display: grid;
+  max-width: 700px;
+  gap: 4px;
+}
+
+.activity-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2px;
+  color: #62666b;
+  font-size: 11px;
+  font-weight: 720;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.activity-eyebrow i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #168557;
+  box-shadow: 0 0 0 4px rgb(22 133 87 / 12%);
+}
+
+.activity-context-stat {
+  display: grid;
+  min-width: 112px;
+  gap: 2px;
+  padding-inline-start: 18px;
+  border-inline-start: 1px solid #e5e5e5;
+}
+
+.activity-context-stat span {
+  color: var(--activity-muted);
+  font-size: 11px;
+  font-weight: 630;
+}
+
+.activity-context-stat strong {
+  color: #242126;
+  font-size: 22px;
+  font-weight: 720;
+  letter-spacing: -0.025em;
+}
+
+.activity-summary-card {
+  display: grid;
+  min-height: 116px;
+  gap: 7px;
+  align-content: start;
+  padding: 17px 18px;
+  border: 1px solid var(--activity-border);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 4%);
+}
+
+.activity-summary-card span {
+  color: var(--activity-muted);
+  font-size: 12px;
+  font-weight: 640;
+}
+
+.activity-summary-card strong {
+  color: #242126;
+  font-size: clamp(25px, 2.3vw, 34px);
+  font-weight: 735;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.activity-summary-card small {
+  color: var(--activity-muted);
+  font-size: 11px;
+}
+
+.activity-table-header,
+.activity-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.activity-table-header {
+  min-height: 78px;
+  padding: 17px 20px;
+  border-bottom: 1px solid #ededee;
+}
+
+.activity-table-header > div:first-child {
+  display: grid;
+  gap: 3px;
+}
+
+.activity-pagination {
+  padding: 14px 18px;
+  border-top: 1px solid #ededee;
+}
+
+.activity-shop-cell,
+.activity-charge-cell {
+  display: grid;
+  min-width: 190px;
+  gap: 2px;
+}
+
+.activity-shop-cell strong,
+.activity-charge-cell strong {
+  overflow: hidden;
+  max-width: 280px;
+  color: #242126;
+  font-size: 13px;
+  font-weight: 670;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.activity-shop-cell span,
+.activity-charge-cell span {
+  overflow: hidden;
+  max-width: 280px;
+  color: var(--activity-muted);
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .subscriptions-context {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .subscriptions-table-header {
+    align-items: flex-start;
+  }
+
+  .activity-context,
+  .activity-table-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .activity-context-stat {
+    padding-inline-start: 0;
+    border-inline-start: 0;
+  }
+}
+
+.reports-workspace {
+  --reports-border: #e3e3e3;
+  --reports-text: #202223;
+  --reports-muted: #6d7175;
+  --reports-surface: #ffffff;
+  --reports-subdued: #f7f7f8;
+  --reports-accent: #6d43d9;
+  padding-bottom: 48px;
+}
+
+/* Reports index: the section links down the left. A button, not a link — it
+   scrolls to a heading on this page rather than navigating, so it must not
+   look like somewhere to go. */
+/* Reports index cards: a fixed grid and a fixed card height.
+   `minmax(0, 1fr)` rather than `1fr` because a grid column's default minimum is
+   its content, so the longest description was widening its column and pushing
+   the last card past the edge. The fixed height stops a one-line description
+   from making a shorter card than a three-line one. */
+.reports-index-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+@media (max-width: 1200px) {
+  .reports-index-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .reports-index-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.reports-index-card {
+  display: block;
+  height: 9.5rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Polaris renders its own wrapper inside the link; both have to stretch or the
+   Card sits at content height inside a taller box. */
+.reports-index-card > * {
+  height: 100%;
+}
+
+.reports-index-section-link {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.75rem 1rem;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--p-color-border-secondary, #e3e3e3);
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+}
+
+.reports-index-section-link:last-child {
+  border-bottom: 0;
+}
+
+.reports-index-section-link:hover {
+  background: var(--p-color-bg-surface-hover, #f7f7f7);
+}
+
+.reports-context-bar,
+.reports-toolbar,
+.reports-results-shell {
+  border: 1px solid var(--reports-border);
+  background: var(--reports-surface);
+  border-radius: 16px;
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 4%),
+    0 8px 24px rgb(0 0 0 / 3%);
+}
+
+.reports-context-bar {
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) minmax(520px, 1.5fr);
+  gap: 32px;
+  align-items: center;
+  padding: 22px 24px;
+  background:
+    radial-gradient(circle at 0% 0%, rgb(150 104 255 / 10%), transparent 34%),
+    var(--reports-surface);
+}
+
+.reports-context-intro {
+  display: grid;
+  gap: 4px;
+}
+
+.reports-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 3px;
+  color: #5c5f62;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.reports-eyebrow > span,
+.reports-status-value > i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #1a9f62;
+  box-shadow: 0 0 0 3px rgb(26 159 98 / 12%);
+}
+
+.reports-context-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  overflow: hidden;
+  border: 1px solid #ececec;
+  border-radius: 12px;
+  background: rgb(248 248 248 / 88%);
+}
+
+.reports-context-grid > div {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+  padding: 13px 16px;
+  border-inline-start: 1px solid #e8e8e8;
+}
+
+.reports-context-grid > div:first-child {
+  border-inline-start: 0;
+}
+
+.reports-context-grid span {
+  color: var(--reports-muted);
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+}
+
+.reports-context-grid strong {
+  overflow: hidden;
+  color: var(--reports-text);
+  font-size: 13px;
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reports-status-value {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.reports-toolbar {
+  padding: 20px;
+}
+
+/* The filter row applies on selection, so it carries no heading and no submit
+   button — it needs breathing room, not the panel chrome the old form had. */
+.reports-toolbar--inline {
+  padding: 12px 16px;
+}
+
+/* `AppPicker` is fullWidth by design — it is normally one cell of a form grid.
+   In this inline row it needs a bound, or it takes the whole width and pushes
+   the other filters onto their own line. */
+.reports-toolbar-control {
+  min-width: 12rem;
+}
+
+.reports-toolbar-header,
+.reports-results-header,
+.reports-chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.reports-infotip-trigger {
+  color: var(--p-color-text-secondary);
+  cursor: help;
+  font-size: var(--p-font-size-300);
+  margin-left: 6px;
+}
+
+.reports-infotip p {
+  margin: 0 0 6px;
+}
+
+.reports-infotip ul {
+  margin: 0;
+  padding-left: 16px;
+}
+
+.reports-infotip li {
+  margin-bottom: 4px;
+}
+
+.reports-chart-tooltip {
+  background: #090909;
+  border: 1px solid #333;
+  border-radius: 10px;
+  color: #f7f7f7;
+  min-width: 210px;
+  padding: 12px 14px;
+}
+
+.reports-chart-tooltip__title {
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.reports-chart-tooltip__row {
+  align-items: center;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 10px minmax(0, 1fr) auto;
+  margin-bottom: 4px;
+}
+
+.reports-chart-tooltip__dot {
+  border-radius: 50%;
+  height: 9px;
+  width: 9px;
+}
+
+.reports-chart-tooltip__row strong {
+  font-variant-numeric: tabular-nums;
+}
+
+/* The trial charts' tooltip is rendered by us, into a portal on <body>, and
+   placed from the cursor — see `TrialComboCard`.
+
+   ComboChart is the one polaris-viz chart that doesn't portal its tooltip:
+   VerticalBarChart, LineChart, DonutChart and StackedAreaChart all pass
+   `usePortal: true`, so the DOCUMENT coordinates the library computes
+   (`useContainerBounds` stores `getBoundingClientRect().y + window.scrollY`)
+   land correctly on <body>. ComboChart renders it inline inside its own
+   `position: relative` container instead, where those coordinates are re-based
+   on the chart's own position and the tooltip lands off the card. Its math is
+   inconsistent too — `formatPositionForTooltip` adds `chartBounds.x` to X but
+   never adds `chartBounds.y` to Y. Correcting either from CSS was tried twice
+   and is not worth a third attempt, so placement is ours outright. polaris-viz
+   still draws the crosshair and bar highlight, which are correct. */
+.reports-chart-tooltip--floating {
+  position: fixed;
+  z-index: 521;
+  pointer-events: none;
+}
+
+.reports-trial-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-bottom: 8px;
+}
+
+.reports-trial-choice {
+  padding: 12px 16px;
+}
+
+.reports-trial-history-head {
+  align-items: flex-start;
+  border-bottom: 1px solid var(--p-color-border-secondary);
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  padding: 16px;
+}
+
+.reports-trial-history-filters {
+  align-items: center;
+  border-bottom: 1px solid var(--p-color-border-secondary);
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px;
+}
+
+.reports-trial-history-search {
+  flex: 1;
+  max-width: 340px;
+}
+
+.reports-trial-history-scroll {
+  overflow-x: auto;
+  scrollbar-color: var(--p-color-border) transparent;
+  scrollbar-width: thin;
+}
+
+.reports-trial-history-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+
+.reports-trial-history-scroll::-webkit-scrollbar-thumb {
+  background: var(--p-color-border);
+  border-radius: 999px;
+}
+
+.reports-trial-history-table {
+  border-collapse: collapse;
+  min-width: 760px;
+  width: 100%;
+}
+
+.reports-trial-history-table th,
+.reports-trial-history-table td {
+  border-bottom: 1px solid var(--p-color-border-secondary);
+  font-size: var(--p-font-size-325);
+  padding: 10px 16px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.reports-trial-history-table th {
+  color: var(--p-color-text-secondary);
+  font-weight: var(--p-font-weight-medium);
+}
+
+.reports-trial-history-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.reports-trial-history-link {
+  color: var(--p-color-text-link);
+  display: block;
+  text-decoration: underline;
+}
+
+.reports-trial-history-sub {
+  color: var(--p-color-text-secondary);
+  display: block;
+  font-size: var(--p-font-size-300);
+}
+
+.reports-trial-history-empty {
+  display: grid;
+  min-height: 140px;
+  padding: 24px 16px;
+  place-items: center;
+}
+
+.reports-trial-history-pagination {
+  border-top: 1px solid var(--p-color-border-secondary);
+  display: flex;
+  justify-content: center;
+  padding: 12px;
+}
+
+/* The two money stats beside a trial chart's headline rate — Mantle puts
+   Converted/Canceled (or Active/Canceled) top-right of the same card. */
+.reports-trial-stats {
+  display: flex;
+  gap: 24px;
+  text-align: right;
+}
+
+.reports-trial-stats span {
+  color: var(--p-color-text-secondary);
+  display: block;
+  font-size: var(--p-font-size-300);
+}
+
+.reports-trial-stats strong {
+  font-size: var(--p-font-size-400);
+  font-variant-numeric: tabular-nums;
+}
+
+.reports-toolbar-header {
+  align-items: center;
+  margin-bottom: 18px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #eeeeef;
+}
+
+.reports-results-shell {
+  overflow: hidden;
+}
+
+.reports-results-header {
+  align-items: center;
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid #eeeeef;
+}
+
+.reports-results-content {
+  min-height: 420px;
+  padding: 24px;
+  background: #fafafa;
+  border-top: 1px solid #eeeeef;
+}
+
+.reports-metric-card {
+  /* min-width: 0 overrides the grid item's implicit min-width: auto — without
+     it, a card with an unbreakable long value/label can refuse to shrink
+     below its content size and push past its InlineGrid track (seen with 4+
+     funnel-event metric cards selected). */
+  min-width: 0;
+  height: 100%;
+  min-height: 132px;
+  padding: 18px 18px 16px;
+  border: 1px solid #e1e2e3;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 1px 1px rgb(0 0 0 / 3%);
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+
+.reports-metric-card:hover {
+  transform: translateY(-1px);
+  border-color: #cbc7d8;
+  box-shadow: 0 8px 22px rgb(49 34 84 / 7%);
+}
+
+.reports-metric-label {
+  overflow: hidden;
+  color: var(--reports-muted);
+  font-size: 13px;
+  font-weight: 580;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reports-metric-value {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  overflow: hidden;
+  color: #242126;
+  font-size: clamp(25px, 2.4vw, 34px);
+  font-weight: 720;
+  letter-spacing: -0.035em;
+  line-height: 1.08;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.reports-metric-dot {
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.reports-metric-detail {
+  overflow: hidden;
+  color: var(--reports-muted);
+  font-size: 12px;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reports-chart-card {
+  min-width: 0;
+  overflow: hidden;
+  padding: 20px;
+  color: #f7f7f7;
+  border: 1px solid #39383a;
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 100% 0%, rgb(150 104 255 / 9%), transparent 34%),
+    #242323;
+  box-shadow: 0 12px 28px rgb(20 16 27 / 12%);
+}
+
+.reports-chart-header {
+  align-items: center;
+}
+
+.reports-chart-label {
+  margin-bottom: 3px;
+  color: #aaa7ac;
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0.045em;
+  text-transform: uppercase;
+}
+
+.reports-chart-value {
+  color: #fff;
+  font-size: clamp(25px, 2.7vw, 36px);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  font-variant-numeric: tabular-nums;
+}
+
+.reports-chart-badge {
+  padding: 5px 9px;
+  color: #d8c9ff;
+  border: 1px solid rgb(166 132 255 / 28%);
+  border-radius: 999px;
+  background: rgb(150 104 255 / 10%);
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.reports-chart-info-icon {
+  display: inline-flex;
+  align-items: center;
+  cursor: help;
+  opacity: 0.75;
+}
+
+.reports-chart-info-icon:hover {
+  opacity: 1;
+}
+
+.reports-compare-option {
+  padding: var(--p-space-150) var(--p-space-200);
+  border-radius: var(--p-border-radius-200);
+}
+
+.reports-compare-option:hover {
+  background: var(--p-color-bg-surface-hover);
+}
+
+.reports-chart-canvas {
+  min-height: 288px;
+  margin-top: 12px;
+}
+
+/* Diverging charts (MRR changes) split their plot area above and below zero,
+   so every bar gets roughly half the height it would on a single-sided chart.
+   The extra room is what makes the bars readable rather than a thin band. */
+.reports-chart-canvas--tall {
+  min-height: 440px;
+}
+
+/* Funnel-event tiles above the traffic trend chart. They are the legend AND
+   the chart's tab strip (see FunnelStatTiles), so each one has to read as
+   both a colour key and a pressable control — hence the swatch, the number,
+   and a selected state distinct from hover. `--funnel-tile-color` is set
+   per tile from the series colour so the swatch and the selected accent can
+   never drift from the line they describe. */
+.reports-funnel-tiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 14px 0 6px;
+}
+
+.reports-funnel-tile {
+  display: flex;
+  flex: 1 1 150px;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+  min-width: 0;
+  padding: 10px 14px;
+  color: inherit;
+  border: 1px solid #39383a;
+  border-radius: 12px;
+  background: rgb(255 255 255 / 3%);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 120ms ease,
+    background 120ms ease,
+    opacity 120ms ease;
+}
+
+.reports-funnel-tile:hover,
+.reports-funnel-tile:focus-visible {
+  border-color: var(--funnel-tile-color);
+  background: rgb(255 255 255 / 6%);
+}
+
+.reports-funnel-tile.is-selected {
+  border-color: var(--funnel-tile-color);
+  /* colour-mix keeps the tint tied to the series colour instead of needing a
+     second hardcoded value per funnel event. */
+  background: color-mix(in srgb, var(--funnel-tile-color) 14%, transparent);
+  box-shadow: inset 0 -2px 0 0 var(--funnel-tile-color);
+}
+
+.reports-funnel-tile.is-dimmed {
+  opacity: 0.45;
+}
+
+.reports-funnel-tile-label {
+  display: inline-flex;
+  gap: 7px;
+  align-items: center;
+  max-width: 100%;
+  color: #aaa7ac;
+  font-size: 12px;
+  font-weight: 600;
+  /* Long labels ("App Listing Page View") must not widen the tile past its
+     share of the row. */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reports-funnel-tile-label i {
+  flex: 0 0 auto;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--funnel-tile-color);
+}
+
+.reports-funnel-tile-value {
+  color: #fff;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Right-hand side of the traffic chart header: the conversions figure and the
+   "Show all events" escape hatch, kept on one baseline. */
+.reports-chart-header-actions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.reports-chart-conversions {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  cursor: help;
+}
+
+.reports-chart-conversions-label {
+  color: #aaa7ac;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.reports-chart-conversions-value {
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+html[data-theme="light"] .reports-chart-conversions-label {
+  color: #6d7175;
+}
+
+html[data-theme="light"] .reports-chart-conversions-value {
+  color: #202223;
+}
+
+@media (max-width: 640px) {
+  .reports-chart-header-actions {
+    gap: 10px;
+  }
+
+  .reports-chart-conversions-value {
+    font-size: 16px;
+  }
+}
+
+.reports-funnel-tiles-reset {
+  appearance: none;
+  padding: 0;
+  color: #aaa7ac;
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 12px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.reports-funnel-tiles-reset:hover {
+  color: #fff;
+}
+
+html[data-theme="light"] .reports-funnel-tile {
+  border-color: #e1e2e3;
+  background: #fafafa;
+}
+
+html[data-theme="light"] .reports-funnel-tile:hover,
+html[data-theme="light"] .reports-funnel-tile:focus-visible {
+  background: #f2f2f2;
+}
+
+html[data-theme="light"] .reports-funnel-tile-label,
+html[data-theme="light"] .reports-funnel-tiles-reset {
+  color: #6d7175;
+}
+
+html[data-theme="light"] .reports-funnel-tile-value,
+html[data-theme="light"] .reports-funnel-tiles-reset:hover {
+  color: #202223;
+}
+
+@media (max-width: 640px) {
+  /* Two per row rather than one tall column — the numbers stay comparable at
+     a glance, which is the whole point of the tiles. */
+  .reports-funnel-tile {
+    flex-basis: calc(50% - 5px);
+  }
+}
+
+.reports-chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px 20px;
+  min-height: 22px;
+  padding-top: 12px;
+  color: #c4c1c6;
+  font-size: 12px;
+}
+
+.reports-chart-legend span,
+.reports-chart-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  cursor: default;
+  transition: color 100ms ease, opacity 100ms ease;
+}
+
+.reports-chart-legend span:hover,
+.reports-chart-legend-item:hover:not(:disabled) {
+  color: #fff;
+}
+
+/* Legend entries are real buttons so they are keyboard- and screen-reader
+   reachable; these strip the browser chrome without losing that. */
+.reports-chart-legend-item {
+  appearance: none;
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.reports-chart-legend-item:disabled {
+  /* The last visible series: not an error state, just nothing left to hide. */
+  cursor: default;
+}
+
+/* Struck through rather than merely faded, matching Mantle: a dimmed label
+   reads as disabled, a struck one reads as switched off. */
+.reports-chart-legend-item--hidden {
+  opacity: 0.5;
+  text-decoration: line-through;
+}
+
+.reports-chart-legend-item--hidden i {
+  /* The swatch loses its color too, or a hidden series still looks present. */
+  background: var(--p-color-text-disabled) !important;
+  border-top-color: var(--p-color-text-disabled);
+}
+
+.reports-chart-legend--dimmed {
+  opacity: 0.45;
+}
+
+.reports-chart-legend i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+
+/*
+ * Every chart card follows the site's light/dark toggle. The declarations above
+ * are the dark look; these override them under an explicit light theme.
+ *
+ * `data-theme` is always written as a concrete "light" or "dark" by
+ * `applyTheme` — the "system" preference is resolved before it reaches the DOM —
+ * so matching on the attribute alone is enough and no prefers-color-scheme
+ * fallback is needed here.
+ */
+html[data-theme="light"] .reports-chart-card {
+  color: #202223;
+  border-color: #e1e2e3;
+  background:
+    radial-gradient(circle at 100% 0%, rgb(150 104 255 / 6%), transparent 34%),
+    #ffffff;
+  box-shadow: 0 12px 28px rgb(20 16 27 / 5%);
+}
+
+html[data-theme="light"] .reports-chart-card .reports-chart-label,
+html[data-theme="light"] .reports-chart-card .reports-chart-legend {
+  color: #6d7175;
+}
+
+html[data-theme="light"] .reports-chart-card .reports-chart-value {
+  color: #202223;
+}
+
+html[data-theme="light"] .reports-chart-card .reports-chart-legend span:hover {
+  color: #202223;
+}
+
+html[data-theme="light"] .reports-chart-card .reports-chart-badge {
+  color: #5c3ec2;
+  border-color: rgb(102 104 255 / 22%);
+  background: rgb(150 104 255 / 8%);
+}
+
+@media (max-width: 980px) {
+  .reports-context-bar {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+}
+
+@media (max-width: 680px) {
+  .reports-context-bar,
+  .reports-toolbar {
+    padding: 16px;
+    border-radius: 12px;
+  }
+
+  .reports-context-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .reports-context-grid > div:nth-child(3) {
+    border-inline-start: 0;
+    border-top: 1px solid #e8e8e8;
+  }
+
+  .reports-context-grid > div:nth-child(4) {
+    border-top: 1px solid #e8e8e8;
+  }
+
+  .reports-toolbar-header,
+  .reports-results-header {
+    align-items: flex-start;
+  }
+
+  .reports-results-content {
+    padding: 16px;
+  }
+
+  .reports-chart-card {
+    padding: 16px;
+    border-radius: 13px;
+  }
+
+  .reports-chart-canvas {
+    min-height: 250px;
+  }
+
+  .reports-chart-canvas--tall {
+    min-height: 340px;
+  }
+}
+
+/* Custom dashboard surfaces use the same dark palette as Polaris. */
+html[data-theme="dark"] .overview-workspace {
+  --overview-border: #414141;
+  --overview-text: #f1f1f1;
+  --overview-muted: #b5b5b5;
+}
+
+
+html[data-theme="dark"] .subscriptions-eyebrow,
+html[data-theme="dark"] .activity-eyebrow,
+html[data-theme="dark"] .reports-eyebrow {
+  color: #c5c2c8;
+}
+
+html[data-theme="dark"] .overview-metric,
+html[data-theme="dark"] .subscriptions-summary-card,
+html[data-theme="dark"] .discounts-summary-card,
+html[data-theme="dark"] .activity-summary-card {
+  background: #303030;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 25%);
+}
+
+html[data-theme="dark"] .overview-metric-value,
+html[data-theme="dark"] .overview-workspace-stats strong,
+html[data-theme="dark"] .subscriptions-summary-card strong,
+html[data-theme="dark"] .discounts-summary-card strong,
+html[data-theme="dark"] .discounts-primary-cell strong,
+html[data-theme="dark"] .activity-context-stat strong,
+html[data-theme="dark"] .activity-summary-card strong,
+html[data-theme="dark"] .activity-shop-cell strong,
+html[data-theme="dark"] .activity-charge-cell strong {
+  color: #f1f1f1;
+}
+
+html[data-theme="dark"] .overview-section-header,
+html[data-theme="dark"] .subscriptions-table-header,
+html[data-theme="dark"] .discounts-section-header,
+html[data-theme="dark"] .activity-table-header,
+html[data-theme="dark"] .activity-pagination {
+  border-color: #414141;
+}
+
+
+
+html[data-theme="dark"] .overview-workspace-stats {
+  border-color: #454545;
+  background: #292929;
+}
+
+html[data-theme="dark"] .overview-workspace-stats > div {
+  border-color: #454545;
+}
+
+html[data-theme="dark"] .subscriptions-workspace {
+  --subscriptions-border: #414141;
+  --subscriptions-muted: #b5b5b5;
+}
+
+html[data-theme="dark"] .subscriptions-context,
+html[data-theme="dark"] .activity-context {
+  background:
+    radial-gradient(circle at 0% 0%, rgb(73 149 255 / 18%), transparent 38%),
+    #303030;
+  box-shadow: 0 10px 26px rgb(0 0 0 / 18%);
+}
+
+html[data-theme="dark"] .discounts-summary-card {
+  border-color: #414141;
+}
+
+html[data-theme="dark"] .discounts-summary-card span,
+html[data-theme="dark"] .discounts-summary-card small,
+html[data-theme="dark"] .discounts-primary-cell span {
+  color: #b5b5b5;
+}
+
+html[data-theme="dark"] .activity-workspace {
+  --activity-border: #414141;
+  --activity-muted: #b5b5b5;
+}
+
+html[data-theme="dark"] .activity-context-stat {
+  border-color: #4a4a4a;
+}
+
+html[data-theme="dark"] .reports-workspace {
+  --reports-border: #414141;
+  --reports-text: #f1f1f1;
+  --reports-muted: #b5b5b5;
+  --reports-surface: #303030;
+  --reports-subdued: #292929;
+}
+
+html[data-theme="dark"] .reports-context-bar {
+  background:
+    radial-gradient(circle at 0% 0%, rgb(150 104 255 / 17%), transparent 36%),
+    var(--reports-surface);
+}
+
+html[data-theme="dark"] .reports-context-grid {
+  border-color: #474747;
+  background: rgb(38 38 38 / 92%);
+}
+
+html[data-theme="dark"] .reports-context-grid > div,
+html[data-theme="dark"] .reports-toolbar-header,
+html[data-theme="dark"] .reports-results-header,
+html[data-theme="dark"] .reports-results-content {
+  border-color: #454545;
+}
+
+html[data-theme="dark"] .reports-results-content {
+  background: #242424;
+}
+
+html[data-theme="dark"] .reports-metric-card {
+  border-color: #464646;
+  background: #303030;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 28%);
+}
+
+html[data-theme="dark"] .reports-metric-card:hover {
+  border-color: #756794;
+  box-shadow: 0 10px 24px rgb(0 0 0 / 22%);
+}
+
+html[data-theme="dark"] .reports-metric-value {
+  color: #f1f1f1;
+}
+
+/*
+ * Professional dark palette
+ *
+ * Polaris 13's experimental dark theme does not redefine every semantic token
+ * (notably navigation and several feedback colors). Keep all component states
+ * on one graphite surface scale and use violet only for focus/selection.
+ */
+html[data-theme="dark"] {
+  --app-dark-canvas: #15171b;
+  --app-dark-nav: #191c21;
+  --app-dark-surface: #20242a;
+  --app-dark-surface-raised: #252a31;
+  --app-dark-surface-hover: #2b3038;
+  --app-dark-border: #363c46;
+  --app-dark-border-strong: #48505d;
+  --app-dark-text: #f2f4f7;
+  --app-dark-muted: #a9b0bb;
+  --app-dark-accent: #9b7cf6;
+  --app-dark-accent-hover: #ae94ff;
+
+  --p-color-bg: var(--app-dark-canvas);
+  --p-color-bg-inverse: #111317;
+  --p-color-bg-surface: var(--app-dark-surface);
+  --p-color-bg-surface-hover: var(--app-dark-surface-hover);
+  --p-color-bg-surface-active: #323842;
+  --p-color-bg-surface-selected: #342e49;
+  --p-color-bg-surface-secondary: #1b1e23;
+  --p-color-bg-surface-secondary-hover: #252a31;
+  --p-color-bg-surface-secondary-active: #2d333c;
+  --p-color-bg-surface-secondary-selected: #342e49;
+  --p-color-bg-surface-tertiary: #2a2f37;
+  --p-color-bg-fill: var(--app-dark-surface-raised);
+  --p-color-bg-fill-hover: #2d323a;
+  --p-color-bg-fill-active: #353b45;
+  --p-color-bg-fill-secondary: #2a2f36;
+  --p-color-bg-fill-secondary-hover: #323842;
+  --p-color-bg-fill-secondary-active: #3a414c;
+  --p-color-bg-fill-tertiary: #303640;
+  --p-color-bg-fill-brand: #8064db;
+  --p-color-bg-fill-brand-hover: #9072ed;
+  --p-color-bg-fill-brand-active: #7255cf;
+  --p-color-bg-fill-brand-selected: #7255cf;
+  --p-color-text: var(--app-dark-text);
+  --p-color-text-secondary: var(--app-dark-muted);
+  --p-color-text-disabled: #6e7580;
+  --p-color-text-link: #ae94ff;
+  --p-color-text-link-hover: #c0aeff;
+  --p-color-text-link-active: #9574f0;
+  --p-color-text-brand: #d9ceff;
+  --p-color-text-brand-hover: #ebe5ff;
+  --p-color-text-brand-on-bg-fill: #ffffff;
+  --p-color-icon: #d4d8df;
+  --p-color-icon-secondary: #969eaa;
+  --p-color-icon-disabled: #626973;
+  --p-color-icon-brand: #c7b8ff;
+  --p-color-border: var(--app-dark-border);
+  --p-color-border-hover: #4a5260;
+  --p-color-border-secondary: #303640;
+  --p-color-border-tertiary: #4a5260;
+  --p-color-border-focus: var(--app-dark-accent);
+  --p-color-input-bg-surface: #181b20;
+  --p-color-input-bg-surface-hover: #1d2026;
+  --p-color-input-bg-surface-active: #22262c;
+  --p-color-input-border: #535b68;
+  --p-color-input-border-hover: #6a7381;
+  --p-color-input-border-active: var(--app-dark-accent);
+  --p-color-nav-bg: var(--app-dark-nav);
+  --p-color-nav-bg-surface: transparent;
+  --p-color-nav-bg-surface-hover: #252a31;
+  --p-color-nav-bg-surface-active: #2d333c;
+  --p-color-nav-bg-surface-selected: #302a43;
+  --p-color-scrollbar-thumb-bg: #3e4550;
+  --p-color-scrollbar-thumb-bg-hover: #59616e;
+  --p-color-bg-surface-success: #17382b;
+  --p-color-bg-fill-success-secondary: #214b39;
+  --p-color-text-success: #8be0b4;
+  --p-color-icon-success: #6ed39e;
+  --p-color-border-success: #2d654b;
+  --p-color-bg-surface-info: #172f43;
+  --p-color-bg-fill-info-secondary: #1f435e;
+  --p-color-text-info: #8ecbf5;
+  --p-color-icon-info: #77bcea;
+  --p-color-border-info: #315f7f;
+  --p-color-bg-surface-warning: #3a2d18;
+  --p-color-bg-fill-warning-secondary: #534022;
+  --p-color-text-warning: #efc478;
+  --p-color-icon-warning: #e8b75f;
+  --p-color-border-warning: #6d542b;
+  --p-color-bg-surface-critical: #401f25;
+  --p-color-bg-fill-critical-secondary: #5a2932;
+  --p-color-text-critical: #ff9ba8;
+  --p-color-icon-critical: #f48696;
+  --p-color-border-critical: #773743;
+  --p-shadow-100: 0 1px 0 rgb(255 255 255 / 3%);
+  --p-shadow-200: 0 2px 5px rgb(0 0 0 / 20%);
+  --p-shadow-300: 0 6px 16px rgb(0 0 0 / 25%);
+  --p-shadow-400: 0 12px 28px rgb(0 0 0 / 30%);
+  --p-shadow-button:
+    0 0 0 1px rgb(255 255 255 / 8%) inset, 0 1px 2px rgb(0 0 0 / 28%);
+  --p-shadow-button-hover:
+    0 0 0 1px rgb(255 255 255 / 13%) inset, 0 2px 5px rgb(0 0 0 / 30%);
+  --p-shadow-button-primary:
+    0 0 0 1px rgb(255 255 255 / 13%) inset, 0 1px 2px rgb(0 0 0 / 35%);
+  --p-shadow-border-inset: 0 0 0 1px rgb(255 255 255 / 7%) inset;
+}
+
+html[data-theme="dark"] body {
+  background:
+    radial-gradient(
+      circle at 76% -15%,
+      rgb(122 91 220 / 8%),
+      transparent 32rem
+    ),
+    var(--app-dark-canvas);
+}
+
+html[data-theme="dark"] .Polaris-Frame,
+html[data-theme="dark"] .Polaris-Frame__Main {
+  background: transparent;
+}
+
+html[data-theme="dark"] .Polaris-TopBar {
+  background: rgb(17 19 23 / 94%);
+  border-bottom: 1px solid #292e36;
+  box-shadow: 0 1px 0 rgb(0 0 0 / 35%);
+  backdrop-filter: blur(16px);
+}
+
+html[data-theme="dark"] .Polaris-Navigation {
+  border-right: 1px solid #2d323a;
+  background:
+    linear-gradient(180deg, rgb(155 124 246 / 4%), transparent 13rem),
+    var(--app-dark-nav);
+}
+
+html[data-theme="dark"] .Polaris-Navigation__SectionHeading {
+  color: #7f8792;
+  font-size: 10px;
+  font-weight: 680;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+html[data-theme="dark"] .Polaris-Navigation__Item {
+  color: #c4cad3;
+}
+
+html[data-theme="dark"] .Polaris-Navigation__ItemInnerWrapper {
+  margin-block: 2px;
+}
+
+html[data-theme="dark"]
+  .Polaris-Navigation__ItemInnerWrapper:is(:hover, :focus-visible) {
+  background: #252a31;
+}
+
+html[data-theme="dark"] .Polaris-Navigation__ItemInnerWrapper--selected {
+  background:
+    linear-gradient(90deg, rgb(155 124 246 / 18%), rgb(155 124 246 / 7%)),
+    #24222c;
+  box-shadow:
+    0 0 0 1px rgb(173 148 255 / 12%) inset,
+    0 4px 12px rgb(0 0 0 / 12%);
+}
+
+html[data-theme="dark"]
+  .Polaris-Navigation__ItemInnerWrapper--selected
+  .Polaris-Navigation__Text {
+  color: #f3efff;
+  font-weight: 620;
+}
+
+html[data-theme="dark"]
+  .Polaris-Navigation__Item--selected
+  .Polaris-Navigation__Icon
+  svg {
+  fill: #c8b9ff;
+}
+
+html[data-theme="dark"] .Polaris-Navigation__Item--selected::before {
+  background: var(--app-dark-accent);
+  box-shadow: 0 0 10px rgb(155 124 246 / 55%);
+  opacity: 1;
+}
+
+html[data-theme="dark"] .Polaris-TopBar-Menu__Activator,
+html[data-theme="dark"] .Polaris-TopBar-UserMenu {
+  border: 1px solid #303640;
+  background: #20242a;
+}
+
+html[data-theme="dark"] .Polaris-TopBar-Menu__Activator:hover,
+html[data-theme="dark"] .Polaris-TopBar-UserMenu:hover {
+  border-color: #454c57;
+  background: #292e36;
+}
+
+html[data-theme="dark"] .overview-workspace {
+  --overview-border: var(--app-dark-border);
+  --overview-text: var(--app-dark-text);
+  --overview-muted: var(--app-dark-muted);
+}
+
+
+html[data-theme="dark"] .overview-metric,
+html[data-theme="dark"] .subscriptions-summary-card,
+html[data-theme="dark"] .discounts-summary-card,
+html[data-theme="dark"] .activity-summary-card {
+  border-color: var(--app-dark-border);
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 2.5%), transparent 50%),
+    var(--app-dark-surface);
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 3%) inset,
+    0 8px 22px rgb(0 0 0 / 13%);
+}
+
+html[data-theme="dark"] .overview-metric-link:hover .overview-metric {
+  border-color: #5d526f;
+  background:
+    linear-gradient(180deg, rgb(155 124 246 / 5%), transparent 58%),
+    var(--app-dark-surface-raised);
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 4%) inset,
+    0 14px 28px rgb(0 0 0 / 22%);
+}
+
+html[data-theme="dark"] .overview-metric-link:focus-visible {
+  outline-color: var(--app-dark-accent);
+}
+
+html[data-theme="dark"] .overview-section-header,
+html[data-theme="dark"] .subscriptions-table-header,
+html[data-theme="dark"] .discounts-section-header,
+html[data-theme="dark"] .activity-table-header {
+  border-color: var(--app-dark-border);
+  background: rgb(255 255 255 / 1.5%);
+}
+
+
+
+
+html[data-theme="dark"] .overview-workspace-stats {
+  border-color: var(--app-dark-border);
+  background: #1b1e23;
+}
+
+html[data-theme="dark"] .overview-workspace-stats > div {
+  border-color: var(--app-dark-border);
+}
+
+html[data-theme="dark"] .reports-context-bar,
+html[data-theme="dark"] .reports-toolbar,
+html[data-theme="dark"] .reports-results-shell {
+  border-color: var(--app-dark-border);
+  background: var(--app-dark-surface);
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 3%) inset,
+    0 12px 28px rgb(0 0 0 / 15%);
+}
+
+html[data-theme="dark"] .reports-results-content {
+  background: #181b20;
+}
+
+html[data-theme="dark"] .reports-metric-card {
+  border-color: var(--app-dark-border);
+  background: var(--app-dark-surface-raised);
+}
+
+html[data-theme="dark"] .reports-chart-card {
+  border-color: #40394e;
+  background:
+    radial-gradient(circle at 100% 0%, rgb(155 124 246 / 13%), transparent 36%),
+    #1b1d22;
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 3%) inset,
+    0 16px 32px rgb(0 0 0 / 25%);
+}
+
+.reports-traffic {
+  position: relative;
+  display: grid;
+  gap: var(--p-space-400);
+  transition: opacity 120ms ease;
+}
+
+.reports-traffic.is-loading {
+  min-height: 240px;
+  opacity: 0.42;
+  pointer-events: none;
+}
+
+/*
+ * Deliberately NOT a Polaris <Card>: Card's inner Box always renders with
+ * overflow-x: clip (even with padding="0"), which silently disables the
+ * DataTable's own horizontal ScrollContainer instead of letting it scroll —
+ * a real problem here since pivot dimensions make the column count dynamic
+ * and often wider than the viewport, unlike this page's other fixed-column
+ * report tables.
+ */
+.reports-traffic-table {
+  overflow-x: auto;
+  border: 1px solid var(--p-color-border);
+  border-radius: var(--p-border-radius-300);
+  background: var(--p-color-bg-surface);
+}
+
+.reports-traffic__spinner {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+html[data-theme="dark"] ::selection {
+  color: #ffffff;
+  background: rgb(128 100 219 / 72%);
+}
+
+html[data-theme="dark"] .app-brand {
+  color: var(--app-dark-text);
+}
+
+html[data-theme="dark"] .Polaris-TopBar-SearchField__Backdrop {
+  border-color: #343a44;
+  background: #1b1e23;
+}
+
+html[data-theme="dark"] .Polaris-TopBar-SearchField__Input {
+  color: #eef0f3;
+}
+
+html[data-theme="dark"] .Polaris-TopBar-SearchField__Input::placeholder {
+  color: #858d98;
+}
+
+html[data-theme="dark"] .Polaris-Card {
+  border: 1px solid var(--app-dark-border);
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 3%) inset,
+    0 10px 24px rgb(0 0 0 / 14%);
+}
+
+html[data-theme="dark"] .Polaris-IndexTable,
+html[data-theme="dark"] .Polaris-DataTable {
+  --p-color-border-secondary: #343a43;
+}
+
+/* A solid destructive Button (e.g. Modal's `primaryAction.destructive`) is
+   meant to read white-on-red like any other solid-fill button, but rendered
+   dark/low-contrast in dark mode. Force it directly rather than chase which
+   token Polaris resolves it from. */
+html[data-theme="dark"]
+  [class*="Polaris-Button--variantPrimary"][class*="Polaris-Button--toneCritical"] {
+  --pc-button-color: #ffffff;
+}
+
+.api-log-search {
+  min-width: 260px;
+  flex: 1 1 420px;
+}
+
+.api-logs-workbench {
+  display: grid;
+  grid-template-columns: minmax(560px, 1.1fr) minmax(420px, 0.9fr);
+  gap: var(--p-space-400);
+  align-items: start;
+}
+
+.api-logs-table {
+  max-height: 720px;
+  overflow: auto;
+}
+
+.api-logs-table .Polaris-IndexTable__TableHeading {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.api-logs-table .Polaris-IndexTable__TableRow {
+  cursor: pointer;
+}
+
+.api-logs-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--p-space-300);
+  padding: var(--p-space-300) var(--p-space-400);
+  border-top: 1px solid var(--p-color-border-secondary);
+}
+
+.api-log-detail {
+  min-width: 0;
+}
+
+.api-log-detail__header,
+.api-log-detail__meta {
+  padding: var(--p-space-500);
+  border-bottom: 1px solid var(--p-color-border-secondary);
+}
+
+.api-log-detail__header {
+  background:
+    radial-gradient(circle at 100% 0%, rgb(103 82 188 / 9%), transparent 48%),
+    var(--p-color-bg-surface);
+}
+
+.api-log-detail__meta .Polaris-DescriptionList {
+  grid-template-columns: minmax(110px, 0.45fr) minmax(0, 1fr);
+}
+
+.api-log-detail__meta .Polaris-DescriptionList__Description {
+  overflow-wrap: anywhere;
+}
+
+.api-log-detail__payload {
+  min-width: 0;
+}
+
+.api-log-code {
+  min-height: 360px;
+  max-height: 520px;
+  margin: 0;
+  padding: var(--p-space-500);
+  overflow: auto;
+  color: #d9e2f2;
+  background: #151820;
+  border-top: 1px solid #303642;
+  font:
+    500 12px/1.65 ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    "Liberation Mono",
+    monospace;
+  tab-size: 2;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+html[data-theme="dark"] .api-log-detail__header {
+  background:
+    radial-gradient(circle at 100% 0%, rgb(155 124 246 / 14%), transparent 48%),
+    var(--app-dark-surface);
+}
+
+html[data-theme="dark"] .api-logs-pagination,
+html[data-theme="dark"] .api-log-detail__header,
+html[data-theme="dark"] .api-log-detail__meta {
+  border-color: var(--app-dark-border);
+}
+
+html[data-theme="dark"] .api-log-code {
+  color: #dbe6fa;
+  background: #11141a;
+  border-color: var(--app-dark-border);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 2%);
+}
+
+.product-empty-state {
+  min-height: 240px;
+  display: grid;
+  place-items: center;
+  padding: 48px 32px;
+  background:
+    radial-gradient(circle at 50% 16%, rgb(103 82 188 / 8%), transparent 42%),
+    transparent;
+}
+
+.product-empty-state > * {
+  max-width: 460px;
+}
+
+.product-empty-state__icon {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--p-color-border-secondary);
+  border-radius: 16px;
+  background: var(--p-color-bg-surface-secondary);
+  box-shadow: 0 8px 24px rgb(31 33 36 / 8%);
+}
+
+.product-empty-state__icon .Polaris-Icon {
+  width: 24px;
+  height: 24px;
+  margin: 0;
+}
+
+.reports-integration-example {
+  padding: var(--p-space-400);
+  border: 1px solid var(--p-color-border-secondary);
+  border-radius: var(--p-border-radius-300);
+  background: var(--p-color-bg-surface-secondary);
+}
+
+.reports-integration-example pre {
+  margin: var(--p-space-300) 0 0;
+  padding: var(--p-space-400);
+  overflow-x: auto;
+  color: #dbe6fa;
+  background: #151820;
+  border-radius: var(--p-border-radius-200);
+  font:
+    500 12px/1.65 ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    "Liberation Mono",
+    monospace;
+}
+
+html[data-theme="dark"] .reports-integration-example {
+  border-color: var(--app-dark-border);
+  background: var(--app-dark-surface-raised);
+}
+
+html[data-theme="dark"] .reports-integration-example pre {
+  background: #11141a;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 3%);
+}
+
+html[data-theme="dark"] .product-empty-state {
+  background:
+    radial-gradient(circle at 50% 16%, rgb(155 124 246 / 11%), transparent 42%),
+    transparent;
+}
+
+html[data-theme="dark"] .product-empty-state__icon {
+  border-color: #454052;
+  background: #292632;
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 4%) inset,
+    0 12px 28px rgb(0 0 0 / 22%);
+}
+
+@media (max-width: 47.9975em) {
+  .app-brand {
+    min-height: var(--pg-top-bar-height);
+  }
+
+  .app-shell-content > .Polaris-Page {
+    padding-bottom: 36px;
+  }
+
+  .product-empty-state {
+    min-height: 200px;
+    padding: 36px 24px;
+  }
+}
+
+@media (max-width: 78em) {
+  .api-logs-workbench {
+    grid-template-columns: 1fr;
+  }
+
+  .api-logs-table {
+    max-height: 520px;
+  }
+}
+
+@media (max-width: 47.9975em) {
+  .api-log-search {
+    min-width: 0;
+  }
+
+  .api-log-detail__meta .Polaris-DescriptionList {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-shell-content > .Polaris-Page,
+  .route-progress,
+  .route-progress span,
+  .overview-metric,
+  .reports-metric-card {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/*
+ * Custom pill instead of Polaris <Tag> — Tag doesn't get properly re-skinned
+ * under this app's "experimental" dark theme (low-contrast text on dark
+ * backgrounds), even though the base --p-color-* tokens it would need are
+ * themselves correctly resolved everywhere else on the same page.
+ */
+.reports-filter-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 4px 2px 10px;
+  border-radius: 999px;
+  background: var(--p-color-bg-surface-secondary);
+  color: var(--p-color-text);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* Read-only summary pills (no remove button) need symmetric padding —
+ * `.reports-filter-tag` alone is lopsided (10px left / 4px right) because
+ * it's designed to leave room for `.reports-filter-tag__remove` on the
+ * right, which these don't have. */
+.reports-filter-tag--plain {
+  padding: 2px 10px;
+  flex: 0 0 auto;
+}
+
+/* Polaris's primary+critical Button only overrides the fill color, not text
+ * color (it inherits --pc-button-color from the base "on-fill" text token,
+ * which doesn't read as pure white under this app's dark theme) — force it
+ * for the delete action so it's legible against the solid red fill. */
+.reports-delete-filter-btn .Polaris-Button {
+  --pc-button-color: #fff;
+  --pc-button-color_hover: #fff;
+  --pc-button-color_active: #fff;
+}
+
+.reports-filter-tag__label {
+  overflow: hidden;
+  max-width: 100px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reports-filter-tag__remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.reports-filter-tag__remove:hover {
+  background: var(--p-color-bg-surface-hover);
+}
+
+.reports-filter-tag__remove:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.thin-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--p-color-border) transparent;
+}
+
+.thin-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.thin-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.thin-scrollbar::-webkit-scrollbar-thumb {
+  background-color: var(--p-color-border);
+  border-radius: 999px;
+}
+
+.thin-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: var(--p-color-border-hover, var(--p-color-border));
+}
+
+/* Thin scrollbar for Polaris DataTable's horizontal scroll container. Targeted
+   via attribute selector since Polaris may suffix this class with a build
+   hash depending on environment. */
+[class*="Polaris-DataTable__ScrollContainer"] {
+  scrollbar-width: thin;
+  scrollbar-color: var(--p-color-border) transparent;
+}
+
+[class*="Polaris-DataTable__ScrollContainer"]::-webkit-scrollbar {
+  height: 6px;
+}
+
+[class*="Polaris-DataTable__ScrollContainer"]::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+[class*="Polaris-DataTable__ScrollContainer"]::-webkit-scrollbar-thumb {
+  background-color: var(--p-color-border);
+  border-radius: 999px;
+}
+
+[class*="Polaris-DataTable__ScrollContainer"]::-webkit-scrollbar-thumb:hover {
+  background-color: var(--p-color-border-hover, var(--p-color-border));
+}
+
+/* Customer 360 ----------------------------------------------------------- */
+
+/* The primary link in a Customers table row. Polaris tokens throughout, so
+   both themes are covered without an override. */
+.customer-primary-link {
+  color: var(--p-color-text);
+  font-weight: var(--p-font-weight-semibold);
+  text-decoration: none;
+}
+
+.customer-primary-link:hover {
+  color: var(--p-color-text-brand);
+  text-decoration: underline;
+}
+
+.customer-metric-card {
+  min-height: 9.5rem;
+  padding: var(--p-space-500);
+  border: 1px solid var(--p-color-border-secondary);
+  border-radius: var(--p-border-radius-300);
+  background:
+    linear-gradient(
+      145deg,
+      color-mix(in srgb, var(--p-color-bg-fill-brand) 7%, transparent),
+      transparent 60%
+    ),
+    var(--p-color-bg-surface);
+  box-shadow: var(--p-shadow-100);
+}
+
+.customer-metric-card .Polaris-Text--headingXl {
+  margin-block: var(--p-space-200) var(--p-space-100);
+  letter-spacing: -0.035em;
+}
+
+.customer-profile-layout {
+  display: grid;
+  grid-template-columns: minmax(17rem, 0.72fr) minmax(0, 2fr);
+  gap: var(--p-space-400);
+  align-items: start;
+}
+
+.customer-definition-list {
+  display: grid;
+  grid-template-columns: minmax(7rem, 0.8fr) minmax(0, 1.3fr);
+  gap: var(--p-space-300) var(--p-space-400);
+  align-items: start;
+}
+
+.customer-definition-list span {
+  color: var(--p-color-text-secondary);
+}
+
+.customer-definition-list strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: var(--p-color-text);
+  font-weight: var(--p-font-weight-medium);
+}
+
+.customer-locked-actions {
+  padding: var(--p-space-400);
+  border: 1px dashed var(--p-color-border-secondary);
+  border-radius: var(--p-border-radius-300);
+  background: var(--p-color-bg-surface-secondary);
+}
+
+.customer-card-header {
+  padding: var(--p-space-400);
+  border-bottom: 1px solid var(--p-color-border-secondary);
+}
+
+.customer-empty-section {
+  display: flex;
+  min-height: 8rem;
+  align-items: center;
+  justify-content: center;
+  padding: var(--p-space-500);
+  text-align: center;
+}
+
+.customer-activity-list,
+.customer-api-list {
+  display: grid;
+  gap: var(--p-space-300);
+}
+
+.customer-activity-row,
+.customer-api-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--p-space-300);
+  align-items: start;
+  padding-block: var(--p-space-200);
+}
+
+.customer-activity-row + .customer-activity-row,
+.customer-api-row + .customer-api-row {
+  border-top: 1px solid var(--p-color-border-secondary);
+}
+
+.customer-activity-dot {
+  width: 0.625rem;
+  height: 0.625rem;
+  margin-top: 0.35rem;
+  border-radius: var(--p-border-radius-full);
+  background: var(--p-color-bg-fill-brand);
+  box-shadow: 0 0 0 0.25rem
+    color-mix(in srgb, var(--p-color-bg-fill-brand) 18%, transparent);
+}
+
+@media (max-width: 52rem) {
+  .customer-profile-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.customer-tab-panel {
+  padding-top: var(--p-space-400);
+}
+
+/* Polaris's <Icon> sets margin:auto on itself, which as a direct flex child
+   of an InlineStack absorbs all free space and centers the icon instead of
+   sitting flush next to its label. Wrapping it resets that without touching
+   Icon's own styles. */
+.customer-card-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.customer-comment-form {
+  width: 100%;
+}
+
+/* Stat strip --------------------------------------------------------------- */
+/* One card, one row of figures, icon beside each — the compact alternative to
+   a grid of metric tiles, which at five across pushes a table below the fold.
+   Polaris tokens throughout so it follows the theme without an override. */
+
+.stat-strip {
+  display: grid;
+  grid-template-columns: repeat(var(--stat-strip-cols, 4), minmax(0, 1fr));
+  gap: var(--p-space-300) var(--p-space-200);
+  padding: var(--p-space-400) var(--p-space-500);
+  border: 1px solid var(--p-color-border-secondary);
+  border-radius: var(--p-border-radius-300);
+  background: var(--p-color-bg-surface);
+  box-shadow: var(--p-shadow-100);
+}
+
+.stat-strip-item {
+  display: flex;
+  gap: var(--p-space-300);
+  align-items: flex-start;
+  min-width: 0;
+  padding: var(--p-space-100) 0;
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Only the linked ones react to a pointer — a figure that cannot be followed
+   should not pretend it can. */
+a.stat-strip-item:hover .stat-strip-value {
+  color: var(--p-color-text-brand);
+}
+
+a.stat-strip-item:focus-visible {
+  border-radius: var(--p-border-radius-200);
+  outline: 2px solid var(--p-color-border-focus);
+  outline-offset: 2px;
+}
+
+.stat-strip-icon {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--p-border-radius-200);
+  background: var(--p-color-bg-surface-secondary);
+}
+
+.stat-strip-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.stat-strip-label {
+  color: var(--p-color-text-secondary);
+  font-size: var(--p-font-size-300);
+  line-height: 1.25;
+  overflow-wrap: break-word;
+}
+
+/* Tabular figures so a column of numbers does not jitter as values change, and
+   ellipsis rather than wrap: a multi-currency total can be long, and the full
+   value is in the detail line or the page below. */
+.stat-strip-value {
+  overflow: hidden;
+  color: var(--p-color-text);
+  font-size: var(--p-font-size-500);
+  font-weight: var(--p-font-weight-semibold);
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-strip-detail {
+  color: var(--p-color-text-secondary);
+  font-size: var(--p-font-size-275);
+  line-height: 1.3;
+}
+
+/* Stepping down by breakpoint rather than by auto-fit, so a narrow strip is an even
+   grid at every width instead of a full row plus one stranded tile. */
+@media (max-width: 75rem) {
+  .stat-strip {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 48rem) {
+  .stat-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 30rem) {
+  .stat-strip {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* --- App dashboard sub-navigation (App overview / App events) ------------- */
+.app-detail-tabs {
+  display: flex;
+  gap: var(--p-space-100);
+  border-bottom: 1px solid var(--p-color-border);
+  margin-bottom: var(--p-space-400);
+}
+.app-detail-tab {
+  padding: var(--p-space-300) var(--p-space-300);
+  color: var(--p-color-text-secondary);
+  text-decoration: none;
+  font-weight: 500;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+.app-detail-tab:hover {
+  color: var(--p-color-text);
+}
+.app-detail-tab--active {
+  color: var(--p-color-text);
+  border-bottom-color: var(--p-color-border-emphasis);
+}
+
+/* --- App events feed ----------------------------------------------------- */
+.app-events-feed {
+  padding: 0 var(--p-space-400) var(--p-space-400);
+}
+.app-events-day-divider {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: var(--p-space-300) 0 var(--p-space-200);
+  font-size: var(--p-font-size-300);
+  font-weight: 600;
+  color: var(--p-color-text-secondary);
+  background: var(--p-color-bg-surface);
+}
+.app-events-card {
+  display: flex;
+  gap: var(--p-space-300);
+  padding: var(--p-space-300) 0;
+  border-top: 1px solid var(--p-color-border-secondary);
+}
+.app-events-card__icon {
+  flex: 0 0 auto;
+  width: 2rem;
+  height: 2rem;
+  display: grid;
+  place-items: center;
+  border-radius: var(--p-border-radius-200);
+  background: var(--p-color-bg-surface-secondary);
+}
+.app-events-card__icon .Polaris-Icon {
+  width: 1.1rem;
+  height: 1.1rem;
+  margin: 0;
+}
+.app-events-card__body {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.app-events-card__time {
+  flex: 0 0 auto;
+  color: var(--p-color-text-secondary);
+  font-size: var(--p-font-size-300);
+  white-space: nowrap;
+  cursor: default;
+}
+.app-events-card__fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--p-space-200) var(--p-space-500);
+  margin-top: var(--p-space-200);
+}
+.app-events-field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.app-events-field__label {
+  font-size: var(--p-font-size-275);
+  color: var(--p-color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.app-events-field__value,
+.app-events-field__link {
+  font-size: var(--p-font-size-325);
+  color: var(--p-color-text);
+  overflow-wrap: anywhere;
+}
+.app-events-field__link {
+  color: var(--p-color-text-emphasis);
+  text-decoration: none;
+}
+.app-events-field__link:hover {
+  text-decoration: underline;
+}
+
+/* The dashed key for ARR's fitted trend line, matching the stroke the chart
+   draws. A background stripe rather than a border so it sits on the same
+   baseline as the solid color swatches beside it. */
+/* Compound selector on purpose: `.reports-chart-legend i` sets the round
+   swatch's width/height/radius and would outrank a bare class here. */
+.reports-chart-legend i.reports-chart-legend-dash {
+  width: 14px;
+  height: 0;
+  border-top: 2px dashed currentColor;
+  background: none;
+  border-radius: 0;
+  opacity: 0.7;
+}
+
+/* The recurring report uses compact, flat cards like the reference charts. */
+html[data-theme] .reports-chart-card--recurring {
+  padding: 24px 20px 20px;
+  border-radius: 8px;
+  background: #242323;
+  box-shadow: 0 1px 1px rgb(0 0 0 / 6%);
+}
+
+html[data-theme="light"] .reports-chart-card--recurring {
+  background: #fff;
+}
+
+html[data-theme] .reports-chart-card--recurring .reports-chart-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 3px;
+  color: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+html[data-theme] .reports-chart-card--recurring .reports-chart-value {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 22px;
+  letter-spacing: normal;
+}
+
+.reports-chart-card--recurring .reports-chart-header {
+  align-items: flex-start;
+  min-height: 45px;
+}
+
+.reports-chart-card--recurring .reports-chart-canvas {
+  margin-top: 24px;
+}
+
+html[data-theme] .reports-chart-card--recurring .reports-chart-legend {
+  color: inherit;
+  font-size: 12px;
+  padding-top: 18px;
+  gap: 10px 16px;
+}
+
+.reports-chart-help {
+  display: inline-flex;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  opacity: 0.7;
+  cursor: help;
+}
+
+.reports-chart-help:focus-visible,
+.reports-chart-card--recurring .reports-chart-legend-item:focus-visible {
+  outline: 2px solid #9364ff;
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.reports-chart-legend i.reports-chart-legend-line,
+.reports-chart-legend i.reports-chart-legend-area {
+  width: 16px;
+  height: 2px;
+  border-radius: 0;
+}
+
+.reports-chart-legend i.reports-chart-legend-area {
+  height: 5px;
+  opacity: 0.35;
+  mask-image: linear-gradient(to bottom, #000, transparent);
+}
+
+.reports-chart-comparison {
+  display: grid;
+  gap: 3px;
+  text-align: right;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.reports-chart-comparison strong {
+  font-size: 16px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.reports-chart-change--up { color: #15803d; }
+.reports-chart-change--down { color: #c9342b; }
+html[data-theme="dark"] .reports-chart-change--up { color: #5fd0a0; }
+html[data-theme="dark"] .reports-chart-change--down { color: #ff8585; }
+
+@media (max-width: 600px) {
+  html[data-theme] .reports-chart-card--recurring { padding: 20px 12px 16px; }
+  .reports-chart-card--recurring .reports-chart-header { gap: 12px; }
+}
+
+/* MRR changes table. Periods are columns, so a wide range overflows: it
+   scrolls inside its own container rather than widening the page. */
+.reports-movement-scroll {
+  overflow-x: auto;
+}
+.reports-movement-scroll table {
+  /* Without this the period columns squeeze to fit and the money wraps. */
+  min-width: 100%;
+  width: max-content;
+}
+
+/* The two columns that carry meaning at every scroll position: what the row IS
+   (left) and what it adds up to (right). Pinned, because a period column in
+   the middle of a 30-column table is unreadable once the label has scrolled
+   away — and bold, since they are the row's identity and its conclusion rather
+   than another data point.
+
+   An explicit background is required, not optional: a sticky cell is painted
+   over by the cells sliding under it unless it has its own opaque fill. It uses
+   the Polaris surface token so it tracks light and dark automatically.
+
+   Polaris DataTable's own `fixedFirstColumns` is deliberately NOT used. It
+   activates against the component's internal scroll container, and this table
+   scrolls in the wrapper above at `width: max-content` — so whether Polaris's
+   scroller is the live one depends on layout. `position: sticky` resolves
+   against whichever ancestor actually scrolls, so it is correct either way, and
+   it also pins the LAST column, which Polaris offers no prop for. */
+.reports-movement-scroll th:first-child,
+.reports-movement-scroll td:first-child,
+.reports-movement-scroll th:last-child,
+.reports-movement-scroll td:last-child {
+  position: sticky;
+  background: var(--p-color-bg-surface);
+  font-weight: 600;
+  z-index: 1;
+}
+
+.reports-movement-scroll th:first-child,
+.reports-movement-scroll td:first-child {
+  left: 0;
+  /* A hairline that reads as an edge rather than a table border, so the pinned
+     column is visibly separate from what scrolls beneath it. */
+  box-shadow: 1px 0 0 var(--p-color-border-secondary);
+}
+
+.reports-movement-scroll th:last-child,
+.reports-movement-scroll td:last-child {
+  right: 0;
+  box-shadow: -1px 0 0 var(--p-color-border-secondary);
+}
+
+/* The header's own sticky cells sit above the body's, or a body cell scrolls
+   over the pinned heading. */
+.reports-movement-scroll thead th:first-child,
+.reports-movement-scroll thead th:last-child {
+  z-index: 2;
+}
+
+/* The table sits in a padding-0 Card so its rows reach the edges; the pager
+   underneath needs its own padding back, and centring keeps it clear of the
+   last row's numeric column. */
+.never-billed-pagination {
+  display: flex;
+  justify-content: center;
+  padding: 16px;
+  border-top: 1px solid var(--p-color-border-secondary);
+}
+
+/* ---- Sidebar: the per-app navigation ---------------------------------- */
+
+/* Polaris reveals sub-navigation with a grow animation plus a staggered
+   fade-in on each row (`Polaris-Navigation__snappy--grow`, and
+   `animation-delay` steps of 50ms on `ListItem:nth-child(n)`). Across nine
+   pages that is nearly half a second of the menu assembling itself every time
+   you switch app, which reads as lag rather than polish.
+
+   `!important` is load-bearing here, not laziness: Polaris's stagger rules are
+   `.Polaris-Navigation__ListItem:nth-child(n)`, the same specificity as the
+   selector below, so without it the winner would depend on stylesheet order —
+   which is not something this file should be betting on. */
+.Polaris-Navigation__SecondaryNavigation,
+.Polaris-Navigation__SecondaryNavigation .Polaris-Navigation__ListItem {
+  animation: none !important;
+  animation-delay: 0s !important;
+  opacity: 1 !important;
+}
+
+/* Polaris draws a tree connector from an app down to the page you are on: a
+   vertical line, and an elbow pointing at the selected row. It ships as
+   `content: url(...)` on `::before`, in its own grey.
+
+   What made it purple was THIS theme's selected-item indicator (further up
+   this file), which paints an accent background plus a 10px glow onto the very
+   same pseudo-element — covering the artwork rather than tinting it. Clearing
+   just those two properties for sub-navigation rows lets the connector render
+   as Polaris intended, and the elbow is then the active-page cue. No
+   `!important`: the extra class here already outranks the rule it corrects. */
+html[data-theme="dark"]
+  .Polaris-Navigation__SecondaryNavigation
+  .Polaris-Navigation__Item--selected::before {
+  background: none;
+  box-shadow: none;
+}
+
+/* The same indicator, on the app rows themselves.
+   Polaris gives every `.Polaris-Navigation__Item::before` a 21x32 box at the
+   left, which is exactly where an app's logo sits — so the accent bar lands on
+   top of the artwork and reads as a purple tile instead of a selection cue.
+   `:has()` scopes this to rows with an image icon, i.e. the app list, leaving
+   the indicator intact on every glyph-icon item it was designed for. */
+html[data-theme="dark"]
+  .Polaris-Navigation__Item--selected:has(.Polaris-Navigation__Icon img)::before {
+  background: none;
+  box-shadow: none;
+}
+
+/* App logos reach the sidebar as an `<img>` (a string `IconSource`), and
+   Polaris filters nav icons to the accent colour when their row is selected —
+   which would repaint a real logo a flat purple the moment you opened that
+   app. Every other nav icon is an inline `<svg>`, so scoping to `img` touches
+   only these. */
+.Polaris-Navigation__Icon img {
+  /* These are real app artwork, not glyphs, so the accent-colour filter
+     Polaris applies to a selected row's icon has to be switched off or the
+     logo repaints flat purple the moment you open that app. Every other nav
+     icon is an inline `<svg>`, so scoping to `img` touches only these. */
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  border-radius: 4px;
+  filter: none !important;
+}
+
+/* A summary figure that offers a second reading (an amount and its
+   percentage) is a real button so it is keyboard- and screen-reader
+   reachable. It must not LOOK like one: it sits in a row beside static
+   figures, and browser chrome there would read as the only actionable thing
+   on the card. The pointer and the hover tint are the whole affordance. */
+.reports-chart-summary-toggle {
+  appearance: none;
+  border: none;
+  background: none;
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  text-align: right;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: opacity 100ms ease;
+}
+
+.reports-chart-summary-toggle:hover {
+  opacity: 0.75;
+}
+
+.reports-chart-summary-toggle:focus-visible {
+  outline: 2px solid #9364ff;
+  outline-offset: 3px;
+}
+
+/* ----------------------------------------------- traffic source insights */
+
+/* Mantle's categorical order with one fix, VALIDATED rather than eyeballed
+   (dataviz skill's validate_palette.js, both modes). Mantle leads purple then
+   blue — the two biggest slices on every pie — and that pair measures ΔE 1.3
+   for deuteranopes and 12.0 with normal vision, below the hard floor of 15.
+   Violet still leads, but orange now sits beside it.
+
+   The order is shared by both modes on purpose: a slice's colour follows its
+   position, so light and dark must agree on WHICH hue is slot 1. Dark gets
+   its own steps of each hue rather than a flip.
+
+   Magenta/aqua (light) and red/aqua (dark) sit in the 6–8 CVD band, legal
+   only with secondary encoding — which the pie always has: direct labels on
+   leader lines, and a 2px surface gap between every slice. */
+:root,
+html[data-theme="dark"] {
+  --insight-1: #9f7aea;
+  --insight-2: #d95926;
+  --insight-3: #3987e5;
+  --insight-4: #d55181;
+  --insight-5: #c98500;
+  --insight-6: #199e70;
+  --insight-7: #e66767;
+  --insight-8: #2f9e2f;
+  --insight-other: #5c5f62;
+  /* The card behind the pie, so the gaps between slices read as cuts. */
+  --insight-surface: #1b1d22;
+  --insight-ink: #f7f7f7;
+  --insight-ink-muted: #aaa7ac;
+}
+
+html[data-theme="light"] {
+  --insight-1: #7c3aed;
+  --insight-2: #eb6834;
+  --insight-3: #2a78d6;
+  --insight-4: #e87ba4;
+  --insight-5: #c98500;
+  --insight-6: #1baf7a;
+  --insight-7: #e34948;
+  --insight-8: #008300;
+  --insight-other: #c9cccf;
+  --insight-surface: #ffffff;
+  --insight-ink: #202223;
+  --insight-ink-muted: #6d7175;
+}
+
+/* Two pies per row, stacking to one on narrower screens. Three per row left
+   each pie at ~43% of a ~500px card — too small to read the slices. Fixed at
+   two rather than auto-fill so a wide monitor never packs them back to
+   three; the pie's canvas is sized for exactly this card width. */
+.insight-grid {
+  display: grid;
+  gap: var(--p-space-400);
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 64em) {
+  .insight-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.insight-pie {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: var(--p-space-200);
+}
+
+.insight-pie__slice {
+  stroke: var(--insight-surface);
+  stroke-width: 2;
+  transition: opacity 120ms ease;
+}
+
+/* White on the slice, with a dark halo so it survives the lighter hues —
+   amber and pink fall below 3:1 against white on their own. */
+.insight-pie__percent {
+  fill: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  paint-order: stroke;
+  stroke: rgb(0 0 0 / 55%);
+  stroke-width: 3px;
+  pointer-events: none;
+}
+
+.insight-pie__leader {
+  fill: none;
+  stroke-width: 1;
+}
+
+/* Text wears the ink token, never the slice colour; the leader line beside it
+   carries the identity. */
+.insight-pie__label {
+  fill: var(--insight-ink);
+  font-size: 12px;
+  dominant-baseline: middle;
+  pointer-events: none;
+}
+
+/* Visually hidden, on a DIV around the table — never on the table itself.
+   A table ignores `width`/`height` (it always grows to fit its content),
+   `overflow` does not apply to table boxes, and `clip` hides painting without
+   removing layout. Put on the <table>, this hid the text but left every
+   table at full size: with `nowrap` the long rows forced a horizontal
+   scrollbar, and the Search term table's hundreds of rows made the page
+   scroll far past the last card. A block box honours all three, so the
+   table's growth is clipped out of layout, not just out of sight. */
+.insight-pie__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.insight-pie-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 18rem;
+  color: var(--insight-ink-muted);
+}
+
+/* The pale band outside a hovered slice (Mantle's lift). Never takes the
+   pointer, or moving onto it would count as leaving the slice. */
+.insight-pie__halo {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+/* Mantle's pie tooltip: the value as a title, then Count and Percentage with
+   the numbers right-aligned. Dark in both themes, as Mantle's is; the border
+   is what separates it from a dark page. */
+.insight-tooltip {
+  position: fixed;
+  z-index: 521;
+  min-width: 11rem;
+  padding: 10px 12px;
+  border: 1px solid rgb(255 255 255 / 10%);
+  border-radius: 8px;
+  background: #0b0b0b;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 25%);
+  color: #ffffff;
+  font-size: 13px;
+  line-height: 1.6;
+  pointer-events: none;
+}
+
+.insight-tooltip__title {
+  margin-bottom: 6px;
+  font-weight: 700;
+}
+
+.insight-tooltip__row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--p-space-600);
+}
+
+.insight-tooltip__row strong {
+  font-variant-numeric: tabular-nums;
+}
+
+/* The export menu sits in the card's bottom-right corner and appears on hover,
+   as Mantle's does — but also on keyboard focus, so it can be reached by Tab,
+   and stays visible while its menu is open. */
+.insight-card {
+  position: relative;
+}
+
+.insight-card__menu {
+  position: absolute;
+  right: var(--p-space-300);
+  bottom: var(--p-space-300);
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+
+.insight-card:hover .insight-card__menu,
+.insight-card:focus-within .insight-card__menu,
+.insight-card__menu--open {
+  opacity: 1;
+}
+
+/* No hover on touch screens: hiding it until hover would hide it for good. */
+@media (hover: none) {
+  .insight-card__menu {
+    opacity: 1;
+  }
+}
+
+/* ------------------------------------------------ Overview: recent reviews */
+
+:root,
+html[data-theme="dark"] {
+  --review-star: #f5b041;
+  --review-star-empty: #4a4a4a;
+}
+
+html[data-theme="light"] {
+  /* Darker amber on white: the lighter tone fails contrast there. */
+  --review-star: #d98a00;
+  --review-star-empty: #d4d4d4;
+}
+
+/* Scrolls inside the card, as Mantle's does, so a busy month doesn't push the
+   rest of the Overview down the page. */
+.overview-reviews {
+  list-style: none;
+  margin: 0;
+  max-height: 420px;
+  overflow-y: auto;
+  padding: 0;
+  scrollbar-color: var(--p-color-border) transparent;
+  scrollbar-width: thin;
+}
+
+.overview-review {
+  border-bottom: 1px solid var(--p-color-border-secondary);
+  display: grid;
+  gap: 4px 24px;
+  grid-template-columns: minmax(140px, 220px) minmax(0, 1fr);
+  padding: 12px 16px;
+}
+
+.overview-review:last-child {
+  border-bottom: 0;
+}
+
+.overview-review__who {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.overview-review__name {
+  color: var(--p-color-text);
+  font-weight: var(--p-font-weight-medium);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.overview-review__meta {
+  color: var(--p-color-text-secondary);
+  font-size: var(--p-font-size-300);
+}
+
+.overview-review__content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.overview-review__stars {
+  color: var(--review-star);
+  font-size: 16px;
+  letter-spacing: 2px;
+  line-height: 1;
+}
+
+.overview-review__star--empty {
+  color: var(--review-star-empty);
+}
+
+/* Two lines, then an ellipsis; the full text is in the title tooltip. */
+.overview-review__body {
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  color: var(--p-color-text);
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+.overview-review__body--empty {
+  color: var(--p-color-text-secondary);
+  font-style: italic;
+}
+
+@media (max-width: 48em) {
+  .overview-review {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ------------------------------------------------------------ Reviews page */
+
+/* App picker, then search, on one row; the filter chips sit below. */
+.reviews-page__toolbar {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px 4px;
+}
+
+.reviews-page__search {
+  flex: 1;
+  min-width: 0;
+}
+
+@media (max-width: 30em) {
+  .reviews-page__toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
+
+.reviews-page__date {
+  align-items: center;
+  display: inline-flex;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.reviews-page__edited {
+  color: var(--p-color-text-secondary);
+}
+
+/* One line in the table; the full review is in the title tooltip and in the
+   export. Capped so a long review can't push the other columns off screen. */
+.reviews-page__content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-width: 460px;
+  min-width: 220px;
+}
+
+.reviews-page__body {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reviews-page__body--empty {
+  color: var(--p-color-text-secondary);
+  font-style: italic;
+}
+
+.reviews-page__replied {
+  color: var(--p-color-text-secondary);
+  font-size: var(--p-font-size-300);
+}
