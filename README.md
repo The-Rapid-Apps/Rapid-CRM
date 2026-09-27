@@ -1,5 +1,8 @@
 # Rapid
 
+[![CI](https://github.com/Rapi-Apps/rapid/actions/workflows/ci.yml/badge.svg)](https://github.com/Rapi-Apps/rapid/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
+
 **Open-source billing and analytics platform for Shopify apps.**
 
 Rapid is a multi-tenant service that one team runs for all of its Shopify apps.

@@ -5,10 +5,40 @@ on:
     branches: [main]
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   check:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
+
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: rapid
+          MYSQL_DATABASE: rapid_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -prapid"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=20
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+
+    env:
+      # Throwaway credentials for the CI-only service containers above.
+      DATABASE_URL: mysql://root:rapid@127.0.0.1:3306/rapid_test
+      REDIS_URL: redis://127.0.0.1:6379
+      # Run the feature-flagged parity tests too, so nothing is skipped.
+      TRAFFIC_LOCAL_READ_PATH_ENABLED: "true"
+      INSTALL_SNAPSHOT_READ_PATH_ENABLED: "true"
+
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -17,5 +47,11 @@ jobs:
           cache: npm
       # postinstall runs `prisma generate`, which only needs the schema.
       - run: npm ci
+      - run: npm audit --omit=dev
       - run: npm run typecheck
       - run: npm run build
+      - name: Apply migrations
+        run: npx prisma migrate deploy
+      - name: Schema matches migrations
+        run: npx prisma migrate diff --from-config-datasource --to-schema prisma/schema.prisma --exit-code
+      - run: npm test
