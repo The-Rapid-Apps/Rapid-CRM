@@ -1,6 +1,6 @@
 import type { ActionFunctionArgs } from "react-router";
 import { apiError } from "~/lib/api-auth.server";
-import { env } from "~/lib/env.server";
+import { hasValidCronSecret } from "~/lib/cron-auth.server";
 import { runTrafficEventsCron } from "~/lib/reports/traffic-events-sync.server";
 
 /**
@@ -23,7 +23,7 @@ import { runTrafficEventsCron } from "~/lib/reports/traffic-events-sync.server";
 export async function action({ request }: ActionFunctionArgs) {
   if (request.method !== "POST") return apiError(405, "Method not allowed");
 
-  if (request.headers.get("x-cron-secret") !== env.CRON_SECRET) {
+  if (!hasValidCronSecret(request)) {
     return apiError(401, "Invalid cron secret");
   }
 

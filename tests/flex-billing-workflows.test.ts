@@ -219,7 +219,7 @@ test("discount management normalizes, validates, scopes, and persists duration",
     (error: unknown) =>
       error instanceof DiscountManagementError &&
       error.field === "code" &&
-      /already exists/i.test(error.message),
+      /already used/i.test(error.message),
   );
   await assert.rejects(
     createDiscountForOrganization(fixture.organization.id, {

@@ -68,22 +68,50 @@ export function collectAppCredentials(
 }
 
 const nodeEnv = process.env.NODE_ENV ?? "development";
-const sessionSecret =
-  process.env.SESSION_SECRET ??
-  (nodeEnv === "production"
-    ? required("SESSION_SECRET")
-    : "dev-only-change-me");
-if (nodeEnv === "production" && sessionSecret.length < 32) {
-  throw new Error(
-    "SESSION_SECRET must be at least 32 characters in production",
+const isProduction = nodeEnv === "production";
+
+/**
+ * Values that are public — this file's own dev fallback and the placeholders
+ * in `.env.example` — and so must never protect a production deployment. A
+ * copied example file would otherwise pass the length check below.
+ */
+function isPublicPlaceholder(value: string): boolean {
+  const lowered = value.trim().toLowerCase();
+  return (
+    lowered === "dev-only-change-me" ||
+    lowered.startsWith("replace-with") ||
+    lowered.startsWith("change-me") ||
+    lowered.includes("change-me")
   );
 }
+
+/** In production: present, at least 32 characters, and not a public placeholder. */
+function assertStrongSecret(name: string, value: string): void {
+  if (!isProduction) return;
+  if (value.length < 32) {
+    throw new Error(`${name} must be at least 32 characters in production`);
+  }
+  if (isPublicPlaceholder(value)) {
+    throw new Error(`${name} is still a placeholder value; generate a random secret`);
+  }
+}
+
+const sessionSecret =
+  process.env.SESSION_SECRET ??
+  (isProduction ? required("SESSION_SECRET") : "dev-only-change-me");
+assertStrongSecret("SESSION_SECRET", sessionSecret);
 const credentialEncryptionKey =
   process.env.CREDENTIAL_ENCRYPTION_KEY ?? sessionSecret;
-if (nodeEnv === "production" && credentialEncryptionKey.length < 32) {
-  throw new Error(
-    "CREDENTIAL_ENCRYPTION_KEY must be at least 32 characters in production",
-  );
+assertStrongSecret("CREDENTIAL_ENCRYPTION_KEY", credentialEncryptionKey);
+const cronSecret =
+  process.env.CRON_SECRET ??
+  (isProduction ? required("CRON_SECRET") : sessionSecret);
+assertStrongSecret("CRON_SECRET", cronSecret);
+const identifyCredentials = collectAppCredentials(process.env);
+for (const { appId, apiKey } of identifyCredentials) {
+  if (isProduction && isPublicPlaceholder(apiKey)) {
+    throw new Error(`Identify API key for ${appId} is still a placeholder value`);
+  }
 }
 
 export const env = {
@@ -97,9 +125,7 @@ export const env = {
    */
   CREDENTIAL_ENCRYPTION_KEY: credentialEncryptionKey,
   /** Dedicated scheduler credential; mandatory in production. */
-  CRON_SECRET:
-    process.env.CRON_SECRET ??
-    (nodeEnv === "production" ? required("CRON_SECRET") : sessionSecret),
+  CRON_SECRET: cronSecret,
   /**
    * Master switch for the Partner-API downgrade-credit path. Keep false until
    * per-app Partner credentials are populated (appCreditCreate is Partner API).
@@ -166,7 +192,7 @@ export const env = {
    * collectAppCredentials). Validated against the X-App-Id / X-App-Api-Key
    * request headers. Empty by default — every identify is then unauthorized.
    */
-  IDENTIFY_APP_CREDENTIALS: collectAppCredentials(process.env),
+  IDENTIFY_APP_CREDENTIALS: identifyCredentials,
   /** Per-app fixed-window request cap (per minute) for POST /v1/identify. */
   IDENTIFY_RATE_LIMIT: Number(process.env.IDENTIFY_RATE_LIMIT ?? "120"),
 

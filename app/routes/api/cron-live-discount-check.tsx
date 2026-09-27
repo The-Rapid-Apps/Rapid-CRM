@@ -1,6 +1,6 @@
 import type { ActionFunctionArgs } from "react-router";
 import { apiError } from "~/lib/api-auth.server";
-import { env } from "~/lib/env.server";
+import { hasValidCronSecret } from "~/lib/cron-auth.server";
 import { prisma } from "~/lib/db.server";
 import { syncOrganizationLiveDiscountChecks } from "~/lib/shopify/partner-live-discount.server";
 
@@ -20,7 +20,7 @@ import { syncOrganizationLiveDiscountChecks } from "~/lib/shopify/partner-live-d
  */
 export async function action({ request }: ActionFunctionArgs) {
   if (request.method !== "POST") return apiError(405, "Method not allowed");
-  if (request.headers.get("x-cron-secret") !== env.CRON_SECRET) {
+  if (!hasValidCronSecret(request)) {
     return apiError(401, "Invalid cron secret");
   }
 

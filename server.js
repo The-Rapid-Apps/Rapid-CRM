@@ -5,9 +5,6 @@
 // point. The previous pm2 config ran `script: "npm", interpreter: "none"`,
 // which can only ever run as a single fork.
 //
-// Same shape as pixelio's `server.js`, minus the Shopify/Cloudflare specifics
-// (Early Hints, noisy-route log filtering) that don't apply to an internal
-// dashboard.
 import "dotenv/config";
 
 import path from "node:path";

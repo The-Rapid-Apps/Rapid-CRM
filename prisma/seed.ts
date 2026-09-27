@@ -34,6 +34,12 @@ async function main() {
     console.log(
       "SEED_ADMIN_EMAIL/SEED_ADMIN_PASSWORD not set — skipping admin user creation.",
     );
+  } else if (adminPassword.length < 12 || /change-me|replace-with/i.test(adminPassword)) {
+    /* The example file ships a placeholder; an admin created with it would
+       have a password anyone reading this repository knows. */
+    throw new Error(
+      "SEED_ADMIN_PASSWORD must be at least 12 characters and not the example placeholder.",
+    );
   } else {
     const admin = await prisma.user.upsert({
       where: { email: adminEmail },

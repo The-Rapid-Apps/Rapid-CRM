@@ -1,6 +1,6 @@
 import type { ActionFunctionArgs } from "react-router";
 import { apiError } from "~/lib/api-auth.server";
-import { env } from "~/lib/env.server";
+import { hasValidCronSecret } from "~/lib/cron-auth.server";
 import { reconcileStandardSubscriptions } from "~/lib/standard/reconcile.server";
 import { expirePendingOneTimePurchases } from "~/lib/standard/one-time.server";
 
@@ -17,7 +17,7 @@ import { expirePendingOneTimePurchases } from "~/lib/standard/one-time.server";
  */
 export async function action({ request }: ActionFunctionArgs) {
   if (request.method !== "POST") return apiError(405, "Method not allowed");
-  if (request.headers.get("x-cron-secret") !== env.CRON_SECRET) {
+  if (!hasValidCronSecret(request)) {
     return apiError(401, "Invalid cron secret");
   }
   const [subscriptions, purchases] = await Promise.all([
