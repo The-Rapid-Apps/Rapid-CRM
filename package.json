@@ -17,6 +17,7 @@
     "shopify:discover-apps": "tsx scripts/discover-partner-apps.ts",
     "db:studio": "prisma studio",
     "db:seed": "tsx prisma/seed.ts",
+    "db:seed-demo": "tsx scripts/seed-demo.ts",
     "test": "tsx --test --test-force-exit --import ./tests/fixtures/test-env.ts --import ./tests/redis-teardown.ts --test-concurrency=1 tests/*.test.ts",
     "sync:shopify": "tsx scripts/sync-shopify.ts",
     "seed:demo-plans": "tsx scripts/seed-demo-plans.ts",

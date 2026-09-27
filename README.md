@@ -12,6 +12,21 @@ trials, LTV — from Shopify Partner data.
 
 Built with React Router, Shopify Polaris, Prisma and MySQL.
 
+![Business overview: MRR, subscriptions and churn across every app](./docs/screenshots/overview.png)
+
+<table>
+  <tr>
+    <td><img src="./docs/screenshots/mrr.png" alt="Monthly recurring revenue report" /></td>
+    <td><img src="./docs/screenshots/app-dashboard.png" alt="Per-app dashboard with top plans and uninstall reasons" /></td>
+  </tr>
+  <tr>
+    <td align="center">MRR &amp; ARR report</td>
+    <td align="center">Per-app dashboard</td>
+  </tr>
+</table>
+
+<sub>Screenshots use the fictional demo data from <code>npm run db:seed-demo</code>.</sub>
+
 ## Features
 
 - **Billing**
@@ -47,6 +62,14 @@ npm run dev
 
 Open <http://localhost:5173/login> and sign in as the seeded admin. There is
 intentionally no public sign-up page; add teammates from **Team**.
+
+**Want to look around first?** Fill the dashboard with a fictional portfolio —
+three demo apps with 18 months of installs, subscriptions, churn and reviews —
+instead of connecting a Shopify Partner account:
+
+```bash
+npm run db:seed-demo            # REMOVE=1 npm run db:seed-demo to delete it again
+```
 
 Don't have MySQL locally? Docker works:
 
