@@ -40,7 +40,7 @@ const SCOPE = "sync-live-discount-checks";
  * server's env.
  */
 const PORT = process.env.APP_PORT ?? process.env.PORT ?? "3000";
-const BASE_URL = `http://127.0.0.1:${PORT}`;
+const BASE_URL = process.env.APP_INTERNAL_URL ?? `http://127.0.0.1:${PORT}`;
 /** Well inside the hourly tick, so a run never overlaps its successor. */
 const DEADLINE_MS = 45 * 60_000;
 /** Bounded so a permanently-202 endpoint cannot spin for the whole window. */

@@ -1,0 +1,5 @@
+# UTC schedules, matching ecosystem.config.cjs. Logs go to container stdout.
+*/5 * * * * cd /app && /usr/local/bin/node --import tsx scripts/sync-shopify.ts >> /proc/1/fd/1 2>&1
+*/5 * * * * cd /app && /usr/local/bin/node --import tsx scripts/sync-org-logo-churn.ts >> /proc/1/fd/1 2>&1
+20 * * * * cd /app && /usr/local/bin/node --import tsx scripts/sync-live-discount-checks.ts >> /proc/1/fd/1 2>&1
+0 3 * * 0 cd /app && /usr/local/bin/node --import tsx scripts/cleanup-api-logs.ts >> /proc/1/fd/1 2>&1

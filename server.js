@@ -14,12 +14,14 @@ import { createRequestHandler } from "@react-router/express";
 import compression from "compression";
 import express from "express";
 import { closeRedis } from "./app/lib/redis.server.ts";
+import { prisma } from "./app/lib/db.server.ts";
 
 process.env.NODE_ENV = process.env.NODE_ENV ?? "production";
 
 // The cron workers in ecosystem.config.cjs post to this port over loopback, so
 // they must see the same PORT.
 const PORT = Number(process.env.PORT) || 3000;
+const HOST = process.env.HOST ?? "127.0.0.1";
 
 const build = await import(
   url.pathToFileURL(path.resolve("build/server/index.js")).href
@@ -47,16 +49,26 @@ app.use(
 // contents. Keep it short.
 app.use(express.static("build/client", { maxAge: "1h" }));
 
+// Database readiness for the container proxy and deployment health check.
+app.get("/healthz", async (_req, res) => {
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    res.status(200).json({ status: "ok" });
+  } catch {
+    res.status(503).json({ status: "unavailable" });
+  }
+});
+
 // Mounted with `app.use`, not `app.all("*")`: Express 5 moved to
 // path-to-regexp v8, where a bare "*" is no longer a valid path and throws at
 // boot. Root-mounted middleware means the same file works on Express 4 and 5.
 app.use(createRequestHandler({ build, mode: process.env.NODE_ENV }));
 
-// Bind loopback only — nothing should reach this port except nginx and the
-// cron wrapper, and the box has a public IP.
-const server = app.listen(PORT, "127.0.0.1", () => {
+// Bare-metal deployments default to loopback; containers set HOST=0.0.0.0
+// so a reverse proxy on the Compose network can reach the server.
+const server = app.listen(PORT, HOST, () => {
   const worker = process.env.NODE_APP_INSTANCE ?? "0";
-  console.log(`[server] worker ${worker} listening on 127.0.0.1:${PORT}`);
+  console.log(`[server] worker ${worker} listening on ${HOST}:${PORT}`);
 });
 
 // pm2 `reload` sends SIGINT to each worker in turn and waits for it to exit
@@ -68,6 +80,7 @@ for (const signal of ["SIGTERM", "SIGINT"]) {
     server.close(async (err) => {
       if (err) console.error("[server] error during shutdown:", err);
       await closeRedis();
+      await prisma.$disconnect();
       process.exit(err ? 1 : 0);
     });
   });

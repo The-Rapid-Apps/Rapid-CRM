@@ -1,4 +1,14 @@
+.git
+.github
+.env
+.env.*
+secrets
+logs
+node_modules
+generated
 .react-router
 build
-node_modules
-README.md
+docs
+tests
+*.log
+.DS_Store

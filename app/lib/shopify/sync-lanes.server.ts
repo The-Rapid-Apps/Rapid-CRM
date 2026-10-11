@@ -111,7 +111,7 @@ export async function runSyncLanes(
     maxIterations = 12,
     requestTimeoutMs = 480_000,
     pauseMs = 3_000,
-    baseUrl = `http://127.0.0.1:${process.env.PORT ?? "3000"}`,
+    baseUrl = process.env.APP_INTERNAL_URL ?? `http://127.0.0.1:${process.env.PORT ?? "3000"}`,
     lanes = LANE_NAMES,
     onEvent,
     fetchImpl = fetch,

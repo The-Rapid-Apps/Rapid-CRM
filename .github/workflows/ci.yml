@@ -55,3 +55,22 @@ jobs:
       - name: Schema matches migrations
         run: npx prisma migrate diff --from-config-datasource --to-schema prisma/schema.prisma --exit-code
       - run: npm test
+
+  container:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          load: true
+          tags: rapid:smoke
+          cache-from: type=gha,scope=ci-container
+          cache-to: type=gha,mode=max,scope=ci-container
+      - name: Verify fresh self-hosted installation
+        run: node docker/smoke-test.mjs

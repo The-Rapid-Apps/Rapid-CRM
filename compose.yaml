@@ -1,0 +1,88 @@
+name: rapid
+
+# Generate the SERVICE_PASSWORD_* values with: node docker/setup.mjs
+# Supply these values through your host's environment settings or .env.compose.
+x-rapid: &rapid
+  image: ${RAPID_IMAGE:-ghcr.io/the-rapid-apps/rapid-crm:latest}
+  pull_policy: always
+  restart: unless-stopped
+  init: true
+  environment: &environment
+    NODE_ENV: production
+    HOST: 0.0.0.0
+    PORT: "3000"
+    APP_URL: ${APP_URL:-${SERVICE_URL_RAPID_3000:-http://localhost:3000}}
+    APP_INTERNAL_URL: http://rapid:3000
+    DATABASE_URL: mysql://rapid:${SERVICE_PASSWORD_MYSQL:?}@mysql:3306/rapid?allowPublicKeyRetrieval=true
+    REDIS_URL: redis://redis:6379
+    SESSION_SECRET: ${SERVICE_PASSWORD_64_SESSION:?}
+    CREDENTIAL_ENCRYPTION_KEY: ${SERVICE_PASSWORD_64_ENCRYPTION:?}
+    CRON_SECRET: ${SERVICE_PASSWORD_64_CRON:?}
+    SEED_ADMIN_EMAIL: ${SEED_ADMIN_EMAIL:?}
+    SEED_ADMIN_PASSWORD: ${SERVICE_PASSWORD_64_ADMIN:?}
+    FLEX_PARTNER_CREDITS_ENABLED: ${FLEX_PARTNER_CREDITS_ENABLED:-false}
+    API_LOG_RETENTION_DAYS: ${API_LOG_RETENTION_DAYS:-30}
+    POSTMARK_SERVER_TOKEN: ${POSTMARK_SERVER_TOKEN:-}
+    POSTMARK_MESSAGE_STREAM: ${POSTMARK_MESSAGE_STREAM:-outbound}
+    MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS:-no-reply@example.com}
+    MAIL_FROM_NAME: ${MAIL_FROM_NAME:-Rapid}
+    GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_APPLICATION_CREDENTIALS:-}
+    GCP_PROJECT_ID: ${GCP_PROJECT_ID:-}
+    GA4_PROPERTY_ID: ${GA4_PROPERTY_ID:-}
+    BIGQUERY_DATASET: ${BIGQUERY_DATASET:-}
+
+services:
+  rapid:
+    <<: *rapid
+    expose:
+      - "3000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  scheduler:
+    <<: *rapid
+    # BusyBox crond needs root to launch jobs. Only this internal service uses
+    # root; the HTTP server and migrations run as the image's node user.
+    user: root
+    command: [scheduler]
+    healthcheck:
+      disable: true
+    depends_on:
+      rapid:
+        condition: service_healthy
+
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: rapid
+      MYSQL_USER: rapid
+      MYSQL_PASSWORD: ${SERVICE_PASSWORD_MYSQL:?}
+      MYSQL_ROOT_PASSWORD: ${SERVICE_PASSWORD_MYSQLROOT:?}
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: [CMD-SHELL, 'MYSQL_PWD="$$MYSQL_PASSWORD" mysql -h 127.0.0.1 -u rapid -D rapid -e "SELECT 1" >/dev/null']
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: [redis-server, --appendonly, "yes", --maxmemory, 256mb, --maxmemory-policy, noeviction]
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: [CMD, redis-cli, ping]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  mysql-data:
+  redis-data:

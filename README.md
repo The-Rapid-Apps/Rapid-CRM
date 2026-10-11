@@ -48,6 +48,11 @@ Built with React Router, Shopify Polaris, Prisma and MySQL.
 
 ## Quick start
 
+**Self-hosting with containers?** Use the Docker Compose stack on your server
+or any platform supporting Compose, with MySQL, Redis, scheduled jobs,
+automatic migrations, and GHCR images. Follow the
+[self-hosting guide](./docs/SELF_HOSTING.md).
+
 Requires Node (see `.nvmrc`), MySQL 8 and, optionally, Redis.
 
 ```bash

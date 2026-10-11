@@ -1,0 +1,6 @@
+# Optional host access for ordinary Docker Compose. Deployment platforms use
+# compose.yaml alone and route their proxy directly to rapid:3000.
+services:
+  rapid:
+    ports:
+      - "127.0.0.1:${RAPID_PORT:-3000}:3000"
